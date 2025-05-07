@@ -9,7 +9,7 @@
 	Chạy ./hello_executable.
 
 
-2.	Viết macro MAX(a, b) trả về giá trị lớn hơn giữa a và b. Thử nghiệm với MAX(x++, y++) và giải thích tại sao kết quả có thể không như mong đợi.
+2.	Viết macro MAX(a, b)  với MAX(x++, y++) và giải thích .
 
 3.	Viết macro DEBUG_PRINT(msg) mà chỉ in ra msg nếu macro DEBUG được định nghĩa. Sử dụng #ifdef và #endif. Biên dịch với và không có flag -DDEBUG.
 
