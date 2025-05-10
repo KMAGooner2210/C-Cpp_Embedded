@@ -260,3 +260,227 @@ Time: 14:30:00
   * **Quy tắc 16.3(MISRA C:2012): Mỗi file.c nên có file.h tương ứng**
 
      </details> 
+
+<details>
+	<summary><strong>BÀI 2: Advanced Function Concepts and Debug</strong></summary>
+
+## **Bài 2: Advanced Function Concepts and Debug**
+
+### **Variadic Functions: Hàm có số lượng tham số không cố định**
+
+#### Cho phép định nghĩa hàm nhận số lượng tham số thay đổi.Để triển khai,ta sử dụng thư viện `<stdarg.h>`, cung cấp các macro và kiểu dữ liệu hỗ trợ xử lý danh sách tham số thay đổi 
+
+ *  **va_list:** 
+   
+    ◦ Đây là một kiểu dữ liệu đặc biệt dùng để lưu trữ danh sách tham số biến thiên. 
+   
+    ◦ Hoạt động như một con trỏ hoặc cấu trúc nội bộ để theo dõi các tham số trong danh sách
+
+ *  **va_start(ap, last_fixed_arg)**
+
+    ◦ Macro này khởi tạo đối tượng `va_list(thường được gọi là ap)` để bắt đầu truy cập danh sách tham số biến thiên
+
+    ◦ last_fixed_arg là tham số cố định cuối cùng được truyền vào hàm trước dấu ...(phần tham số biến thiên)
+
+    ◦ Macro này thiết lập `ap` để trỏ đến tham số biến thiên đầu tiên
+
+ * **va_arg(ap,type):**
+
+    ◦ Lấy giá trị của tham số tiếp theo trong danh sách được lưu trong `va_list`
+
+    ◦ `type` là kiểu dữ liệu của tham số được truy xuất
+
+    ◦ Mỗi lần gọi `va_arg`, con trỏ nội bộ của `va_list` sẽ di chuyển đến tham số tiếp theo 
+
+
+ * **va_end(ap):**
+
+    ◦ Macro này dọn dẹp đối tượng `va_list` sau khi hoàn tất việc truy cập danh sách tham số 
+
+    ◦ Nó đảm bảo giải phóng mọi tài nguyên được cấp phát bởi `va_start` và phải được gọi trước khi hàm kết thúc
+
+   
+#### Quy tắc và lưu ý khi sử dụng
+
+ * **Tham số cố định:** Hàm này phải có ít nhất một tham số cố định trước dấu `...` .Tham số thường được dùng để xác định số lượng hoặc kiểu của các tham số biến thiên
+
+ * **Kiểu dữ liệu:** Phải biết chính xác kiểu dữ của từng tham số biến thiên để gọi `va_arg` đúng cách.Nếu chỉ định sai kiểu,chương trình có thể trả về sai hoặc lỗi
+
+ * **Không thể đếm trực tiếp số tham số:** Không có cách nào để tự động biết được số lượng tham số biến thiên, trừ khi sử dụng một tham số cố định để chỉ Định
+
+ * **Cấu trúc chung:**
+ ```
+ #include<stdarg.h>
+
+ return_type Function_name(fixed_arg,...){
+   va_list ap;
+   va_start(ap, fixed_arg);
+   //Xử lý các tham số biến thiên bằng va_arg
+   va_end(ap);
+   return result;
+ } 
+ ```
+ * **VD:**
+ ```
+ #include<stdio.h>
+ #include<stdarg.h>
+
+ int sum(int count, ...){
+   va_list ap;           // Khai báo khởi tạo va_list
+   va_start(ap, count);  // Khởi tạo va_list với tham số cố định cuối cùng là count
+
+   int total =0;
+   for(int i=0; i < count; i++){
+     total += va_arg(ap,int);
+   }
+
+   va_end(ap);
+   return total;
+ }
+
+ int main(){
+   printf("Sum of 1,2,3: %d\n",sum(3, 1, 2, 3));
+   printf("Sum ofn 10,20,30,40: %d\n",sum(4, 10, 20, 30, 40));
+   return 0;
+ }
+ ```
+ * **Khi không sử dụng Variadic Function:**
+
+   **Cú pháp phức tạp khi gọi hàm:**
+
+   Người dùng phải tạo một mảng (int numbers[] = {1, 2, 3}) trước khi gọi hàm, ngay cả khi chỉ cần truyền một vài số.
+
+   Điều này làm tăng số lượng mã lệnh và giảm tính trực quan so với cách gọi đơn giản của variadic functions, như sum(3, 1, 2, 3).
+
+   **Thiếu tính linh hoạt:**
+   Nếu muốn truyền các số riêng lẻ (không phải từ một mảng có sẵn), người dùng phải tự xây dựng mảng trước. 
+   Ví dụ, không thể gọi trực tiếp sum_array(1, 2, 3) mà phải làm như sau:
+```
+  int temp[] = {1, 2, 3};
+  sum_array(temp, 3);
+Với variadic functions, bạn chỉ cần gọi sum(3, 1, 2, 3) mà không cần tạo mảng trung gian.
+```
+
+  **Khó xử lý các tham số không đồng nhất:**
+
+  Nếu bạn muốn mở rộng hàm để xử lý các kiểu dữ liệu khác nhau (ví dụ: tổng của int, double, hoặc thậm chí chuỗi), việc sử dụng mảng trở nên phức tạp hơn nhiều.    
+  Bạn sẽ cần:
+
+  Một mảng cho mỗi kiểu dữ liệu.
+
+  Hoặc một cơ chế phức tạp để lưu trữ và phân tích các kiểu dữ liệu khác nhau.
+
+  Với variadic functions, bạn có thể sử dụng chuỗi định dạng hoặc các tham số cố định để chỉ định kiểu, như trong `printf("%d %f %s", 42, 3.14, "hello")`
+
+### **Assert - Kiểm tra lỗi với Assert**
+
+#### Để kiểm tra các giả định và gỡ lỗi ta sử dụng Macro Assert được định nghĩa trong thư viện `<assert.h>`.Macro này giúp phát hiện lỗi lập trình tại thời điểm chạy bằng cách kiểm tra các biểu thức logic
+
+* Các thành phần chính của **assert**
+
+  ◦ **assert(expression):**
+
+    Macro này kiểm tra giá trị của biểu thức `expression` tại thời điểm chạy
+
+    Nếu `expression` trả về `0`(sai), chương trình sẽ in thông báo lỗi(bao gồm biểu thức sai, tên file,số dòng và có thể tên hàm) và gọi `abort()` để dừng chương trình
+
+    Nếu `expression` trả về giá trị `khác 0`(đúng), chương trình tiếp tục chạy bình thường
+
+   ◦ **Thông báo lỗi:**
+
+    Khi `assert` thất bại, thông báo lỗi cung cấp thông tin chi tiết để định vị lỗi
+
+    VD: 
+
+  ```
+  Assertion Failed: (ptr != null), function myFunction, file example.c, line 42
+  ```
+
+   ◦ **Vô hiệu hóa assert:**
+
+    Khi định nghĩa macro `NDEBUG` trong chế độ biên dịch release, mọi `assert` sẽ bị vô hiệu hóa, và biểu thức trong `assert` sẽ không được thực thi
+
+    Điều này đảm bảo `assert` không gây ảnh hưởng đến hiệu suất của chương trình
+
+* **Mục đích và cách sử dụng:**
+
+   ◦ **Kiểm tra điều kiện tiên quyết(preconditions):**
+
+     Đảm bảo các điều kiện phải đúng trước khi thực thi hàm,ví dụ: con trỏ NULL,chỉ số mảng hợp lệ
+
+     VD: `assert(ptr!=NULL);`
+
+   ◦ **Kiểm tra điều kiện hậu quyết(postconditions):**
+
+     Đảm bảo các điều kiện phải đúng sau khi thực thi,ví dụ: giá trị trả về nằm trong khoảng mong đợi
+
+     VD: `assert(result >=0);`
+
+   ◦ **Kiểm tra bất biến(invariants):**
+
+     Đảm bảo các điều kiện luôn đúng tại một thời điểm cụ thể trong chương trình, ví dụ: biến đếm không âm
+
+     VD: `assert(counter>=0);`
+
+* **Quy tắc và lưu ý khi sử dụng:**
+
+   ◦ **Không sử dụng cho logic chương trình:**
+
+    Vì `assert` bị vô hiệu hóa trong chế độ release, không được đặt mã logic quan trọng trong `assert`
+
+    VD: `assert(x = 5);`
+
+   ◦ **Không dùng để xử lý lỗi runtime thông thường:**
+
+    `assert` chỉ dùng để phát hiện lỗi lập trình trong giai đoạn phát triển, không phù hợp cho các lỗi runtime như input sai từ người dùng (dùng if-else hoặc try-catch cho các trường hợp này).
+    
+   ◦ **Cấu trúc chung:**
+
+  ```
+  #include<assert.h>
+
+  return_type function_name(parameters){
+    assert(condition); //Kiểm tra điều kiện
+    //Xử lý logic
+    return result;
+  }
+  ```
+
+  VD:
+  ```
+  #include<stdio.h>
+  #include<assert.h>
+
+  void print_array(int* arr, int size){
+    assert(arr != NULL); //Precondition: Con trỏ không được NULL
+    assert(size > 0); //Precondition:kích thước phải dương
+
+    for(int i=0; i<size; i++){
+      printf("%d",&arr[i]);
+    }
+    printf("\n");
+  }
+
+  int main(){
+    int numbers[]={1,2,3};
+    print_array(numbers, 3);
+    print_array(NULL, 0); //Lỗi Assert
+    return 0;
+  }
+  ```
+
+* **Khi không sử dụng Assert:**
+
+    ◦ Cú pháp phức tạp khi kiểm tra lỗi:Phải tự viết các khối if-else để kiểm tra điều kiện và xử lý lỗi, làm tăng độ dài và phức tạp của mã.
+
+    ```
+    if (ptr == NULL) {
+    fprintf(stderr, "Error: NULL pointer in file %s, line %d\n", __FILE__, __LINE__);
+    exit(1);
+    }
+    ```
+    ◦ Khó duy trì và gỡ lỗi
+
+    ◦ Tăng nguy cơ lỗi không được phát hiện
+
+     </details> 
