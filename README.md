@@ -482,5 +482,875 @@ Với variadic functions, bạn chỉ cần gọi sum(3, 1, 2, 3) mà không c�
     ◦ Khó duy trì và gỡ lỗi
 
     ◦ Tăng nguy cơ lỗi không được phát hiện
-
      </details> 
+<details>
+	<summary><strong>BÀI 3: Advanced Pointers</strong></summary>
+
+## **Bài 3: Advanced Pointers**
+
+### **3.1.Function Pointers - Con trỏ hàm**
+
+#### **3.1.1.Định nghĩa**
+
+Là một loại con trỏ đặc biệt trong C, thay vì trỏ đến dữ liệu như (`int*` hay `char*`), nó **trỏ đến địa chỉ một hàm** trong bộ nhớ 
+
+ *  **Mục đích:** 
+   
+    ◦  Lưu trữ địa chỉ của hàm để gọi hàm đó tại runtime
+   
+    ◦  Cho phép truyền hàm như một tham số(callback) hoặc lưu trữ trong cấu trúc dữ liệu
+
+    ◦  Hỗ trợ lập trình linh hoạt, như chọn hàm để thực thi dựa trên điều kiện hoặc triển khai mẫu thiết kế
+
+ *  **Đặc điểm:**
+
+    ◦ Hàm trong C có địa chỉ cố định trong bộ nhớ, và con trỏ hàm lưu địa chỉ này
+
+    ◦ Con trỏ hàm phải khớp với **kiểu trả về(return type)** và **danh sách tham số** của hàm mà nó trỏ tới
+
+
+
+   
+#### **3.1.2.Cú pháp khai báo**
+
+
+ * `return_type (*pointer_name)(parameter_types);`
+ 
+    ◦ **return_type:** Kiểu dữ liệu mà hàm trả về(VD: `int`,`void`, `double`)
+
+    ◦ **pointer_name:** Tên của con trỏ hàm, được bao quanh bởi dấu `(*...)`
+
+    ◦ **parameter_type:** Danh sách các kiểu tham số mà hàm có thể nhận
+    ```
+    int  (*opera)(int, int);
+    void (*callback)(void);
+    double (*compute)(float, int);
+    ```
+  **=> Dấu `*(pointer_name)` là cần thiết để phân biệt con trỏ hàm với hàm thông thường, nếu không có dấu `*`, khai báo sẽ trở thành function prototype thay vì con trỏ**
+
+#### **3.1.3.Gán giá trị cho con trỏ hàm**
+
+ * Để gán một hàm cho con trỏ hàm, có thể sử dụng tên hàm(hoặc địa chỉ hàm)
+
+ ```
+ pointer_name = function_name;
+ // hoặc
+ pointer_name = &function_name;
+ ```
+
+ VD:
+ ```
+ #include<stdio.h>
+
+ int add(int a, int b){
+   return a + b;
+ }
+ int main(){
+   int (*opera)(int,int);
+   opera = add;
+   return 0;
+ }
+ ```
+
+#### **3.1.4.Gọi hàm thông qua con trỏ**
+
+ * Có 2 cách để gọi hàm thông qua con trỏ hàm 
+ ```
+ (*pointer_name)(arguments);
+ //hoặc
+ pointer_name(arguments);
+ ```
+ VD:
+ ```
+ #include<stdio.h>
+ int add(int a, int b){
+   return a+b;
+ }
+ int main(){
+   int (*opera)(int,int);
+   opera = add;
+   printf("Result: %d\n",opera(5,3));
+   printf("Result: %d\n",(*opera)(5,3));
+   return 0;
+ }
+ }
+ ```
+
+ #### **3.1.5.Ứng dụng**
+
+  * **Callbacks:**
+   
+    ◦ Truyền một hàm làm tham số cho hàm khác để gọi lại sau này
+
+    ◦ VD: Hàm `qsort` trong thư viện chuẩn C
+
+    ```
+    #include<stdlib.h>
+
+    int compare(const void* a, const void* b){
+      return (*(int*)a) - (*(int*)b);
+    }
+
+    int main(){
+      int arr[]={5,2,8,1};
+      qsort(arr, 4, sizeof(int), compare);
+    }
+    ```
+
+  * **State Machines:**
+
+    ◦ Dùng con trỏ hàm để biểu diễn các trạng thái và hành vi trong máy trạng thái
+
+    ◦ VD: Một chương trình chuyển đổi dựa trên trạng thái đầu vào
+
+    ```
+    void state1(){
+      printf("In state1\n");
+    }
+    void state2(){
+      printf("In state2\n");
+    }
+    void (*current_state)() = state1;
+    ```
+
+  * **Strategy Pattern:**
+
+    ◦ Cho phép chọn thuật toán hoặc hành vi tại runtime
+
+  * **Lưu trữ hàm trong cấu trúc dữ liệu:**
+
+    ◦ Lưu con trỏ hàm trong mảng hoặc cấu trúc để gọi động
+
+      VD: Mảng con trỏ hàm để xử lý các lệnh
+      ```
+      int (*opera[])(int,int)={add,subtract};
+      int result = opera[0](5,3); //Gọi add
+      ```
+   #### **3.1.6.Lưu ý**
+
+   * Kiểm tra khớp kiểu
+
+   * Kiểm tra NULL
+
+
+### **3.2.Void Pointers - Con trỏ void**
+
+#### **3.2.1.Định nghĩa**
+
+ * Con trỏ void`(void*)` là một loại con trỏ đặc biệt trong C,được gọi là con trỏ "generic" vì nó **có thể trỏ đến bất kỳ kiểu dữ liệu nào(int,char,float,struct,...)** mà không bị ràng buộc bởi kiểu cụ thể
+
+ * **Mục đích:**
+
+   ◦ Cho phép xử lý dữ liệu một cách tổng quát, mà không cần biết trước kiểu dữ liệu
+
+   ◦ Được sử dụng trong các tình huống cần cấp phát bộ nhớ động hoặc truyền dữ liệu mà kiểu chưa được xác Định
+
+ * **Đặc điểm:**
+
+   ◦ **Không thể dereference trực tiếp:** Vì trình biên dịch không biết kích thước hoặc kiểu dữ liệu mà `void*` trỏ đến, nên `*void_ptr` sẽ gây lỗi biên dịch
+
+   ◦ **Không hỗ trợ số học con trỏ:** Các phép toán như `void_ptr++` hoặc `void_ptr + n` không hợp lệ(hoặc không chuẩn) vì trình biên dịch không biết kích thước của kiểu dữ liệu
+
+   ◦ **Ép kiểu:** Trước khi dereference hoặc thực hiện các thao tác, con trỏ void phải được ép kiểu sang một kiểu con trỏ cụ thể
+
+  
+#### **3.2.2.Cú pháp khai báo**
+
+```
+void *pointer_name;
+```
+* `void`: Chỉ định rằng con trỏ không gắn với kiểu dữ liệu cụ thể
+
+* `pointer_name`: Tên của con trỏ void
+
+VD:
+```
+void *generic_ptr;
+void *memory_block;
+```
+
+#### **3.2.3.Gán giá trị cho con trỏ void**
+
+* Cách gán:
+
+```
+pointer_name = &variable; //Gán địa chỉ của biến
+pointer_name = another_pointer; //Gán từ con trỏ khác
+```
+
+VD:
+
+```
+#include<stdio.h>
+int main(){
+  int x = 42;
+  char c = 'A';
+  float f = 3.14;
+
+  void *ptr;
+  ptr = &x;
+  ptr = &c;
+  ptr = &f;
+
+  return 0;
+}
+```
+#### **3.2.4.Sử dụng con trỏ void**
+
+* Để sử dụng con trỏ void, cần **ép kiểu** sang kiểu con trỏ cụ thể trước khi **dereference** hoặc thực hiện thao tác
+
+* **Cách sử dung:**
+```
+*(type_cast *)pointer_name; //dereference sau khi ép kiểu
+```
+VD:
+```
+#include<stdio.h>
+
+int main(){
+  int x = 42;
+  void *ptr = &x;
+
+  // Ép kiểu void* sang int* để dereference
+  int *int_ptr = (int *)ptr;
+  printf("Value of x: %d\n", *int_ptr);
+
+  return 0;
+}
+```
+#### **3.2.5.Ứng dụng**
+
+**Hàm generic:**
+
+  ◦ Các hàm như `memset`,`memcpy`,`qsort` trong thư viện C sử dụng `void*` để hoạt động trên bất kỳ kiểu dữ liệu nào
+
+  VD:
+
+  ```
+  #include<stdlib.h>
+
+  int compare(const void *a, const void *b){
+    return (*(int*)a) - (*(int*)b);
+  }
+
+  int main(){
+    int arr[]= {5, 2, 8, 1};
+    qsort(arr, 4, sizeof(int), compare);
+    return 0;
+  }
+
+  ```
+
+**Cấp phát bộ nhớ động:**
+
+  ◦ Các hàm như `malloc` và `calloc` trả về `void*` ,cho phép người dùng quyết định kiểu dữ liệu của bộ nhớ được cấp phát
+
+  VD:
+
+  ```
+  #include<stdlib>
+
+  int main(){
+    //Cấp phát bộ nhớ cho 5 mảng số nguyên
+    void *memory = malloc(5 * sizeof(int));
+    int *int_array = (int *)memory;
+
+    //Sử dụng mảng
+    for(int i = 0;i < 5; i++){
+      int_array[i] = i + 1;
+    }
+
+    //In mảng 
+    for(int i = 0;i < 5; i++){
+      printf("%d ", int_array[i]);
+    }
+
+    free(memory);
+    return 0;
+  }
+  ```
+**Truyền tham số linh hoạt:**
+
+  ◦ Dùng trong các hàm cần truyền dữ liệu mà kiểu không xác định trước 
+
+  VD:
+  ```
+  #include<stdio.h>
+  void print_data(void *data, char type){
+    if (type == 'i'){
+      printf("Integer: %d\n", *(int *)data);
+    }else if (type == 'c'){
+      printf("Char: %c\n", *(char *)data);
+    }
+  }
+
+  int main(){
+    int x = 100;
+    char c = 'Z';
+
+    print_data(&x,'i');
+    print_data(&c, 'c');
+    return 0;
+  }
+  ```
+
+  **Lưu trữ trong cấu trúc dữ liệu:**
+
+  ◦ Dùng để lưu trữ địa chỉ của các đối tượng có kiểu khác nhau trong danh sách liên kết, cây, hoặc các cấu trúc dữ liệu khác
+
+  VD:
+  ```
+  #include<stdio.h>
+
+  struct Node{
+    void *data;
+    char type;
+  }
+
+  int main(){
+    struct Node node;
+    int x = 42;
+
+    node.data = &x;
+    node.type = 'i';
+
+    printf("Data: %d\n", *(int *)node.data);
+    return 0;
+  }
+  ```
+
+  #### **3.2.6.Lưu ý**
+  
+  **Kiểm tra ép kiểu:**
+
+   ◦ Ép kiểu sai (ví dụ: ép void* trỏ đến int thành float*) có thể gây lỗi truy cập bộ nhớ hoặc kết quả không mong muốn.
+
+   VD:
+   ```
+   int x = 42;
+   void *ptr = &x;
+   float *float_ptr = (float *)ptr; // Sai: Ép kiểu không đúng
+   printf("%f\n", *float_ptr);     // Kết quả không xác định
+   ```
+  **Kiểm tra NULL:**
+
+   ◦ Con trỏ void có thể là NULL, cần kiểm tra trước khi sử dụng.
+
+   ```
+   void *ptr = NULL;
+   if (ptr != NULL) {
+    int *int_ptr = (int *)ptr;
+    printf("%d\n", *int_ptr);
+    } else {
+    printf("Pointer is NULL\n");
+    }
+   ```
+
+  **Giải phóng bộ nhớ:**
+
+   ◦ Khi dùng `void*` với `malloc` hoặc `calloc`, luôn nhớ giải phóng bộ nhớ bằng `free` để tránh rò rỉ bộ nhớ.
+
+### **3.3.NULL Pointers - Con trỏ NULL**   
+
+#### **3.3.1.Định nghĩa**
+
+* Là một giá trị đặc biệt của con trỏ trong C/C++,biểu thị **con trỏ không trỏ đến bất kỳ địa chỉ bộ nhớ hợp lệ nào**.Nó thường được định nghĩa là `(void*)0` hoặc một macro tương đương(VD: `NULL` trong C hoặc `nullptr` trong C++)
+
+* **Mục đích:**
+
+  ◦ Khởi tạo con trỏ chưa được gán giá trị,tránh việc trỏ đến địa chỉ ngẫu nhiên
+
+  ◦ Đánh dấu kết thúc của danh sách liên kết hoặc cấu trúc dữ liệu
+
+  ◦ Biểu thị trạng thái lỗi hoặc không hợp lệ khi một hàm trả về con trỏ
+
+  ◦ Dùng để kiểm tra tính hợp lệ của con trỏ trước khi truy cập
+
+* **Đặc điểm:**
+
+  ◦ Gía trị của NULL Pointer thường là `0` trong bộ nhớ,nhưng cách biểu diên thực tế phụ thuộc vào hệ thống
+
+  ◦ Trong C++,`nullptr` là lựa chọn an toàn hơn `NULL`,vì nó có kiểu riêng (`std::nullptr_t`) và tránh các lỗi liên quan đến ép Kiểu
+
+  ◦ dereference một NULL Pointer (vd: `*ptr` hoặc ptr->member`) sẽ gây lỗi **segmentation fault**
+
+#### **3.3.2.Gán giá trị NULL**
+
+  ◦ Gán trị NULL cho con trỏ để đảm bao nó không trỏ đến địa chỉ không xác định
+
+  ```
+  Trong C:
+  int *ptr;
+  ptr = NULL;
+  ```
+  ```
+  Trong C++:
+  int *ptr;
+  ptr = nullptr;
+  ```
+
+#### **3.3.3.Kiểm tra và sử dụng NULL Pointer**
+
+* Kiểm tra con trỏ trước khi **dereference**
+  
+  ◦ Luôn kiểm tra xem con trỏ có phải là NULL hay không để tránh lỗi truy cập bộ nhớ
+
+  ```
+  if(ptr != NULL){
+    *ptr  10;
+  }else{
+    printf("Con trỏ là NULL,không thể truy cập\n");
+  }
+  ```
+* Trong C++ với nullptr
+  ```
+  if(ptr != nullptr){
+    *ptr = 10;
+  }else{
+    std::cout <<"Con trỏ là nullptr,khong the truy cap" << std::endl;
+  }
+  ```
+
+* Trả về NULL từ hàm
+
+  ◦ Hàm trả về con trỏ có thể trả về `NULL` để biểu thị lỗi hoặc không tìm thấy dữ liệu
+  ```
+  int *find_element(int arr[], int size, int value) {
+    for(int i = 0; i < size; i++){
+      if(arr[i] == value){
+        return &arr[i];
+      }
+    }
+    return NULL; //không tìm thấy
+  }
+  ```
+
+#### **3.3.4.Ứng dụng**
+
+* **Khởi tạo con trỏ:**
+
+  ◦ Đảm bảo con trỏ không trỏ đến địa chỉ ngẫu nhiên trước khi được gán giá trị hợp lệ
+  ```
+  int *ptr = NULL;
+  ptr = malloc(sizeof(int));
+  ```
+
+* **Kết thúc danh sách liên kết:**
+
+  ◦ Trong danh sách liên kết, node cuối cùng có con trỏ `next` trỏ đến `NULL`
+  ```
+  struct Node{
+    int data;
+    struct Node *next;
+  };
+  struct Node *head = NULL; 
+  ```
+
+* **Kiểm tra lỗi:**
+
+  ◦ Hàm cấp phát bộ nhớ như `malloc` hoặc `calloc` trả về `NULL` nếu không đủ bộ nhớ
+  ```
+  int *ptr = malloc(sizeof(int) * 10);
+  if(ptr == NULL){
+    printf("Cap phat bo nho that bai\n");
+    exit(1);
+  }
+  ```
+
+* **Callback và hàm trả về con trỏ:**
+
+  ◦ Hàm trả về con trỏ có thể dùng `NULL` để báo trạng thái không hợp lệ
+  ```
+  void *process_data(){
+    return NULL;
+  }
+  ```
+
+#### **3.3.5.Lưu ý**
+
+* **Kiểm tra NULL trước khi dereference**
+  
+  Luôn kiểm tra `if(ptr != NULL)` hoặc `if(ptr)`
+
+* **Sự khác biệt giữa C và C++**
+  
+  Trong C,`NULL` là 1 macro, thường là `(void*)0`,có thể gây lỗi khi sử dụng ngữ cảnh ép kiểu
+
+* **Tránh gán giá trị khác cho NULL**
+
+* **Giải phóng bộ nhớ**
+
+  Sau khi gọi `free(ptr)`,nên gán `ptr = NULL` để tránh sử dụng con trỏ đã được giải phóng
+
+  ```
+  free(ptr);
+  ptr = NULL;
+  ```
+
+### **3.4.Pointer to Pointer - Con trỏ trỏ đến con trỏ**
+
+#### **3.4.1.Định nghĩa**
+
+* Là biến lưu trữ **địa chỉ của 1 biến con trỏ khác**
+
+* Quản lý con trỏ cấp thấp hơn hoặc hỗ trợ cấu trúc dữ liệu phức tạp
+
+* **Mục đích:**
+  
+  ◦ Hỗ trợ quản lý cấu trúc dữ liệu, mảng động, danh sách liên kết
+
+  ◦ Cho phép con trỏ được truyền vào hàm
+
+* **Đặc điểm:**
+
+  ◦ Con trỏ cấp 2(`**`) có thể trỏ đến con trỏ cấp 1 (`*`),và con trỏ cấp 1 trỏ đến dữ liệu thực tiếp
+
+  ◦ Hỗ trợ nhiều cấp con trỏ(vd:`***` cho con trỏ cấp 3),nhưng cấp 2 là phổ biến nhất
+
+* **Cú pháp**
+
+  ```
+  type **pointer_name;
+  ```
+  ◦ `type:` Kiểu dữ liệu của biến cuối cùng mà con trỏ cấp 1 trỏ tới(vd: `int`,`char`,`float`)
+
+  ◦ `pointer_name:` Tên con trỏ cấp 2
+
+  VD:
+  ```
+  int **ptr
+  ```
+
+#### **3.4.2.Gán giá trị**
+
+* Gán địa chỉ của một con trỏ cấp 1 cho con trỏ cấp 2
+
+```
+pointer_name = &pointer_level_1;
+```
+VD:
+```
+int x = 10;
+int *ptr = &x;
+int **ptr_to_ptr = &ptr;
+```
+#### **3.4.3.Truy cập giá trị**
+
+* `ptr_to_ptr:` Địa chỉ của con trỏ cấp 1
+* `*ptr_to_ptr:` Giá trị của con trỏ cấp 1,tức là địa chỉ của dữ liệu cuối cùng
+* `**ptr_to_ptr:` Giá trị dữ liệu cuối cùng mà con trỏ cấp 1 trỏ tới
+
+```
+#include <stdio.h>
+int main() {
+    int x = 10;
+    int *ptr = &x;              // Con trỏ cấp 1 trỏ đến x
+    int **ptr_to_ptr = &ptr;    // Con trỏ cấp 2 trỏ đến ptr
+    
+    printf("Địa chỉ của ptr: %p\n", ptr_to_ptr);        // Địa chỉ của ptr
+    printf("Địa chỉ của x: %p\n", *ptr_to_ptr);         // Địa chỉ của x
+    printf("Giá trị của x: %d\n", **ptr_to_ptr);        // Giá trị x = 10
+    
+    **ptr_to_ptr = 20; // Thay đổi giá trị x thông qua ptr_to_ptr
+    printf("Giá trị mới của x: %d\n", x);               // x = 20
+    return 0;
+}
+
+```
+#### **3.4.4.Ứng dụng**
+
+* **Pass-by-reference cho con trỏ**
+
+  ◦ Cho phép hàm thay đổi con trỏ cấp 1 được truyền vào
+
+  ```
+  #include<stdio.h>
+
+  void change_pointer(int **p, int *new_ptr){
+    *pp = new_ptr;
+  }
+
+  int main(){
+    int x = 10, y = 20;
+    int *ptr = &x;
+    int **ptr_to_ptr = &x;
+    int **ptr_to_ptr = &ptr;
+
+    printf("Before: %d\n", *ptr);
+    change_pointer(ptr_to_ptr, &y);
+    printf("After: %d\n",*ptr);
+    return 0;
+  }
+
+* **Quản lý mảng các chuỗi:**
+
+  ◦ Sử dụng `char **` để lưu trữ danh sách các chuỗi(mảng con trỏ kiểu `char *`)
+
+  ```
+  #include<stdio.h>
+  int main(int argc, char ** argv){
+    for(int i=0;i<argc;i++){
+      printf("Argument %d: %s\n", i, argv[i]);
+    }
+    return 0;
+  }
+
+  ```
+
+* **Cấp phát và quản lý mảng 2 chiều động**
+
+  ◦ Mảng 2 chiều động được biểu diễn như mảng các con trỏ,mỗi con trỏ trỏ đến một hàng
+
+  VD: Cấp phát mảng 2 chiều 3x4
+  ```
+  #include<stdio.h>
+  #include<stdlib.h>
+
+  int main(){
+    int rows = 3, cols = 4;
+    int **matrix;
+
+    matrix = (int **)malloc(rows * sizeof(int *));
+    for (int i = 0; i < rows; i++){
+      matrix[i] = (int *)malloc(cols * sizeof(int));
+    }
+
+    //gán giá trị
+    for (int i = 0; i < rows; i++){
+      for(int j = 0; j < cols; j++){
+        matrix[i][j] = i * cols + j; 
+      }
+    }
+
+    //In mảng
+    for(int i = 0;i < rows; i++){
+      for(int j = 0; j < cols; j++){
+        printf("%d", matrix[i][j]);
+      }
+      printf("\n");
+    }
+
+    //Giải phóng bộ nhớ
+    for(int i = 0;i < rows; i++){
+      free(matrix[i]);
+    }
+    free(matrix);
+    return 0;
+    
+  }
+  ```
+
+### **3.5.Const Pointer - Con trỏ hằng số và hằng con trỏ**   
+
+#### **3.5.1.Định nghĩa**
+
+* **Con trỏ hằng số và hằng con trỏ** là các con trỏ trong C/C++ sử dụng từ khóa `const` để hạn chế việc thay đổi giá trị mà con trỏ trỏ tới hoặc địa chỉ mà con trỏ lưu trữ
+
+#### **3.5.2.Phân loại**
+
+ *  **1.** `const int *ptr` hoặc `int const *ptr`: Con trỏ trỏ tới một giá trị hằng(`int` không thể thay đổi, nhưng địa chỉ mà `ptr` trỏ tới có thể thay đổi)
+
+ *  **2.** `int * const ptr`: Hằng con trỏ trỏ tới một giá trị `int`(**địa chỉ** mà `ptr` trỏ tới **không thể thay đổi**, **giá trị** tại địa chỉ đó **có thể thay đổi**)
+
+ *  **3.** `const int * const ptr` hoặc `int const * const ptr`:Hằng con trỏ trỏ tới một giá trị hằng(**cả giá trị và địa chỉ đều không thể thay đổi**)
+
+#### **3.5.3.Đặc điểm**
+
+   * **Đọc từ phải sang trái:** Cú pháp `const` được hiểu theo cách đọc từ phải sang trái để xác định `const` áp dụng cho giá trị hay con trỏ
+
+   * **Tính bất biến:** 
+    
+    const int *ptr: Giá trị tại `*ptr` là bất biến
+    
+    int * const ptr: Địa chỉ mà `ptr` lưu trữ là bất biến
+ 
+    const int * const ptr: Cả giá trị và địa chỉ đều bất biến
+  
+   * **Khởi tạo:** Hằng con trỏ phải được khởi tạo khi khai báo
+
+#### **3.5.4.Cú pháp**
+
+
+   * **Con trỏ trỏ tới giá trị hằng**
+    
+    const int * ptr;
+    
+   * **Hằng con trỏ trỏ tới giá trị**
+    
+    int * const ptr = &variable;
+    
+   * **Hằng con trỏ tới giá trị hằng**
+    
+    const int * const ptr = &variable;
+    
+#### **3.5.5.Gán giá trị và sử dụng**
+
+  * VD1: const int *ptr
+  ```
+  #include<stdio.h>
+  int main(){
+    int x = 10, y = 20;
+    const int *ptr = &x; //ptr trỏ tới x
+    ptr = &y; //thay đổi địa chỉ
+    printf("%d\n", *ptr);
+    return 0;
+  }
+  ```
+  * VD2: int * const ptr
+  ```
+  #include<stdio.h>
+  int main(){
+    int x = 10, y = 20;
+    int * const ptr = &x;
+    *ptr = 15;
+
+    printf("%d\n", *ptr);
+    return 0;
+  }
+  ```
+  * VD3: const int * const ptr
+  ```
+  #include<stdlib.h>
+  int main(){
+    int x = 10;
+    const int * const ptr = &x;
+
+    printf("%d\n", *ptr);
+    return 0;
+  }
+  ```
+
+### **3.6.Size of Pointer - Kích thước của con trỏ**
+
+#### **3.6.1.Định nghĩa**
+
+* **Toán tử sizeof():**
+
+  ◦ Toán tử `sizeof()` trả về kích thước (tính bằng byte) của 1 biến hoặc 1 kiểu dữ liệu
+
+  ◦ Khi áp dụng với con trỏ, `sizeof(pointer_variable)` hoặc `sizeof(pointer_type)` trả về kích thước của chính biến con trỏ
+
+  ◦ Khi áp dụng với toán tử giải tham chiếu `*`,`sizeof(*pointer_variable)` trả về kích thước của kiểu dữ liệu mà con trỏ trỏ tới
+
+#### **3.6.2.Kích thước của con trỏ**
+
+* Kích thước của con trỏ không phụ thuộc vào kiểu dữ liệu mà nó trỏ tới
+
+  VD: `int*`, `char*`, `double*` hoặc `void*` đều có kích thước giống nhau trên cùng 1 hệ thống
+
+* Kích thước của con trỏ phụ thuộc vào kiến trúc hệ thống
+
+  ◦ **32-bit:** Con trỏ thường có kích thước **4 byte**
+
+  ◦ **64-bit:** Con trỏ thường có kích thước 8 byte
+
+* Con trỏ chỉ lưu trữ địa chỉ bộ nhớ,và kích thước của địa chỉ này phụ thuộc vào không gian địa chỉ mà hệ thống hỗ trợ
+
+#### **3.6.3.Kích thước của kiểu dữ liệu mà con trỏ trỏ tới**
+
+* Khi sử dụng `sizeof(*pointer_variable)`,kết quả trả về là kích thước của kiểu dữ liệu mà con trỏ trỏ tới
+
+```
+VD:
+sizeof(int): thường là 4 byte
+sizeof(char): thường là 1 byte
+sizeof(double): thường là 8 byte
+```
+
+#### **3.6.4.Lưu ý**
+
+* Kích thước của con trỏ có thể khác nhau giữa các hệ thống hoặc trình biên dịch
+
+* Toán tử `sizeof()` là 1 toán tử thời gian biên dịch(compile-time) không phụ thuộc vào giá trị của biến tại thời điểm chạy
+
+```
+#include<stdio.h>
+
+int main(){
+  int *int_ptr;
+  char *char_ptr;
+  double *double_ptr;
+  void *void_ptr;
+
+  int a ='10';
+  char b = 'A';
+  double c = '3.14';
+ 
+  //In kích thước của các con trỏ
+  printf("Size cua int*: %zu bytes\n", sizeof(int_ptr));
+  printf("Size cua char*: %zu bytes\n", sizeof(char_ptr));
+  printf("Size cua double*: %zu bytes\n",sizeof(double_ptr));
+  printf("Size cua void*: %zu bytes\n",sizeof(void_ptr));
+
+  //In kích thước của các kiểu dữ liệu mà con trỏ trỏ tới
+  printf("Size cua kieu int: %zu bytes\n",sizeof(*int_ptr));
+  printf("Size cua kieu char: %zu bytes\n",sizeof(*char_ptr));
+  printf("Size cua kieu double: %zu bytes\n",sizeof(*double_ptr));
+  printf("Size cua kieu void: %zu bytes\n",sizeof(*void_ptr));
+
+  //In kích thước của các biến
+  printf("Size cua bien int: %zu bytes\n",sizeof(a));
+  printf("Size cua bien char: %zu bytes\n",sizeof(b));
+  printf("Size cua bien doublr: %zu bytes\n",sizeof(c));
+
+  return 0;
+}
+```
+
+```
+Size cua int*: 8 bytes
+Size cua char*: 8 bytes
+Size cua double*: 8 bytes
+Size cua void*: 8 bytes
+Size cua kieu int: 4 bytes
+Size cua kieu char: 1 bytes
+Size cua kieu double: 8 bytes
+Size cua bien int: 4 bytes
+Size cua bien char: 1 bytes
+Size cua bien double: 8 bytes
+```
+
+* Kiểm tra kích thước con trỏ trong Mảng
+```
+#include<stdio.h>
+int main(){
+  int arr[5]={1, 2, 3, 4, 5};
+  int *ptr = arr;
+
+  printf("Size cua con tro ptr: %zu bytes \n",sizeof(ptr));
+  printf("Size cua kieu du lieu ma ptr tro toi: %zu bytes\n", sizeof(*ptr));
+  printf("Size cua mang arr: %zu bytes\n",sizeof(arr));
+
+  return 0;
+}
+```
+
+```
+Size cua con tro ptr: 8 bytes
+Size cua kieu du lieu ma ptr tro toi: 4 bytes
+Size cua mang arr: 20 bytes
+```
+
+* Con trỏ hàm
+
+```
+#include<stdio.h>
+
+void myFunction(){
+  printf("This is a function.\");
+}
+
+int main(){
+  void (*func_ptr)() = myFunction;
+
+    printf("Kich thuoc cua con tro ham: %zu bytes\n", sizeof(func_ptr));
+
+    return 0;
+}
+```
+```
+Kich thuoc cua con tro ham: 8 bytes
+```
+   </details> 
+
+   
