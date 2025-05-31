@@ -1353,4 +1353,307 @@ Kich thuoc cua con tro ham: 8 bytes
 ```
    </details> 
 
+<details>
+	<summary><strong>BÀI 4: Storage Class</strong></summary>
+
+## **Bài 4: Storage Class**
+
+### **4.1.Kiến thức chung**
+
+
+
+* Không chỉ xác định phạm vi(scope), thời gian sống(lifetime), và vùng nhớ lưu trữ(memory location) mà còn xác định **liên kết(linkage)** của biến hoặc hàm 
+
+*  **Scope:** Nơi mà tên biến/hàm có thể được truy cập 
    
+    ◦  **Block Scope:** Bên trong cặp dấu {}
+   
+    ◦  **File Scope:** Bên ngoài tất cả các hàm trong một file.Biến/hàm khai báo ở đây thường được gọi là toàn cục(global) cho file đó
+
+    ◦  **Function Prototype Scope:** Chỉ áp dụng cho tên tham số trong khai báo hàm
+
+*  **Lifetime:** Khoảng thời gian biến tồn tại trong bộ nhớ
+
+    ◦ **Automatic:** Biến cục bộ, tồn tại khi khối lệnh chứa nó được thực thi,bị hủy khi ra khỏi khối
+
+    ◦ **Static:** Biến toàn cục, biến `static` cục bộ, biến `extern`.Tồn tại suốt thời gian chương trình chạy
+
+* **Memory Location:**
+
+    ◦ **Stack:** Biến cục bộ 
+
+    ◦ **Data Segment/BSS Segment:** Biến toàn cục, biến `extern`, biến `static`
+
+        Data Segment: Lưu các biến toàn cục/static **đã được khởi tạo**
+
+        BSS Segment: Lưu các biến toàn cục/static **chưa được khởi tạo hoặc khởi tạo bằng 0**
+
+    ◦ **Heap:** Bộ nhớ cấp phát động(qua malloc,calloc)
+
+    ◦ **Text Segment(Code segment):** Mã lệnh của chương trình(các hàm)
+* **Linkage:**
+
+    ◦ Quyết định xem một tên(biến / hàm) có thể được tham chiếu từ các đơn vị dịch khác hay không
+
+        External Linkage: Tên có thể được tham chiếu từ các file khác.Biến toàn cục(không static) và hàm(không static) mặc định có liên kết ngoài
+
+        Internal Linkage: Tên chỉ được tham chiếu bên trong file hiện tại.Biến toàn cục static và hàm static có liên kết nội
+
+        No linkage: Biến cục bộ
+
+
+### **4.2.Extern**
+
+#### **4.2.1.Mục đích**
+
+  * Extern là một **chỉ thị khai báo**
+
+  * **Khi dùng với biến:**
+
+     ◦ Nó thông báo cho trình biên dịch **Biến này được định nghĩa ở đâu đó, có thể ở trong file này hoặc file khác.Đừng cấp phát bộ nhớ cho nó tại đây, chỉ cần biết kiểu và tên của nó thôi.Linker sẽ tìm định nghĩa sau**
+
+  * **Khi dùng với hàm:**
+
+     ◦ **Nó khai báo một hàm mà định nghĩa của nó có thể ở file khác (hoặc ở phần sau của file hiện tại)**.Đối với hàm ,`extern` thường là ngầm định khi bạn khai báo prototype ở phạm vi toàn cục
+
+#### **4.2.2.Extern và Linkage**
+
+  * Extern ngụ ý rằng biến hoặc hàm có **liên kết ngoài**.Điều này có nghĩa là định nghĩa thực sự của biến hoặc hàm đó có thể nằm trong 1 file.c khác và linker sẽ kết nối các tham chiếu đến định nghĩa đó
+
+#### **4.2.3.Sử dụng**  
+
+ * **Chia sẻ biến toàn cục**
+ 
+    ◦ File 1 (vd: config.c):
+
+    ```
+    //Định nghĩa biến toàn cục
+    int max_users = 100;
+    const char * server_name = "KMA";
+    ```
+
+    ◦ File 2 (vd: main.c):
+    ```
+    #include <stdio.h>
+
+    
+    extern int max_users;
+    extern const char* server_name; // Quan trọng: phải khớp kiểu, kể cả const
+
+    void display_config() {
+    printf("Server Name: %s\n", server_name);
+    printf("Max Users: %d\n", max_users);
+    }
+
+    int main() {
+    display_config();
+    max_users = 150; 
+    printf("Updated Max Users: %d\n", max_users);
+    return 0;
+    }
+
+
+    ```
+ * **Khai báo hàm từ file khác**
+
+    ◦ File 1 (vd:math_utils.c):
+    ```
+    //Định nghĩa hàm
+    int add(int a, int b){
+      return a + b;
+    }
+    ```
+    ◦ File 2 (vd:math_utils.h):
+
+    ```
+    #ifndef MATH_UTILS_H
+    #define MATH_UTILS_H
+
+    // Khai báo hàm (extern là ngầm định cho khai báo hàm ở phạm vi file)
+    // Viết tường minh extern cũng không sai: extern int add(int, int);
+    int add(int a, int b);
+
+    #endif
+    ```
+
+    ◦ File 3 (vd:main.c):
+
+    ```
+    #include <stdio.h>
+    #include "math_utils.h" // Bao gồm khai báo hàm
+
+    int main() {
+    int result = add(5, 3);
+    printf("Sum: %d\n", result);
+    return 0;
+    }
+    ```
+
+
+### **4.3.Static**
+
+#### **4.3.1.Biến static cục bộ**
+
+* **Lifetime:** Tồn tại suốt vòng đời chương trình, được cấp phát trong **data segment (khởi tạo khác 0)** hoặc **bss segment (khởi tạo bằng 0 hoặc không khởi tạo)**
+
+* **Scope:** Chỉ truy cập được bên trong Hàm
+
+* **Khởi tạo:** 
+
+  ◦  Chỉ khởi tạo **1 lần** khi hàm được gọi lần đầu, 
+
+  ◦  Giữ giá trị giữa các lần gọi,Giá trị của nó không bị mất đi và được duy trì giữa các lần gọi hàm. 
+    
+  ◦  Mỗi lần hàm được gọi, giá trị của biến chính bằng giá trị tại lần gần nhất hàm được gọi.
+
+
+
+```
+void counter() {
+    static int count = 0; // Chỉ khởi tạo một lần
+    count++;
+    printf("Count: %d\n", count);
+}
+
+int main() {
+    counter(); // In: Count: 1
+    counter(); // In: Count: 2
+    counter(); // In: Count: 3
+    return 0;
+}
+```
+
+
+#### **4.3.2.Biến static toàn cục**
+
+* **Lifetime:** Tồn tại **suốt vòng đời chương trình**,từ khi chương trình khởi động(trước khi hàm `main` chạy) đến khi chương trình kết thúc
+
+* **Scope:** Chỉ được truy cập **bên trong file`.c` được định nghĩa,không thể truy cập từ file khác,kể cả khi sử dụng extern
+
+* **Khởi tạo:** 
+
+    Chỉ khởi tạo một lần duy nhất tại thời điểm chương trình khởi động (trước khi main được gọi).
+
+    Giá trị của biến toàn cục static không bị mất và được duy trì trong suốt thời gian chương trình chạy.
+
+    Mỗi lần giá trị biến được thay đổi (bởi bất kỳ hàm nào trong cùng file), giá trị mới sẽ được giữ và sử dụng cho các lần truy cập tiếp theo trong file.
+
+```
+// file1.c
+static int globalCount = 0; // Khởi tạo một lần khi chương trình chạy
+
+void increment() {
+    globalCount++;
+    printf("Global Count: %d\n", globalCount);
+}
+
+void print() {
+    printf("Current Count: %d\n", globalCount); // Giá trị được duy trì
+}
+
+int main() {
+    increment(); // In: Global Count: 1
+    increment(); // In: Global Count: 2
+    print();     // In: Current Count: 2
+    return 0;
+}
+
+// file2.c
+extern int globalCount; // Lỗi: không tìm thấy globalCount
+```
+
+
+### **4.4.Volatile**  
+
+#### **4.4.1.Định nghĩa**
+
+* Khi một biến được đánh dấu là `Volatile`,trình biên dịch không được phép tối ưu hóa (như loại bỏ hoặc cache) các thao tác đọc/ghi liên quan đến biến này,**vì giá trị của nó có thể thay đổi bất ngờ** từ các nguồn ngoài luồng thực thi hiện tại **(như phần cứng,ISR, hoặc thread khác)**
+
+#### **4.4.2.Hành vi**
+
+* Buộc trình biên dịch đọc/ghi trực tiếp từ/tới bộ nhớ mỗi khi truy cập biến,thay vì cache trong thanh ghi
+
+* Giữ nguyên thứ tự thao tác đọc/ghi,tránh tái sắp xếp do tối ưu hóa
+
+#### **4.4.3.Các trường hợp sử dụng**
+
+* **Memory-mapped peripheral registers:** Truy cập các thanh ghi phần cứng(như GPIO,UART) để đảm bảo đọc/ghi chính xác giá trị hiện tại
+```
+#define GPIO_PORTA_DATA (*(volatile uint32_t *)0x40058000) // Địa chỉ thanh ghi GPIO
+
+void toggle_pin(void) {
+    GPIO_PORTA_DATA |= (1 << 5);  // Ghi giá trị để bật bit 5 (pin 5)
+    GPIO_PORTA_DATA &= ~(1 << 5); // Ghi giá trị để tắt bit 5
+}
+```
+* **Biến toàn cục trong ISR:** Đảm bảo biến toàn cục được truy cập bởi các routine xử lý ngắt luôn phản ánh giá trị mới nhất
+
+```
+volatile uint8_t flag = 0;
+void ISR_Tim1(void){
+  flag = 1;
+}
+int main(){
+  while(1){
+    if(flag){
+      flag = 0;
+    }
+  }
+  return 0;
+}
+```
+* **Biến toàn cục trong xử lý đa nguồn:** Đảm bảo giá trị biến được cập nhật đúng khi được truy cập bởi nhiều tác vụ
+
+```
+#include <pthread.h>
+#include <stdio.h>
+
+volatile int shared_counter = 0; // Biến toàn cục chia sẻ
+
+void* thread1_func(void* arg) {
+    while (shared_counter < 10) {
+        shared_counter++; // Tăng giá trị biến
+        printf("Thread 1: counter = %d\n", shared_counter);
+    }
+    return NULL;
+}
+
+void* thread2_func(void* arg) {
+    while (shared_counter < 10) {
+        shared_counter++; // Tăng giá trị biến
+        printf("Thread 2: counter = %d\n", shared_counter);
+    }
+    return NULL;
+}
+
+int main(void) {
+    pthread_t thread1, thread2;
+    pthread_create(&thread1, NULL, thread1_func, NULL);
+    pthread_create(&thread2, NULL, thread2_func, NULL);
+    pthread_join(thread1, NULL);
+    pthread_join(thread2, NULL);
+    return 0;
+}
+```
+
+### **4.5.Register**
+
+#### **4.5.1.Định nghĩa**
+
+* Biến register được sử dụng để gợi ý cho trình biên dịch rằng 1 biến nên được lưu trữ trong **thanh ghi CPU thay vì RAM**
+
+=> Tăng hiệu năng, giảm thời gian truy cập
+
+#### **4.5.2.Đặc điểm**
+
+* ALU là đơn vị xử lý toán học và logic trong CPU, thực hiện các phép toán như cộng, trừ, nhân, chia, AND, OR, XOR, ...
+
+
+![Image](https://github.com/user-attachments/assets/a73e7c81-7d77-4439-a087-2d87d89a2398)
+
+#### **4.5.3.Hạn ché**
+
+* Không áp dụng cho tất cả biến
+
+* Hạn chế với biến lớn   
+ </details> 
