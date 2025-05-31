@@ -1354,9 +1354,9 @@ Kich thuoc cua con tro ham: 8 bytes
    </details> 
 
 <details>
-	<summary><strong>BÀI 4: Storage Class</strong></summary>
+	<summary><strong>BÀI 4: Special Variables</strong></summary>
 
-## **Bài 4: Storage Class**
+## **Bài 4: Special Variables**
 
 ### **4.1.Kiến thức chung**
 
