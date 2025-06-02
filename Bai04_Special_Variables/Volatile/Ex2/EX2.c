@@ -3,7 +3,7 @@
 #include<unistd.h>
 
 volatile uint32_t button_count = 0;
-volatile uint32_t led_state = 0;
+volatile uint8_t led_state = 0;
 
 void button_isr(void){
 	button_count++;
