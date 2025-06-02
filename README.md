@@ -1651,7 +1651,7 @@ int main(void) {
 
 ![Image](https://github.com/user-attachments/assets/a73e7c81-7d77-4439-a087-2d87d89a2398)
 
-#### **4.5.3.Hạn ché**
+#### **4.5.3.Hạn chế**
 
 * Không áp dụng cho tất cả biến
 
