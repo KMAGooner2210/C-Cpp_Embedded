@@ -1657,3 +1657,160 @@ int main(void) {
 
 * Hạn chế với biến lớn   
  </details> 
+<details>
+	<summary><strong>BÀI 5: Control Flow</strong></summary>
+
+## **Bài 5: Control Flow**
+
+### **5.1.Goto**
+
+#### **5.1.1.Định nghĩa**
+
+* Câu lệnh `goto` cho phép chương trình **nhảy trực tiếp và vô điều kiện** đến một nhãn được định nghĩa trong cùng một hàm
+
+* Nhãn là một điểm được đánh dấu trong mã nguồn,thường được **đặt tên bằng một định danh (identifier) và kết thúc bằng dấu :**
+
+
+#### **5.1.2.Mục đích**
+
+*  Dùng để thay đổi luồng điều khiển chương trình một cách thủ công, bỏ qua các cấu trúc điều khiển thông thường như vòng lặp,câu lệnh điều kiện hoặc hàm
+
+*  Được sử dụng để thoát khỏi nested loops
+    ```
+    for(int i = 0;i < n; i++){
+        for(int j = 0; j < m; j++){
+            if(some_condition){
+                goto exit_loops; //Thoát khỏi cả 2 vòng lặp
+            }
+        }
+    }
+    exit_loops:
+    ```
+
+#### **5.1.3.Cú pháp**
+
+    
+    goto label_name; //Nhảy đến nhãn có tên label_name
+
+    //... (các dòng mã khác)
+
+    label_name: //Định nghĩa nhãn
+    // khối mã được thực thi sau khi nhảy đến đây
+    
+    
+
+```
+    #include<stdio.h>
+    #include<stdlib.h>
+
+    int main(){
+
+        int * arr = malloc(sizeof(int) * 100);
+        if(arr = NULL){
+            goto error;
+        }
+
+        for(int i =0; i < 5; i++){
+            arr[i] = i;
+            printf("%d", arr[i]);
+        }
+
+        free(arr);
+        goto done;
+    
+    error:
+        printf("Loi: Khong the cap phat bo nho!\n");
+    
+    done:
+        printf("End.\n");
+
+        return 0;
+    }
+
+```
+
+
+
+### **5.2.setjmp và longjmp**
+
+#### **5.2.1.Định nghĩa**
+
+* `setjmp` và `longjmp` là 1 cặp hàm trong C cung cấp cơ chế **nhảy không cục bộ**, cho phép chuyển luồng điều khiển từ một hàm sâu trong ngăn xếp gọi trở về một điểm đã đánh dấu ở một hàm gọi bên ngoài, **bỏ qua các lệnh return thông thường**
+
+* `goto` chỉ nhảy trong phạm vi cùng một hàm
+
+* `setjmp/longjmp` có thể nhảy qua nhiều cấp hàm trong ngăn xếp gọi,kể cả từ hàm con về hàm cha
+
+#### **5.2.2.Mục đích**
+
+* Triển khai cơ chế xử lý ngoại lệ đơn giản trong C
+
+* Thoát khỏi các ngữ cảnh xử lý phức tạp khi xảy ra lỗi hoặc điều kiện đặc biệt
+
+#### **5.2.3.Thư viện**
+
+* Sử dụng thư viện `<setjmp.h>`
+
+* **Hàm int setjmp(jmp_buf env)**
+
+    ◦ **Chức năng:** Lưu trạng thái môi trường hiện tại(bao gồm con trỏ ngăn xếp, thanh ghi, và các thông tin liên quan đến luồng điều khiển) vào biến `jmp_buf_env`
+
+    ◦ **Giá trị trả về:** 
+
+        Trả về 0 khi được gọi trực tiếp (lần đầu tiên)
+
+        Trả về giá trị val(hoặc 1 nếu val == 0)khi được khôi phục bởi longjmp
+
+    ◦ **Lưu ý:**
+
+        jmp_buf là một kiểu dữ liệu đặc biệt (thường là mảng hoặc cấu trúc được định nghĩa trong <setjmp.h>,dùng để lưu trạng thái)
+
+* **Hàm void longjmp(jmp_buf env,int val)**
+
+    ◦ **Chức năng:** Khôi phục trạng thái môi trường đã được lưu trong `env` bởi `setjmp`.Sau khi gọi, luồng thực thi sẽ tiếp tục ngay sau lệnh `setjmp` tương ứng, như thể `setjmp` vừa trả về giá trị `val`
+
+    ◦ **Tham số:** 
+
+        env: Môi trường đã lưu bởi setjmp
+        
+        val: Giá trị trả về cho `setjmp`. Nếu val == 0, setjmp sẽ trả về 1
+
+    
+    ◦ **Lưu ý:**
+
+        Hàm gọi long_jmp không bảo giờ trả về
+
+        longjmp khôi phục trạng thái ngăn xếp và thanh ghi, nhưng không đảm bảo trạng thái của các biến cục bộ hoặc tài nguyên
+
+* **VD:**
+```
+#include<setjmp.h>
+#include<stdio.h>
+
+jmp_buf env;
+
+void check_even(int number){
+    if(number % 2 != 0){
+        printf("Loi: %d la so le!\n", number);
+        longjmp(env, 1); //Nhay ve setjmp voi ma loi 1
+    }
+    printf("%d la so chan\n", number);
+}
+
+int main(){
+    if(setjmp(env) == 0){
+        printf("Kiem tra so...\n");
+        check_even(7);
+    }else{
+        printf("Da phat hien loi,chuong trinh tiep tuc.\n");
+    }
+    return 0;
+}
+```
+
+```
+Kiem tra so...
+Loi: 7 la so le!
+Da phat hien loi,chuong trinh tiep tuc
+```
+ </details>
