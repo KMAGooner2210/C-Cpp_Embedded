@@ -1814,3 +1814,215 @@ Loi: 7 la so le!
 Da phat hien loi,chuong trinh tiep tuc
 ```
  </details>
+<details> 
+ <summary><strong>BÀI 6: Bit Manipulation</strong></summary>
+
+## **Bài 6: Bit Manipulation**
+
+### **6.1.Số nhị phân và bit**
+
+#### **6.1.1.Định nghĩa**
+
+* Máy tính lưu trữ và xử lý dữ liệu dưới dạng nhị phân (binary), sử dụng các bit (0 và 1)
+
+* Một byte gồm 8 bit.Các giá trị lớn hơn(như 16,32,64 bit) được dùng cho các kiểu dữ liệu như `short`,`int`,`long`,...
+
+* VD:
+  ```
+  Số thập phân 5: 00000101
+  Số thập phân 13: 00001101
+  ```
+#### **6.1.2.Số có dấu và không dấu**
+
+* Với **số không dấu (unsigned)**, các bit chỉ biểu diễn **giá trị dương**
+
+* Với **số có dấu(signed)**
+
+  ◦ bit cao nhất (MSB) biểu thị dấu **0 cho dương , 1 cho âm**
+  
+  ◦ Giá trị thường được biểu diễn dưới dạng bù 2
+
+  VD: 
+  ```
+  -5 = 11111011
+  ```
+
+### **6.2.Bitwise Operators (Toán tử thao tác bit)**
+
+*  Các toán tử này hoạt động trực tiếp trên biểu diễn bit của toán hạng, thường là kiểu số nguyên (`int`,`unsigned int`,...)
+
+#### **6.2.1. & (Bitwise AND)**
+
+* Kết quả bit là 1 nếu cả 2 bit tương ứng là 1
+
+* Ứng dụng : Xóa bit, kiểm tra bit
+
+* VD: 101 & 110 = 100
+
+#### **6.2.2. | (Bitwise OR)**
+
+* Kết quả bit là 1 nếu ít nhất 1 trong 2 bit tương ứng là 1
+
+* Ứng dụng: Đặt bit
+
+* VD: 101 | 110 = 111
+
+#### **6.2.3. ^ (Bitwise XOR)**
+
+* Kết quả bit là 1 nếu 2 bit tương ứng khác nhau
+
+* Ứng dụng: Đảo bit, kiểm tra khác biệt
+
+* VD: 101 ^ 110 = 011
+
+#### **6.2.4. ~ (Bitwise NOT)**
+
+* Đảo tất cả các bit: 0 thành 1, 1 thành 0
+
+* Kết quả phụ thuộc vào kích thước kiểu dữ liệu (8,16,32 bit,...)
+
+* `~101` = `~00000101 = 11111010`
+
+#### **6.2.5. << (Left Shift)**
+
+* Dịch chuyển các bit sang trái n vị trí, các bit mới bên phải được điền bằng 0
+
+* Tương đương nhân với `2^n` (cho số không dấu)
+
+* VD: `101 << 1 = 1010  (Thập phân: 5 << 1 = 10)`
+
+* Lưu ý: Nếu dịch quá nhiều, bit có thể bị mất, gây tràn
+
+#### **6.2.6. >> (Right Shift)**
+
+* Dịch chuyển các bit sang phải n vị trí, các bit mới bên trái được điền bằng 0 (thường cho số không dấu)
+
+* Tương đương chia với `2^n` (cho số không dấu)
+
+ VD: `1011 >> 1 = 0101 (Thập phân: 11 >> 1 = 5)`
+
+* **Arithmetic Shift:** Bit mới bên trái điền bằng bit dấu (MSB) ban đầu (thường cho số có dấu)
+
+ VD: `-5 (11111011) >> 1 = 11111101`
+
+### **6.3.Bitmasks (Mặt nạ bit)**
+
+#### **6.3.1.Định nghĩa**
+
+* Bitmask là một giá trị (thường là hằng số) được thiết kế để thao tác (set,clear,toggle,test) các bit cụ thể trong một biến bằng các toán tử Bitwise
+
+* Mỗi bit trong mask địa diện cho một cờ (flag) hoặc tùy chọn
+
+#### **6.3.2.Kỹ thuật phổ biến**
+
+* **Tạo mask cho bit thứ n** 
+
+◦  Công thức: `1 << n`
+
+◦  VD: Mask cho bit 3: `1 << 3 = 00001000`
+
+* **Set bit thứ n(đặt bit thành 1)**
+
+◦  Công thức: `value |= (1 << n);`
+
+◦ VD: Set bit 3 của `value = 5 (nhị phân: 00000101)`
+
+  ```
+  value |= ( 1 << 3); -> 00000101 | 00001000 = 00001101 (thập phân: 13)
+  ```
+
+* **Clear bit thứ n(xóa bit, đặt thành 0)**
+
+◦ Công thức: `value &= ~(1 << n);`
+
+◦ VD: Clear bit thứ 3 của `value = 13 (nhị phân: 00001101)`
+  ```
+  value &= ~(1 << 3); -> 00001101 & 11110111 = 00000101
+  ```
+
+* **Toggle bit thứ n(đảo bit: 0 thành 1, 1 thành 0)**
+
+◦ Công thức: `value ^= (1 << n);`
+
+◦ VD: Toggle bit thứ 3 của `value = 5 (nhị phân: 00000101)`
+  ```
+  value ^= (1 << 3); -> 00000101 ^ 00001000 = 00001101
+  ```
+
+* **Test bit thứ n (kiểm tra bit có được set không)**
+
+◦ Công thức: `if (value & (1 << n)) {...}`
+
+◦ Kết quả khác 0 nếu bit được set (là 1)
+
+◦ VD: Kiểm tra bit 2 của `value = 5 (nhị phân: 00000101)`
+  ```
+  5 & (1 << 2) -> 00000101 & 00000100 = 00000100 (khác 0, bit 2 được set)
+  ```
+
+* **Set nhiều bit**
+
+◦ Công thức: `value |= (MASK1 | MASK2);`
+
+◦ VD: Set bit 2 và bit 3: `value |= (1 << 2 | 1 << 3);`
+```
+00000000 | (00000100 | 00001000) = 00001100 (thập phân: 12)
+```
+
+* **Clear nhiều bit**
+
+◦ Công thức: `value &= ~(MASK1 | MASK2);`
+
+◦ VD: Clear bit 2 và 3 của `value = 15 (nhị phân: 00001111)`
+```
+value &= ~(1 << 2 | 1 << 3); -> 00001111 & 11110011 = 00000011 (thập phân: 3)
+```
+* **Kiểm tra nhiều bit cùng được set**
+
+◦ Công thức: `if ((value & (MASK1 | MASK2)) == (MASK1 | MASK2)) {...}`
+
+◦ VD: Kiểm tra bit 2 và 3 của `value = 12 (nhị phân: 00001100)`
+```
+(12 & (1 << 2 | 1 << 3)) == (1 << 2 | 1 << 3) -> (00001100 & 00001100) == 00001100 -> true
+```
+
+### **6.4.Bit Fields (Trường bit trong cấu trúc)**
+
+#### **6.4.1.Lý thuyết**
+
+* Bit Fields cho phép định nghĩa các thành viên của một `struct` với số lượng bit cụ thể, giúp tiết kiệm bộ nhớ hoặc ánh xạ chính xác tới cấu trúc dữ liệu của phần cứng (như thanh ghi điều khiển)
+
+```
+struct Register {
+  unsigned int flag1 : 1;  //flag1 dùng 1 bit
+  unsigned int config : 4; //config dùng 4 bit
+  unsigned int status : 3; //status dùng 3 bit
+};
+```
+Cách sử dụng:
+
+```
+Khởi tạo :  struct Register reg = {1, 5, 2}; (gán flag1 = 1, config = 5, status = 2).
+Truy cập :  reg.flag1 = 0; hoặc if (reg.status == 2) { ... }.
+```
+
+Lưu ý:
+
+* Thứ tự bit và padding: 
+   
+   ◦ Thứ tự các bit field trong bộ nhớ (endianness) và cách đóng gói (padding) phụ thuộc vào trình biên dịch và kiến trúc máy, gây vấn đề về tính tương thích (portability).
+
+   ◦ Một số trình biên dịch có thể chèn padding để căn chỉnh byte.
+
+* Hạn chế:
+
+   ◦ Không thể lấy địa chỉ của bit field (ví dụ: &reg.flag1 là lỗi).
+
+   ◦ Kiểu dữ liệu cơ sở thường là `unsigned int` hoặc `int` để tránh vấn đề với số có dấu.
+
+* Ứng dụng:
+
+   ◦ Lập trình nhúng: Điều khiển thanh ghi phần cứng.
+
+   ◦ Nén dữ liệu: Lưu trữ nhiều giá trị nhỏ trong không gian bộ nhớ hạn chế.
+</details>
