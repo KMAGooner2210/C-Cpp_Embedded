@@ -2026,3 +2026,332 @@ Lưu ý:
 
    ◦ Nén dữ liệu: Lưu trữ nhiều giá trị nhỏ trong không gian bộ nhớ hạn chế.
 </details>
+<details> 
+ <summary><strong>BÀI 7: Kiểu dữ liệu tùy chỉnh</strong></summary>
+
+## **Bài 7: Kiểu dữ liệu tùy chỉnh**
+
+### **7.1.Structs**
+
+#### **7.1.1.Định nghĩa**
+
+* Struct là kiểu dữ liệu tùy chỉnh, nhóm các biến có kiểu dữ liệu khác nhau thành một đơn vị logic
+
+* Các thành viên được lưu trữ liên tiếp trong bộ nhớ, nhưng có thể có **padding** để đảm bảo căn chỉnh bộ nhớ theo kiến trúc CPU
+
+#### **7.1.2.Đặc điểm**
+
+* Mỗi thành viên có thể truy cập riêng lẻ qua tên
+
+* Kích thước của struct (`sizeof(struct)`) là tổng kích thước của tất cả thành viên, cộng thêm **padding** 
+
+* Padding đảm bảo các thành viên nằm ở địa chỉ chia cho hết kích thước căn chỉnh
+
+* Có thể dùng `__attribute__(packed))` để loại bỏ padding
+
+#### **7.1.3.Cú pháp**
+
+```
+struct TenStruct {
+    int bien1;      //4 bytes
+    double bien2;   //8 bytes
+    char ten[10];   //10 bytes 
+}
+
+```
+#### **7.1.4.Khai báo và truy cập**
+
+* Khai báo biến
+```
+struct TenStruct bienStruct;
+struct TenStruct *conTro = &bienStruct;
+
+```
+
+* Truy cập thành viên
+
+   ◦ Dùng `.` cho biến struct : `bienStruct.bien1 = 10`
+
+   ◦ Dung `->` cho con trỏ struct: `conTro->bien1 = 20` 
+
+#### **7.1.5.Struct lồng nhau**
+
+* Cho phép tổ chức dữ liệu theo cấu trúc phân cấp
+
+* Truy cập thành viên lồng nhau bằng cách dùng nhiều toán tử `.` hoặc `->`
+
+* Padding vẫn áp dụng cho cả struct bên trong và bên ngoài
+
+```
+struct SinhVien {
+    int maSV;
+    char ten[50];
+    float diemTB;
+};
+
+struct LopHoc {
+    char tenLop[20];
+    int siSo;
+    struct SinhVien sv[100];
+};
+
+```
+
+* Truy cập
+```
+struct LopHoc lop;
+lop.sv[0].maSV = 1001;
+strcpy(lop.sv[0].ten. "Mai Thanh Tung");
+lop.sv[0].diemTB = 8.5;
+```
+
+
+
+
+### **7.2.Unions**
+
+#### **7.2.1.Định nghĩa**
+
+* Cho phép lưu trữ nhiều kiểu dữ liệu khác nhau tại **cùng một vị trí bộ nhớ**. 
+
+* Chỉ một thành viên chứa giá trị hợp lệ tại một thời điểm
+
+#### **7.2.2.Đặc điểm**
+
+* Kích thước của union bằng kích thước của thành viên lớn nhất
+
+* Phải tự quản lý thành viên hợp lệ, thường dùng biến/enum bổ sung
+
+* Type punning: Ghi dữ liệu bằng một kiểu và đọc bằng kiểu khác(ví dụ: xem bit của float qua int)
+
+#### **7.2.3.Cú pháp**
+```
+union DuLieu{
+    int soNguyen;       //4 bytes
+    float soThuc;       //4 bytes
+    char chuoi[20];     //20 bytes
+};
+```
+
+#### **7.2.4.Khai báo biến và truy cập**
+
+* **Khai báo biến:** `union DuLieu bienUnion;`
+
+* **Truy cập:** `bienUnion.soNguyen = 100;`
+
+#### **7.2.5.Union trong Struct**
+
+* Union được sử dụng như một thành viên của struct để lưu trữ nhiều kiểu dữ liệu khác nhau tại cùng một vị trí bộ nhớ trong struct
+
+* Padding của struct vẫn áp dụng, nhưng union chỉ chiếm kích thước của thành viên lớn nhất
+
+* Cú pháp
+```
+struct SinhVien {
+    int maSV;
+    char ten[50];
+    enum{ DIEM_SO, DIEM_CHU } kieuDiem;
+    union {
+        float diemSo;
+        char diemChu[3];
+    } diem;
+};
+
+```
+
+* Truy cập
+
+  ◦ Ghi và đọc dựa trên giá trị của biến `kieuDiem:`
+  ```
+  struct SinhVien SV;
+  sv.kieuDiem = DIEM_SO;
+  sv.diem.diemSo = 8.5;
+  ```
+
+
+### **7.3.Typedef (Tạo kiểu dữ liệu mới)**
+
+* **Định nghĩa:** Typedef tạo bí danh(alias) cho kiểu dữ liệu hiện có, giúp mã dễ đọc và tăng tính tương thích
+
+* **Đặc điểm:** 
+
+   ◦ Không tạo kiểu mới, chỉ đặt tên khác
+
+   ◦ Ứng dụng: Rút gọn tên kiểu phức tạp (struct,union,con trỏ hàm), tăng tính rõ ràng
+
+* **Cú pháp:**
+
+```
+typedef existing_type new_type_name;
+
+```
+
+* **Ứng dung:**
+
+   ◦ Rút gọn struct: `typedef struct { int x; int y; } Diem;`
+
+   ◦ Rút gọn con trỏ hàm: `typedef int (*HamTinhToan) (int,int);`
+
+   ◦ portability: `typedef unsigned char BYTE;`
+
+### **7.4.Kích thước của Struct và Union**
+
+#### **7.4.1.Kích thước của Struct**
+
+* Kích thước của struct là tổng kích thước của tất cả thành viên, cộng thêm **byte đệm (padding)** để đảm bảo **căn chỉnh bộ nhớ (alignment)** 
+
+* **Alignment:**
+
+   ◦ Mỗi kiểu dữ liệu có yêu cầu căn chỉnh riêng, thường là bộ số của kích thước kiểu (ví dụ: `int` 4 bytes căn chỉnh tại địa chỉ chia hết cho 4, `double` 8 bytes căn chỉnh tại địa chỉ chia hết cho 8)
+
+   ◦ Struct được căn chỉnh theo **yêu cầu căn chỉnh lớn nhất** của bất kỳ thành viên ngoài
+
+* **Padding:**
+
+   ◦ Trình biên dịch thêm byte đệm giữa các thành viên hoặc cuối struct để đảm bảo mỗi thành viên nằm ở địa chỉ phù hợp
+
+   ◦ Kích thước struct phải là bội số của yêu cầu căn chỉnh lớn nhất để hỗ trợ mảng struct
+
+* **Công thức tính:**
+
+   ◦ 1. Xác định kích thước và yêu cầu căn chỉnh của từng thành viên
+
+   ◦ 2. Thêm padding giữa các thành viên để căn chỉnh địa Chỉ
+
+   ◦ 3. Thêm padding cuối struct để kích thước tổng là bội số của yêu cầu căn chỉnh lớn nhất
+
+* **Yếu tố ảnh hưởng**
+
+   ◦ Kiến trúc CPU (32 bit vs 64 bit)
+
+   ◦ Trình biên dịch
+
+   ◦ Thứ tự khai báo thành viên
+
+* **VD1:**
+
+```
+struct Example {
+    char c;    // 1 byte
+    int i;     // 4 bytes
+    double d;  // 8 bytes
+};
+
+```
+Tính toán kích thước (hệ 64 bit)
+```
+ char c: 1 byte, căn chỉnh 1 byte -> offset 0
+ int i: 4 bytes, căn chỉnh 4 bytes -> cần offset chia hết cho 4,nên thêm 3 bytes padding sau c -> offset: 4 (1 + 3)
+ double d: 8 bytes, căn chỉnh 8 bytes -> cần offset chia hết cho 8,nên thêm 4 bytes padding sau i -> offset: 12 (4 + 4 + 4)
+
+ => Tổng: 12 + 8 = 20 bytes
+
+ => Struct cần căn chỉnh 8 bytes (lớn nhất trong các thành viên), nên thêm 4 byte padding cuối -> KÍCH THƯỚC: 24 BYTES
+```
+
+Loại bỏ padding
+```
+struct Example {
+    char c;
+    int i;
+    double d;
+} __attribute__((packed));
+
+=> KÍCH THƯỚC: 1 + 4 + 8 = 13 bytes
+```
+
+* **VD2:**
+
+```
+struct Example2 {
+    double d;  // 8 bytes
+    int i;     // 4 bytes
+    char c;    // 1 byte
+};
+
+```
+Tính toán kích thước (hệ 64 bit)
+```
+double d: 8 bytes, căn chỉnh 8 bytes → offset 0.
+int i: 4 bytes, căn chỉnh 4 bytes → offset 8 (không cần padding).
+char c: 1 byte, căn chỉnh 1 byte → offset 12 (8 + 4).
+
+=> Tổng: 12 + 1 = 13 bytes.
+
+=> Căn chỉnh struct: 8 bytes → thêm 3 byte padding cuối → Kích thước: 16 bytes.
+
+=> Thứ tự khai báo ảnh hưởng padding, nên đặt thành viên lớn trước có thể giảm kích thước.
+
+```
+
+#### **7.4.2.Kích thước của Union**
+
+* Kích thước của union (sizeof(union)) bằng kích thước của **thành viên lớn nhất**, cộng thêm padding (nếu cần) để đảm bảo căn chỉnh bộ nhớ.
+
+* **Alignment:**
+
+   ◦ Union được căn chỉnh theo yêu cầu căn chỉnh lớn nhất của bất kỳ thành viên nào.
+
+   ◦ Tất cả thành viên chia sẻ cùng vị trí bộ nhớ, nên không có padding giữa các thành viên.
+
+
+* **Công thức tính:**
+
+   ◦ 1. Xác định kích thước lớn nhất của các thành viên.
+
+   ◦ 2. Đảm bảo kích thước union là bội số của yêu cầu căn chỉnh lớn nhất.
+
+* **Yếu tố ảnh hưởng**
+
+   ◦ Kiến trúc CPU (32 bit vs 64 bit)
+
+   ◦ Trình biên dịch
+
+   ◦ Kích thước và yêu cầu căn chỉnh của thành viên lớn nhất.
+
+* **VD1:**
+
+```
+union Data {
+    char c;     // 1 byte
+    int i;      // 4 bytes
+    double d;   // 8 bytes
+};
+
+```
+Tính toán kích thước (hệ 64 bit)
+```
+Thành viên lớn nhất: double d (8 bytes).
+Yêu cầu căn chỉnh lớn nhất: 8 bytes.
+Kích thước union: 8 bytes (không cần padding thêm vì 8 đã là bội số của 8).
+
+```
+
+Loại bỏ padding
+```
+union Data {
+    char c;
+    int i;
+    double d;
+} __attribute__((packed));
+
+=> KÍCH THƯỚC: 8 bytes vì thành viên lớn nhất (double) yêu cầu tối thiểu 8 bytes.
+```
+
+* **VD2:**
+
+```
+union Data2 {
+    char arr[7]; // 7 bytes
+    int i;       // 4 bytes
+};
+
+```
+Tính toán kích thước (hệ 64 bit)
+```
+hành viên lớn nhất: char arr[7] (7 bytes).
+Yêu cầu căn chỉnh lớn nhất: 4 bytes (int i).
+Kích thước union: 7 bytes, nhưng phải là bội số của 4 → thêm 1 byte padding → Kích thước: 8 bytes.
+
+```
+</details>
