@@ -2355,3 +2355,138 @@ Kích thước union: 7 bytes, nhưng phải là bội số của 4 → thêm 1 
 
 ```
 </details>
+<details> 
+ <summary><strong>BÀI 8:Memory Layout</strong></summary>
+
+## **Bài 8: Memory Layout**
+
+![Image](https://github.com/user-attachments/assets/0533640f-e379-42a7-a204-6e873241a0c6)
+
+### **8.1.Text Segment(.text)**
+
+#### **8.1.1.Mục đích**
+
+* Lưu trữ mã máy đã được biên dịch từ mã nguồn C, bao gồm các lệnh thực thi của chương trình
+
+#### **8.1.2.Đặc điểm**
+
+* Chỉ đọc (read-only) để bảo vệ mã lệnh khỏi bị sửa đổi trong lúc chạy
+
+* Có thể được chia sẻ giữa nhiều tiến trình chạy cùng một chương trình,giúp tiết kiệm bộ nhớ
+
+* Thường nằm ở vùng địa chỉ thấp của bộ nhớ
+
+VD: Các hàm như main(), các vòng lặp,câu lệnh điều kiện và các hàm khác đều được lưu ở đây
+
+
+
+### **8.2.Initialized Data Segment(.data)**
+
+#### **8.2.1.Mục đích**
+
+* Lưu trữ các biến toàn cục và biến tĩnh được khởi tạo với giá trị khác 0 trong mã nguồn. 
+
+
+#### **8.2.2.Đặc điểm**
+
+* Có thể đọc và ghi (read-write)
+
+* Kích thước được xác định tại thời điểm biên dịch
+
+* Các giá trị khởi tạo được lưu trực tiếp trong file thực thi, do đó làm tăng kích thước file
+```
+int global_value = 100; // Lưu trong .data
+static int static_value = 50; // Lưu trong .data
+```
+
+
+### **8.3.Unitialized Data Segment(.bss)**
+
+#### **8.3.1.Mục đích**
+
+* Lưu trữ các biến toàn cục và biến tĩnh không được khởi tạo tường minh hoặc được khởi tạo bằng 0
+
+#### **8.3.2.Đặc điểm**
+
+* Có thể đọc và ghi (read-write)
+
+* Hệ điều hành tự động khởi tạo tất cả các giá trị trong vùng này thành 0 khi chương trình bắt đầu
+
+* Không lưu giá trị cụ thể trong file thực thi, giúp tiết kiệm không gian
+```
+int global_zero; //Lưu trong .bss
+static float static_uninit; //Lưu trong .bss
+```
+
+### **8.4.Heap**
+
+#### **8.4.1.Mục đích**
+
+* Vùng nhớ động được cấp phát và giải phóng trong lúc chạy chương trình thông qua các hàm như `malloc()`,`calloc()`,`realloc()` và `free()`
+
+
+#### **8.4.2.Đặc điểm**
+
+* Kích thước có thể thay đổi động (tăng hoặc giảm ) trong quá trình thực thi
+
+* Thường "mọc" từ địa chỉ thấp lên cao
+
+* Lỗi thường gặp
+
+   ◦ Memory leak: Không gọi `free()` cho bộ nhớ đã cấp phát
+
+   ◦ Use after free: Truy cập bộ nhớ sau khi đã giải phóng
+
+   ◦ Dangling pointer: Con trỏ vẫn trỏ đến vùng nhớ đã giải phóng
+
+   ◦ Fragmentation: Bộ nhớ bị chia thành các mảnh nhỏ,gây khó khăn cho việc cấp phát các khối lớn
+
+vd:
+```
+int *ptr = malloc(10 * sizeof(int));
+free(ptr);
+
+```
+
+### **8.5.Stack**
+
+#### **8.5.1.Mục đích**
+
+* Lưu trữ các biến cục bộ, tham số hàm, địa chỉ trả về, và trạng thái thanh ghi khi gọi hàm
+
+
+#### **8.5.2.Đặc điểm**
+
+* Hoạt động theo cơ chế LIFO
+
+* Mỗi lần gọi hàm, một **stack frame** được tạo ra để lưu trữ thông tin của hàm đó.Khi hàm kết thúc **stack frame** bị xóa
+
+* Thường "mọc" từ địa chỉ cao xuống thấp
+
+* Kích thước stack thường cố định, được xác định bởi hệ điều hành hoặc trình biên dịch.Vượt quá kích thước có thể gây ra stack overflow
+
+vd:
+```
+void func(int param){
+    int local_var = 10; //Lưu trên stack
+}
+
+```
+
+### **8.6.Các vùng bộ nhớ phụ khác**
+
+#### **8.6.1.Environment/Arguments Segment**
+
+* Lưu trữ các biến môi trường và các tham số dòng lệnh(argc, argv) được truyền vào chương trình
+
+* Thường nằm ở vùng địa chỉ cao, gần stack
+
+
+#### **8.6.2. Memory Mapping Segment**
+
+* Dùng cho các file ánh xạ bộ nhớ (memory-mapped files) hoặc các thư viện động được nạp vào bộ nhớ
+
+* Vị trí và cách sử dụng phụ thuộc vào hệ điều hành
+
+
+</details>
