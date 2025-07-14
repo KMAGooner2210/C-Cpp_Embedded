@@ -1353,58 +1353,157 @@ Kich thuoc cua con tro ham: 8 bytes
 ```
    </details> 
 
+
 <details>
 	<summary><strong>BÀI 4: Special Variables</strong></summary>
 
 ## **Bài 4: Special Variables**
 
-### **4.1.Kiến thức chung**
+### **4.1.Tổng quan**
 
+* Trong lập trình C, các biến và hàm được đặc trưng bởi bốn thuộc tính chính: **phạm vi (scope), thời gian sống (lifetime), vị trí bộ nhớ (memory location), và liên kết (linkage).** Những thuộc tính này quyết định cách truy cập, lưu trữ và liên kết các biến và hàm trong chương trình.
 
+*  **Phạm vi(Scope):** Xác định nơi mà tên biến hoặc hàm có thể được truy cập.
 
-* Không chỉ xác định phạm vi(scope), thời gian sống(lifetime), và vùng nhớ lưu trữ(memory location) mà còn xác định **liên kết(linkage)** của biến hoặc hàm 
+*  **Thời gian tồn tại(Lifetime):** Khoảng thời gian biến tồn tại trong bộ nhớ
 
-*  **Scope:** Nơi mà tên biến/hàm có thể được truy cập 
-   
-    ◦  **Block Scope:** Bên trong cặp dấu {}
-   
-    ◦  **File Scope:** Bên ngoài tất cả các hàm trong một file.Biến/hàm khai báo ở đây thường được gọi là toàn cục(global) cho file đó
+*  **Vị trí bộ nhớ(Memory Location):**
 
-    ◦  **Function Prototype Scope:** Chỉ áp dụng cho tên tham số trong khai báo hàm
+*  **Liên kết(Linkage):** Quy định khả năng tham chiếu đến tên biến hoặc hàm từ các đơn vị dịch (translation unit) khác.
 
-*  **Lifetime:** Khoảng thời gian biến tồn tại trong bộ nhớ
+### **4.2.Phạm vi (Scope)** 
 
-    ◦ **Automatic:** Biến cục bộ, tồn tại khi khối lệnh chứa nó được thực thi,bị hủy khi ra khỏi khối
+*  Phạm vi xác định nơi mà tên của biến hoặc hàm có thể được truy cập trong chương trình.
 
-    ◦ **Static:** Biến toàn cục, biến `static` cục bộ, biến `extern`.Tồn tại suốt thời gian chương trình chạy
+#### **4.2.1.Phạm vi khối (Block Scope):**
 
-* **Memory Location:**
+* Biến được khai báo bên trong một khối lệnh (giới hạn bởi cặp dấu {}).
 
-    ◦ **Stack:** Biến cục bộ 
+* Chỉ có thể truy cập trong khối lệnh chứa nó.
 
-    ◦ **Data Segment/BSS Segment:** Biến toàn cục, biến `extern`, biến `static`
+* Ví dụ: Biến cục bộ trong hàm hoặc trong một khối for, while.
 
-        Data Segment: Lưu các biến toàn cục/static **đã được khởi tạo**
+#### **4.2.2.Phạm vi tệp (File Scope):**
 
-        BSS Segment: Lưu các biến toàn cục/static **chưa được khởi tạo hoặc khởi tạo bằng 0**
+* Biến hoặc hàm được khai báo bên ngoài tất cả các hàm trong một tệp.
 
-    ◦ **Heap:** Bộ nhớ cấp phát động(qua malloc,calloc)
+* Thường được gọi là biến hoặc hàm toàn cục (global) trong tệp đó.
 
-    ◦ **Text Segment(Code segment):** Mã lệnh của chương trình(các hàm)
-* **Linkage:**
+* Có thể truy cập ở bất kỳ đâu trong tệp, trừ khi bị hạn chế bởi từ khóa như static.
 
-    ◦ Quyết định xem một tên(biến / hàm) có thể được tham chiếu từ các đơn vị dịch khác hay không
+#### **4.2.3.Phạm vi prototype hàm (Function Prototype Scope):**
 
-        External Linkage: Tên có thể được tham chiếu từ các file khác.Biến toàn cục(không static) và hàm(không static) mặc định có liên kết ngoài
+* Áp dụng cho các tham số trong khai báo hàm (prototype).
 
-        Internal Linkage: Tên chỉ được tham chiếu bên trong file hiện tại.Biến toàn cục static và hàm static có liên kết nội
+* Chỉ tồn tại trong phần khai báo hàm và không ảnh hưởng đến định nghĩa hàm.
+```
+int globalVar = 10; // File scope
+void myFunction(int param) { // param có Function Prototype Scope
+    int localVar = 5; // Block scope
+    printf("%d\n", localVar);
+}
+```
+### **4.3.Thời gian sống (Lifetime)** 
 
-        No linkage: Biến cục bộ
+* Thời gian sống xác định khoảng thời gian một biến tồn tại trong bộ nhớ.
 
+#### **4.3.1.Tự động (Automatic):**
 
-### **4.2.Extern**
+* Biến cục bộ (local variable) được khai báo trong một khối lệnh.
+* Tồn tại chỉ khi khối lệnh chứa nó đang thực thi.
+* Bị hủy khi thoát khỏi khối lệnh.
 
-#### **4.2.1.Mục đích**
+#### **4.3.2.Tĩnh (Static):**
+
+* Bao gồm biến toàn cục, biến static cục bộ, và biến extern
+* Tồn tại suốt vòng đời của chương trình, từ khi bắt đầu đến khi kết thúc.
+* Chỉ được khởi tạo một lần khi chương trình khởi động.
+```
+void counter() {
+    static int count = 0; // Biến static, tồn tại suốt chương trình
+    count++;
+    printf("Count: %d\n", count);
+}
+
+int main() {
+    counter(); // In: Count: 1
+    counter(); // In: Count: 2
+    counter(); // In: Count: 3
+    return 0;
+}
+```
+### **4.4. Vị trí bộ nhớ (Memory Location)** 
+
+* Vị trí bộ nhớ xác định nơi mà biến hoặc mã lệnh được lưu trữ trong hệ thống
+
+#### **4.4.1.Stack**
+
+* Lưu trữ các biến cục bộ (automatic variables).
+* Bộ nhớ được cấp phát và giải phóng tự động khi khối lệnh thực thi hoặc kết thúc.
+
+#### **4.4.2.Data Segment**
+
+* Lưu trữ các biến toàn cục hoặc biến static đã được khởi tạo với giá trị khác 0.
+```
+Ví dụ: int globalVar = 10;
+```
+#### **4.4.3.BSS Segment**
+
+* Lưu trữ các biến toàn cục hoặc biến static chưa được khởi tạo hoặc được khởi tạo bằng 0.
+```
+Ví dụ: int globalVar;
+```
+
+#### **4.4.4.Heap**
+
+* Lưu trữ bộ nhớ được cấp phát động thông qua các hàm như malloc, calloc, hoặc realloc.
+
+#### **4.4.5.Text Segment (Code Segment)**
+
+* Lưu trữ mã lệnh của chương trình (các hàm).
+
+```
+int globalVar = 10; // Data Segment
+int uninitializedGlobalVar; // BSS Segment
+void myFunction() {
+    int localVar = 5; // Stack
+    int* dynamicVar = malloc(sizeof(int)); // Heap
+    // Text Segment chứa mã của myFunction
+}
+```
+### **4.5. Liên kết (Linkage)** 
+
+* Liên kết quyết định xem một tên (biến hoặc hàm) có thể được tham chiếu từ các tệp khác hay không.
+
+#### **4.5.1.Liên kết ngoài (External Linkage)**
+
+* Tên có thể được truy cập từ các tệp khác.
+
+* Áp dụng cho biến toàn cục (không có static) và hàm (không có static).
+
+* Ví dụ: Biến toàn cục hoặc prototype hàm không khai báo static.
+
+#### **4.5.2.Liên kết nội (Internal Linkage)**
+
+* Tên chỉ có thể được truy cập trong tệp hiện tại.
+
+* Áp dụng cho biến toàn cục hoặc hàm được khai báo với từ khóa static.
+
+#### **4.5.3.Không liên kết (No Linkage)**
+
+* Tên chỉ có thể truy cập trong phạm vi khai báo (thường là biến cục bộ).
+
+```
+int globalVar = 10; // External Linkage
+static int staticGlobalVar = 20; // Internal Linkage
+void myFunction() {
+    int localVar = 5; // No Linkage
+}
+```
+
+### **4.6.Extern**
+
+#### **4.6.1.Mục đích**
 
   * Extern là một **chỉ thị khai báo**
 
@@ -1416,11 +1515,7 @@ Kich thuoc cua con tro ham: 8 bytes
 
      ◦ **Nó khai báo một hàm mà định nghĩa của nó có thể ở file khác (hoặc ở phần sau của file hiện tại)**.Đối với hàm ,`extern` thường là ngầm định khi bạn khai báo prototype ở phạm vi toàn cục
 
-#### **4.2.2.Extern và Linkage**
-
-  * Extern ngụ ý rằng biến hoặc hàm có **liên kết ngoài**.Điều này có nghĩa là định nghĩa thực sự của biến hoặc hàm đó có thể nằm trong 1 file.c khác và linker sẽ kết nối các tham chiếu đến định nghĩa đó
-
-#### **4.2.3.Sử dụng**  
+#### **4.6.2.Ứng dụng**  
 
  * **Chia sẻ biến toàn cục**
  
@@ -1490,9 +1585,9 @@ Kich thuoc cua con tro ham: 8 bytes
     ```
 
 
-### **4.3.Static**
+### **4.7.Static**
 
-#### **4.3.1.Biến static cục bộ**
+#### **4.7.1.Biến static cục bộ**
 
 * **Lifetime:** Tồn tại suốt vòng đời chương trình, được cấp phát trong **data segment (khởi tạo khác 0)** hoặc **bss segment (khởi tạo bằng 0 hoặc không khởi tạo)**
 
@@ -1524,7 +1619,7 @@ int main() {
 ```
 
 
-#### **4.3.2.Biến static toàn cục**
+#### **4.7.2.Biến static toàn cục**
 
 * **Lifetime:** Tồn tại **suốt vòng đời chương trình**,từ khi chương trình khởi động(trước khi hàm `main` chạy) đến khi chương trình kết thúc
 
@@ -1563,19 +1658,19 @@ extern int globalCount; // Lỗi: không tìm thấy globalCount
 ```
 
 
-### **4.4.Volatile**  
+### **4.8.Volatile**  
 
-#### **4.4.1.Định nghĩa**
+#### **4.8.1.Định nghĩa**
 
-* Khi một biến được đánh dấu là `Volatile`,trình biên dịch không được phép tối ưu hóa (như loại bỏ hoặc cache) các thao tác đọc/ghi liên quan đến biến này,**vì giá trị của nó có thể thay đổi bất ngờ** từ các nguồn ngoài luồng thực thi hiện tại **(như phần cứng,ISR, hoặc thread khác)**
+* Từ khóa `volatile` ngăn trình biên dịch tối ưu hóa (như lưu trữ giá trị trong thanh ghi hoặc sắp xếp lại lệnh) các thao tác đọc/ghi biến, vì giá trị của biến có thể thay đổi bất ngờ từ các nguồn bên ngoài (phần cứng, ngắt, hoặc luồng khác).
 
-#### **4.4.2.Hành vi**
+#### **4.8.2.Hành vi**
 
-* Buộc trình biên dịch đọc/ghi trực tiếp từ/tới bộ nhớ mỗi khi truy cập biến,thay vì cache trong thanh ghi
+* Buộc trình biên dịch đọc/ghi trực tiếp từ/tới bộ nhớ mỗi khi truy cập biến.
 
-* Giữ nguyên thứ tự thao tác đọc/ghi,tránh tái sắp xếp do tối ưu hóa
+* Đảm bảo thứ tự thao tác không bị thay đổi do tối ưu hóa.
 
-#### **4.4.3.Các trường hợp sử dụng**
+#### **4.8.3.Các trường hợp sử dụng**
 
 * **Memory-mapped peripheral registers:** Truy cập các thanh ghi phần cứng(như GPIO,UART) để đảm bảo đọc/ghi chính xác giá trị hiện tại
 ```
@@ -1636,27 +1731,52 @@ int main(void) {
 }
 ```
 
-### **4.5.Register**
+### **4.9.Register**
 
-#### **4.5.1.Định nghĩa**
+#### **4.9.1.Định nghĩa**
 
 * Biến register được sử dụng để gợi ý cho trình biên dịch rằng 1 biến nên được lưu trữ trong **thanh ghi CPU thay vì RAM**
 
-=> Tăng hiệu năng, giảm thời gian truy cập
-
+* Thường được sử dụng cho các biến được truy cập thường xuyên trong vòng lặp hoặc tính toán.
 #### **4.5.2.Đặc điểm**
 
-* ALU là đơn vị xử lý toán học và logic trong CPU, thực hiện các phép toán như cộng, trừ, nhân, chia, AND, OR, XOR, ...
+* Tăng hiệu năng: Giảm thời gian truy cập bằng cách lưu biến trong thanh ghi CPU.
+
+* Không đảm bảo: Trình biên dịch có thể bỏ qua gợi ý register nếu không có thanh ghi khả dụng.
+
+* Không thể lấy địa chỉ của biến register (vì nó không nằm trong RAM).
+
+* Không áp dụng cho các biến lớn hoặc cấu trúc phức tạp.
+
+```
+void compute() {
+    register int i; // Gợi ý lưu i trong thanh ghi
+    for (i = 0; i < 1000000; i++) {
+        // Tính toán
+    }
+}
+```
+### **4.10. Tổng kết**
+
+* Phạm vi (Scope): Quy định nơi biến/hàm có thể được truy cập (block, file, prototype)
+
+* Thời gian sống (Lifetime): Quy định thời gian tồn tại của biến (automatic, static).
+
+* Vị trí bộ nhớ (Memory Location): Quy định nơi lưu trữ biến (stack, heap, data, BSS, text).
+
+* Liên kết (Linkage): Quy định khả năng tham chiếu biến/hàm giữa các tệp (external, internal, no linkage).
+
+* Từ khóa đặc biệt:
+
+    extern: Khai báo biến/ham có định nghĩa ở nơi khác, ngụ ý liên kết ngoài.
+    static: Hạn chế phạm vi (liên kết nội) và kéo dài thời gian sống.
+    volatile: Ngăn tối ưu hóa để đảm bảo đọc/ghi chính xác giá trị biến.
+    register: Gợi ý lưu biến trong thanh ghi để tăng hiệu năng.
 
 
-![Image](https://github.com/user-attachments/assets/a73e7c81-7d77-4439-a087-2d87d89a2398)
-
-#### **4.5.3.Hạn chế**
-
-* Không áp dụng cho tất cả biến
-
-* Hạn chế với biến lớn   
  </details> 
+
+
 <details>
 	<summary><strong>BÀI 5: Control Flow</strong></summary>
 
