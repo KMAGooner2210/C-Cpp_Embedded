@@ -1707,21 +1707,72 @@ int main() {
 // file2.c
 extern int globalCount; // Lỗi: không tìm thấy globalCount
 ```
-
-
-### **4.8.Volatile**  
+### **4.8.Weak Symbols**  
 
 #### **4.8.1.Định nghĩa**
 
+* Từ khóa `__attribute__((weak))` (trong GCC) đánh dấu một hàm hoặc biến là`weak` symbol, cho phép định nghĩa khác thay thế nó trong quá trình liên kết (linking).
+
+* Mục đích: Cung cấp một định nghĩa mặc định có thể được ghi đè bởi định nghĩa mạnh hơn (strong symbol) trong file khác.
+#### **4.8.2.Đặc điểm**
+
+* **Liên kết (Linkage):** Weak symbols có liên kết ngoài (external linkage), nhưng ưu tiên thấp hơn strong symbols.
+
+* **Ứng dụng:**Thường dùng trong hệ thống nhúng để: 
+  
+  ◦ Cung cấp hàm mặc định cho xử lý ngắt (ISR) hoặc hàm khởi tạo phần cứng.
+
+  ◦ Cho phép người dùng ghi đè hàm mặc định mà không sửa mã nguồn gốc.
+
+* **Không bắt buộc:** Nếu không có định nghĩa mạnh hơn, weak symbol sẽ được sử dụng.
+
+#### **4.8.3.Cú pháp**
+```
+__attribute__((weak)) return_type function_name(parameters) {
+    // Thân hàm mặc định
+}
+```
+
+#### **4.8.4.VD**
+```
+// File: default_isr.c
+__attribute__((weak)) void TIM1_IRQHandler(void) {
+    printf("Default TIM1 Interrupt Handler\n");
+}
+
+// File: user_isr.c
+void TIM1_IRQHandler(void) {
+    printf("User-defined TIM1 Interrupt Handler\n");
+}
+
+int main() {
+    TIM1_IRQHandler(); // Gọi định nghĩa mạnh từ user_isr.c
+    return 0;
+}
+```
+* **Kết quả:** In ra `User-defined TIM1 Interrupt Handler` vì định nghĩa mạnh trong `user_isr.c` ghi đè định nghĩa yếu
+
+#### **4.8.5.Lưu ý**
+
+* **Hỗ trợ trình biên dịch:** __attribute__((weak)) là tính năng của GCC; các trình biên dịch khác có thể sử dụng cú pháp khác (như #pragma weak).
+
+* **Ứng dụng nhúng:** Thường dùng trong các thư viện hoặc mã khởi động (bootloader) để cho phép tùy chỉnh xử lý ngắt hoặc hàm khởi tạo.
+
+* **Kiểm tra NULL:** Nếu không có định nghĩa mạnh, cần đảm bảo weak symbol xử lý an toàn.
+
+### **4.9.Volatile**  
+
+#### **4.9.1.Định nghĩa**
+
 * Từ khóa `volatile` ngăn trình biên dịch tối ưu hóa (như lưu trữ giá trị trong thanh ghi hoặc sắp xếp lại lệnh) các thao tác đọc/ghi biến, vì giá trị của biến có thể thay đổi bất ngờ từ các nguồn bên ngoài (phần cứng, ngắt, hoặc luồng khác).
 
-#### **4.8.2.Hành vi**
+#### **4.9.2.Hành vi**
 
 * Buộc trình biên dịch đọc/ghi trực tiếp từ/tới bộ nhớ mỗi khi truy cập biến.
 
 * Đảm bảo thứ tự thao tác không bị thay đổi do tối ưu hóa.
 
-#### **4.8.3.Các trường hợp sử dụng**
+#### **4.9.3.Các trường hợp sử dụng**
 
 * **Memory-mapped peripheral registers:** Truy cập các thanh ghi phần cứng(như GPIO,UART) để đảm bảo đọc/ghi chính xác giá trị hiện tại
 ```
@@ -1782,22 +1833,22 @@ int main(void) {
 }
 ```
 
-### **4.9.Register**
+### **4.10.Register**
 
-#### **4.9.1.Định nghĩa**
+#### **4.10.1.Định nghĩa**
 
 * Biến register được sử dụng để gợi ý cho trình biên dịch rằng 1 biến nên được lưu trữ trong **thanh ghi CPU thay vì RAM**
 
 * Thường được sử dụng cho các biến được truy cập thường xuyên trong vòng lặp hoặc tính toán.
-#### **4.5.2.Đặc điểm**
+#### **4.10.2.Đặc điểm**
 
-* Tăng hiệu năng: Giảm thời gian truy cập bằng cách lưu biến trong thanh ghi CPU.
+* **Tăng hiệu năng:** Giảm thời gian truy cập bằng cách lưu biến trong thanh ghi CPU.
 
-* Không đảm bảo: Trình biên dịch có thể bỏ qua gợi ý register nếu không có thanh ghi khả dụng.
+* **Không đảm bảo:** Trình biên dịch có thể bỏ qua gợi ý register nếu không có thanh ghi khả dụng.
 
-* Không thể lấy địa chỉ của biến register (vì nó không nằm trong RAM).
+* **Không thể** lấy địa chỉ của biến register (vì nó không nằm trong RAM).
 
-* Không áp dụng cho các biến lớn hoặc cấu trúc phức tạp.
+* **Không áp dụng** cho các biến lớn hoặc cấu trúc phức tạp.
 
 ```
 void compute() {
@@ -1807,25 +1858,25 @@ void compute() {
     }
 }
 ```
-### **4.10. Tổng kết**
+### **4.11. Tổng kết**
 
-* Phạm vi (Scope): Quy định nơi biến/hàm có thể được truy cập (block, file, prototype)
+* **Phạm vi (Scope):** Quy định nơi biến/hàm có thể được truy cập (block, file, prototype)
 
-* Thời gian sống (Lifetime): Quy định thời gian tồn tại của biến (automatic, static).
+* **Thời gian sống (Lifetime):** Quy định thời gian tồn tại của biến (automatic, static).
 
-* Vị trí bộ nhớ (Memory Location): Quy định nơi lưu trữ biến (stack, heap, data, BSS, text).
+* **Vị trí bộ nhớ (Memory Location):** Quy định nơi lưu trữ biến (stack, heap, data, BSS, text).
 
-* Liên kết (Linkage): Quy định khả năng tham chiếu biến/hàm giữa các tệp (external, internal, no linkage).
+* **Liên kết (Linkage):** Quy định khả năng tham chiếu biến/hàm giữa các tệp (external, internal, no linkage).
 
 * Từ khóa đặc biệt:
-
+```
     extern: Khai báo biến/ham có định nghĩa ở nơi khác, ngụ ý liên kết ngoài.
     static: Hạn chế phạm vi (liên kết nội) và kéo dài thời gian sống.
     volatile: Ngăn tối ưu hóa để đảm bảo đọc/ghi chính xác giá trị biến.
     register: Gợi ý lưu biến trong thanh ghi để tăng hiệu năng.
-
-
- </details> 
+    __attribute__((weak)): Đánh dấu biểu tượng yếu, cho phép ghi đè bởi định nghĩa mạnh hơn.
+```
+ </details>
 
 
 <details>
