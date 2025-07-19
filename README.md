@@ -2389,42 +2389,120 @@ struct SinhVien {
   sv.kieuDiem = DIEM_SO;
   sv.diem.diemSo = 8.5;
   ```
+### **7.3.Enum (Kiểu liệt kê)**
+
+#### **7.3.1.Định nghĩa**
+
+*  enum là một kiểu dữ liệu tùy chỉnh cho phép định nghĩa một tập hợp các hằng số nguyên được đặt tên (enumerators), giúp mã dễ đọc và bảo trì hơn.
+
+*  Mục đích: Biểu diễn các giá trị rời rạc, ví dụ: trạng thái, chế độ, hoặc cờ (flag) trong hệ thống nhúng.
+
+#### **7.3.2.Đặc điểm**
+
+* **Kiểu dữ liệu:**
+
+   ◦ Mặc định, enum được ánh xạ thành kiểu int, nhưng trình biên dịch có thể chọn kiểu nhỏ hơn (như char) để tối ưu bộ nhớ.
+
+* **Giá trị:**
+
+   ◦ Mỗi enumerator được gán một giá trị nguyên, bắt đầu từ 0 (mặc định) hoặc giá trị do người dùng chỉ định.
+
+* **Ứng dụng:**
+
+   ◦ Thường dùng trong hệ thống nhúng để định nghĩa trạng thái thiết bị, mã lỗi, hoặc chế độ hoạt động.
+
+#### **7.3.3. Cú pháp**
+```
+enum TenEnum {
+    VALUE1,    // 0
+    VALUE2,    // 1
+    VALUE3 = 5 // 5, các giá trị tiếp theo tăng dần
+};
+```
+#### **7.3.4.VD**
+```
+enum DeviceState {
+    OFF = 0,
+    ON,
+    STANDBY,
+    ERROR = 10
+};
+
+struct Device {
+    enum DeviceState state;
+};
+
+int main() {
+    struct Device dev;
+    dev.state = ON;
+    if (dev.state == ON) {
+        printf("Device is ON\n");
+    }
+    printf("State value: %d\n", dev.state); // In: State value: 1
+    return 0;
+}
+```
+#### **7.3.5.Lưu ý**
+
+* **Tối ưu bộ nhớ:**
+
+   ◦ Trong hệ thống nhúng, có thể sử dụng enum với kiểu dữ liệu rõ ràng (như uint8_t) bằng cách kết hợp với typedef
+```
+typedef enum { LOW = 0, HIGH } PinState_t __attribute__((packed));
+```
+
+* **Kết hợp với bit fields:**
+   
+   ◦ Có thể dùng enum trong struct với bit fields để tiết kiệm bộ nhớ.
+
+* **Tính rõ ràng:**
+
+   ◦ Sử dụng enum thay vì hằng số #define để tăng tính bảo trì và kiểm tra lỗi.
 
 
-### **7.3.Typedef (Tạo kiểu dữ liệu mới)**
+### **7.4.Typedef (Tạo kiểu dữ liệu mới)**
 
-* **Định nghĩa:** Typedef tạo bí danh(alias) cho kiểu dữ liệu hiện có, giúp mã dễ đọc và tăng tính tương thích
+#### **7.4.1.Định nghĩa**
 
-* **Đặc điểm:** 
+*  Typedef tạo bí danh(alias) cho kiểu dữ liệu hiện có, giúp mã dễ đọc và tăng tính tương thích
 
-   ◦ Không tạo kiểu mới, chỉ đặt tên khác
+#### **7.4.2. Đặc điểm**
+*  Không tạo kiểu mới, chỉ đặt tên khác
 
-   ◦ Ứng dụng: Rút gọn tên kiểu phức tạp (struct,union,con trỏ hàm), tăng tính rõ ràng
+*  Ứng dụng: 
+    
+   ◦ Rút gọn tên kiểu phức tạp (struct,union,con trỏ hàm), tăng tính rõ ràng
+   
+   ◦ Tăng tính rõ ràng và khả năng bảo trì.
 
-* **Cú pháp:**
+   ◦ Cải thiện tính tương thích (portability) giữa các nền tảng.
+#### **7.4.3. Cú pháp**
 
 ```
 typedef existing_type new_type_name;
 
 ```
 
-* **Ứng dung:**
+#### **7.4.4. Ứng dụng**
 
-   ◦ Rút gọn struct: `typedef struct { int x; int y; } Diem;`
+   ◦ Rút gọn struct: 
+   `typedef struct { int x; int y; } Diem;`
 
-   ◦ Rút gọn con trỏ hàm: `typedef int (*HamTinhToan) (int,int);`
+   ◦ Rút gọn con trỏ hàm: 
+   `typedef int (*HamTinhToan) (int,int);`
 
-   ◦ portability: `typedef unsigned char BYTE;`
+   ◦ portability: 
+   `typedef unsigned char BYTE;`
 
-### **7.4.Kích thước của Struct và Union**
+### **7.5.Kích thước của Struct và Union**
 
-#### **7.4.1.Kích thước của Struct**
+#### **7.5.1.Kích thước của Struct**
 
 * Kích thước của struct là tổng kích thước của tất cả thành viên, cộng thêm **byte đệm (padding)** để đảm bảo **căn chỉnh bộ nhớ (alignment)** 
 
 * **Alignment:**
 
-   ◦ Mỗi kiểu dữ liệu có yêu cầu căn chỉnh riêng, thường là bộ số của kích thước kiểu (ví dụ: `int` 4 bytes căn chỉnh tại địa chỉ chia hết cho 4, `double` 8 bytes căn chỉnh tại địa chỉ chia hết cho 8)
+   ◦ Mỗi kiểu dữ liệu có yêu cầu căn chỉnh riêng, thường là bội số của kích thước kiểu (ví dụ: `int` 4 bytes căn chỉnh tại địa chỉ chia hết cho 4, `double` 8 bytes căn chỉnh tại địa chỉ chia hết cho 8)
 
    ◦ Struct được căn chỉnh theo **yêu cầu căn chỉnh lớn nhất** của bất kỳ thành viên ngoài
 
@@ -2506,7 +2584,7 @@ char c: 1 byte, căn chỉnh 1 byte → offset 12 (8 + 4).
 
 ```
 
-#### **7.4.2.Kích thước của Union**
+#### **7.5.2.Kích thước của Union**
 
 * Kích thước của union (sizeof(union)) bằng kích thước của **thành viên lớn nhất**, cộng thêm padding (nếu cần) để đảm bảo căn chỉnh bộ nhớ.
 
@@ -2576,7 +2654,7 @@ Yêu cầu căn chỉnh lớn nhất: 4 bytes (int i).
 Kích thước union: 7 bytes, nhưng phải là bội số của 4 → thêm 1 byte padding → Kích thước: 8 bytes.
 
 ```
-</details>
+</details> 
 <details> 
  <summary><strong>BÀI 8:Memory Layout</strong></summary>
 
