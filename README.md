@@ -2790,3 +2790,451 @@ void func(int param){
 
 
 </details>
+<details> 
+ <summary><strong>BÀI 9: Cấu trúc dữ liệu</strong></summary>
+	
+## **Bài 9: Cấu trúc dữ liệu**
+
+### **9.1.Danh sách liên kết(Linked List)**
+
+<img width="777" height="399" alt="Image" src="https://github.com/user-attachments/assets/86a48646-6d76-4162-a760-56574e90c62a" />
+
+#### **9.1.1.Định nghĩa**
+
+* Danh sách liên kết là một cấu trúc dữ liệu tuyến tính bao gồm các **nút(node)**, trong đó mỗi nút chứa **dữ liệu** và một **con trỏ** trỏ đến nút tiếp theo
+
+* Không giống như mảng, danh sách liên kết không lưu trữ dữ liệu ở các vị trí bộ nhớ liên kề, cho phép cấp phát bộ nhớ động và kích thước linh hoạt
+
+#### **9.1.2.Các loại danh sách liên kết**
+
+<img width="1105" height="583" alt="Image" src="https://github.com/user-attachments/assets/f7451c94-ca95-4ee9-8ad3-24d78ecaca2d" />
+
+* **Danh sách liên kết đơn(Singly Linked List)**: Mỗi nút chứa dữ liệu và con trỏ đến nút tiếp theo.Nút cuối cùng trỏ đến NULL
+
+* **Danh sách liên kết đôi(Doubly Linked List):** Mỗi nút chứa dữ liệu, con trỏ đến nút tiếp theo và nút trước đó
+
+* **Danh sách liên kết vòng(Circular Linked List):** Nút cuối cùng trỏ ngược lại nút đầu tiên, tạo thành 1 vòng
+
+#### **9.1.3.Các thao tác**
+
+* **Cấu trúc cơ bản:**
+```
+#include <stdio.h>
+#include <stdlib.h>
+struct Node { int data; struct Node* next; };
+```
+* **Thêm(Insertion):** Thêm nút vào đầu, cuối hoặc vị trí cụ thể
+
+**Thêm vào đầu:**
+```
+void insertAtBeginning(struct Node** head, int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = *head;
+    *head = newNode;
+}
+```
+
+**Thêm vào cuối:**
+```
+void insertAtEnd(struct Node** head, int data) {
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = NULL;
+    if (*head == NULL) { *head = newNode; return; }
+    struct Node* temp = *head;
+    while (temp->next != NULL) temp = temp->next;
+    temp->next = newNode;
+}
+```
+
+* **Xóa(Deletion):** Xóa nút khỏi đầu, cuối hoặc vị trí cụ thể
+
+**Xóa nút đầu:**
+```
+void deleteAtBeginning(struct Node** head) {
+    if (*head == NULL) return;
+    struct Node* temp = *head;
+    *head = (*head)->next;
+    free(temp);
+}
+```
+
+**Xóa nút cuối:**
+```
+void deleteAtEnd(struct Node** head) {
+    if (*head == NULL) return;
+    if ((*head)->next == NULL) { free(*head); *head = NULL; return; }
+    struct Node* temp = *head;
+    while (temp->next->next != NULL) temp = temp->next;
+    free(temp->next);
+    temp->next = NULL;
+}
+```
+* **Duyệt(Traversal):** Truy cập từng nút để hiển thị hoặc xử lý dữ liệu
+```
+void printList(struct Node* head) {
+    struct Node* temp = head;
+    while (temp != NULL) {
+        printf("%d -> ", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+```
+
+* **Tìm kiếm(Search):** Tìm nút có giá trị cụ thể
+```
+struct Node* search(struct Node* head, int data) {
+    struct Node* temp = head;
+    while (temp != NULL) {
+        if (temp->data == data) return temp;
+        temp = temp->next;
+    }
+    return NULL;
+}
+```
+* **Cập nhật(Update):** Sửa đổi dữ liệu của 1 Nút
+```
+void update(struct Node* head, int oldData, int newData) {
+    struct Node* temp = head;
+    while (temp != NULL) {
+        if (temp->data == oldData) {
+            temp->data = newData;
+            return;
+        }
+        temp = temp->next;
+    }
+}
+```
+#### **9.1.4.Ưu điểm**
+
+* **Kích thước động:** Có thể mở rộng hoặc thu hẹp trong thời gian chạy
+* **Thêm và xóa hiệu quả hơn mảng**
+* **Sử dụng bộ nhớ linh hoạt**
+
+#### **9.1.5.Nhược điểm**
+
+* **Không hỗ trợ truy cập ngẫu nhiên; cần duyệt tuần tự**
+* **Tốn thêm bộ nhớ cho con trỏ**
+
+#### **9.1.6.Ví dụ**
+```
+#include<stdio.h>
+#include<stdlib.h>
+
+//Định nghĩa cấu trúc nút
+struct Node{
+    int data;
+    struct Node * next;
+};
+
+//Thêm nút vào đầu danh sách
+void insertAtBeginning(struct Node** head, int data){
+    struct Node* newNode = (struct Node*)malloc(sizeof(struct Node));
+    newNode->data = data;
+    newNode->next = *head;
+    *head = newNode;
+}
+
+//In danh sách
+void printList(struct Node* head){
+    struct Node* temp = head;
+    while (temp != NULL){
+        printf("%d ->", temp->data);
+        temp = temp->next;
+    }
+    printf("NULL\n");
+}
+
+int main(){
+    struct Node* head = NULL;
+    insertAtBeginning(&head, 3);
+    insertAtBeginning(&head, 2);
+    insertAtBeginning(&head, 1);
+    printList(head); // Kết quả: 1 -> 2 -> 3 -> NULL
+    return 0;
+}
+
+```
+
+### **9.2.Ngăn xếp(Stack)**
+
+<img width="1006" height="568" alt="Image" src="https://github.com/user-attachments/assets/985f8cab-b54f-4b6d-8745-57afb631355d" />
+
+#### **9.2.1.Định nghĩa**
+
+* Ngăn xếp là một cấu trúc dữ liệu tuyến tính hoạt động theo nguyên tắc **Last In, First Out(LIFO)**
+
+* Các phần tử được thêm(push) và xóa(pop) từ cùng một đầu gọi là **đỉnh(top)**
+ 
+
+#### **9.2.2.Các thao tác**
+* **Cấu trúc cơ bản:**
+```
+#define MAX 100
+struct Stack { 
+    int items[MAX]; 
+    int top; 
+    };
+void initStack(struct Stack* s) { 
+    s->top = -1; 
+    }
+```
+* **Push:** Thêm phần tử vào đỉnh
+```
+void push(struct Stack* s, int value){
+    if(s->top == MAX - 1) return;
+    s->item[++s->top] = value;
+}
+```
+* **Pop:** Xóa và trả về phần tử ở đỉnh
+```
+int pop(struct Stack* s){
+    if(s->top == -1) return -1;
+    return s->items[s->top--];
+}
+```
+* **Peek/Top:** Xem phần tử ở đỉnh mà không Xóa
+```
+int peek(struct Stack* s){
+    if(s->top == -1) return -1;
+    return s->items[s->top];
+}
+```
+* **isEmpty:** Kiểm tra ngăn xếp có rỗng không
+```
+int isEmpty(struct Stack* s){
+    return s->top == -1;
+}
+```
+* **isFull:** Kiểm tra ngăn xếp có đầy không(với ngăn xếp dựa trên mảng)
+```
+int isFull(struct Stack* s){
+    return s->top == MAX - 1;
+}
+```
+* **VD:**
+```
+#include <stdio.h>
+#define MAX 100
+struct Stack { 
+    int items[MAX]; 
+    int top; 
+    };
+
+void initStack(struct Stack* s) { 
+    s->top = -1; 
+    }
+
+void push(struct Stack* s, int value) {
+    if (s->top == MAX - 1) { 
+        printf("Ngăn xếp đầy\n"); 
+        return; 
+        }
+    s->items[++(s->top)] = value;
+}
+int pop(struct Stack* s) {
+    if (s->top == -1) { 
+        printf("Ngăn xếp rỗng\n"); 
+        return -1; }
+    return s->items[(s->top)--];
+}
+int main() {
+    struct Stack s;
+    initStack(&s);
+    push(&s, 1);
+    push(&s, 2);
+    printf("Đã xóa: %d\n", pop(&s)); // Kết quả: Đã xóa: 2
+    return 0;
+}
+```
+
+### **9.3.Hàng đợi(Queue)**
+
+<img width="1086" height="420" alt="Image" src="https://github.com/user-attachments/assets/a041c8c3-99c8-4c65-886b-fa76715beeb9" />
+
+#### **9.3.1.Định nghĩa**
+
+* **Hàng đợi** là một cấu trúc dữ liệu tuyến tính hoạt động theo nguyên tắc **First In, First Out(FIFO)**
+
+* Phần tử được thêm vào từ cuối (**rear**) và xóa từ đầu (**front**)
+
+#### **9.3.2.Các loại hàng đợi**
+
+* **Hàng đợi thông thường (Simple Queue):** FIFO cơ bản
+
+* **Hàng đợi vòng (Circular Queue):** Đầu và cuối hàng đợi được kết nối để sử dụng lại không gian
+
+* **Hàng đợi ưu tiên (Priority Queue):** Phần tử có ưu tiên cao được xử lý trước
+
+* **Hàng đợi hai đầu (Deque):** Cho phép thêm/xóa từ 2 đầu
+
+#### **9.3.4.Các thao tác**
+
+* **Cấu trúc cơ bản:**
+```
+#define MAX 100
+struct Queue { 
+    int items[MAX]; 
+    int front, rear; 
+    };
+void initQueue(struct Queue* q) {
+     q->front = -1;
+      q->rear = -1; 
+      }
+```
+* **Enqueue: Thêm phần tử vào cuối hàng đợi**
+```
+void enqueue(struct Queue* q, int value){
+    if(q->rear == MAX - 1) return;
+    if(q->front == -1) q->front = 0;
+    q->items[++q->rear] = value;
+}
+```
+* **Dequeue: Xóa và trả về phần tử ở đầu**
+```
+int dequeue(struct Queue* q){
+    if(q->front == -1 || q->front > q->rear) return -1;
+    return q->items[q->front++];
+}
+```
+* **Front: Xem phần tử ở đầu**
+```
+int front(struct Queue* q){
+    if (q->front == -1 || q->front > q->rear) return -1;
+    return q->items[q->front]; 
+}
+```
+* **isEmpty: Kiểm tra hàng đợi rỗng**
+```
+int isEmpty(struct Queue* q){
+    return q->front = -1 || q->front > q->rear;
+}
+```
+* **isFull: Kiểm tra hàng đợi đầy**
+```
+int isFull(struct Queue* q){
+    return q->rear == MAX - 1;
+}
+```
+* **VD:**
+```
+#include <stdio.h>
+#define MAX 100
+struct Queue { 
+    int items[MAX]; 
+    int front, rear; 
+    };
+void initQueue(struct Queue* q) { 
+    q->front = -1; 
+    q->rear = -1; 
+    }
+void enqueue(struct Queue* q, int value) {
+    if (q->rear == MAX - 1) { 
+        printf("Hàng đợi đầy\n"); 
+        return; 
+        }
+    if (q->front == -1) q->front = 0;
+    q->items[++q->rear] = value;
+}
+int dequeue(struct Queue* q) {
+    if (q->front == -1 || q->front > q->rear) {
+        printf("Hàng đợi rỗng\n"); 
+        return -1; 
+        }
+    return q->items[q->front++];
+}
+int main() {
+    struct Queue q;
+    initQueue(&q);
+    enqueue(&q, 1);
+    enqueue(&q, 2);
+    printf("Đã xóa: %d\n", dequeue(&q)); // Kết quả: Đã xóa: 1
+    return 0;
+}
+```
+
+### **9.4.JSON- Xử lý dữ liệu JSON trong C**
+
+#### **9.4.1.Định nghĩa**
+
+* **JSON(JavaScript Object Notation)** là một định dạng dữ liệu nhẹ, dễ đọc, được sử dụng để trao đổi dữ liệu giữa các hệ thống
+
+* JSON thường được biểu diễn dưới dạng cặp **key-value**, mảng, hoặc các đối tượng lồng nhau
+
+#### **9.4.2.Cấu trúc JSON**
+
+* **Object:** `{ "key": value }
+* **Array:** `[value1, value2, ...]
+* **Value:** Chuỗi số, boolean, null, Object, hoặc Array
+* **Key:** Luôn là chuỗi
+
+
+#### **9.4.3.Thư viện xử lý JSON trong C**
+
+* Trong C, không có hỗ trợ tích hợp cho JSON, nhưng có thể sử dụng các thư viện như cJSON, json-c, hoặc Jansson
+
+
+#### **9.4.4. Các thao tác với JSON**
+
+* **Phân tích cú pháp (Parsing):** Chuyển chuỗi JSON thành cấu trúc dữ liệu trong C.
+
+* **Tạo JSON:** Tạo đối tượng JSON từ dữ liệu trong C.
+
+* **Truy cập dữ liệu:** Lấy giá trị từ các khóa hoặc mảng.
+
+* **Sửa đổi:** Thêm, xóa hoặc cập nhật dữ liệu trong JSON.
+
+#### **9.4.5. Ứng dụng**
+
+* Lưu trữ cấu hình chương trình.
+
+* Trao đổi dữ liệu giữa client và server
+
+* Lưu trữ dữ liệu trong cơ sở dữ liệu NoSQL (như MongoDB).
+
+* API RESTful.
+```
+#include <stdio.h>
+#include <stdlib.h>
+#include "cJSON.h"
+char* createJSON() {
+    cJSON* root = cJSON_CreateObject();
+    cJSON_AddStringToObject(root, "name", "Nguyen Van A");
+    cJSON_AddNumberToObject(root, "age", 25);
+    cJSON* skills = cJSON_CreateArray();
+    cJSON_AddItemToArray(skills, cJSON_CreateString("C"));
+    cJSON_AddItemToArray(skills, cJSON_CreateString("Python"));
+    cJSON_AddItemToObject(root, "skills", skills);
+    char* jsonString = cJSON_Print(root);
+    cJSON_Delete(root);
+    return jsonString;
+}
+void parseJSON(const char* jsonString) {
+    cJSON* root = cJSON_Parse(jsonString);
+    if (root == NULL) { printf("Lỗi phân tích JSON\n"); return; }
+    cJSON* name = cJSON_GetObjectItem(root, "name");
+    cJSON* age = cJSON_GetObjectItem(root, "age");
+    cJSON* skills = cJSON_GetObjectItem(root, "skills");
+    printf("Tên: %s\n", name->valuestring);
+    printf("Tuổi: %d\n", age->valueint);
+    printf("Kỹ năng: ");
+    for (int i = 0; i < cJSON_GetArraySize(skills); i++) {
+        cJSON* skill = cJSON_GetArrayItem(skills, i);
+        printf("%s ", skill->valuestring);
+    }
+    printf("\n");
+    cJSON_Delete(root);
+}
+int main() {
+    char* jsonString = createJSON();
+    printf("JSON: %s\n", jsonString);
+    parseJSON(jsonString);
+    free(jsonString);
+    return 0;
+}
+
+```
+</details>
+
