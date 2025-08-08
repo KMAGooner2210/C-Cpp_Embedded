@@ -3239,3 +3239,482 @@ int main() {
 ```
 </details>
 
+# PHẦN 2: C++ Advanced
+<details>
+	<summary><strong>BÀI 10: Lập trình hướng đối tượng (OOP)</strong></summary>
+
+## **BÀI 10: Lập trình hướng đối tượng (OOP)**
+
+### **10.1. Classes and Objects**
+
+#### **10.1.1. Khái niệm**
+
+*  **Class (Lớp):** 
+   
+    ◦ Là một bản thiết kế hoặc khuôn mẫu định nghĩa các **thuộc tính (dữ liệu)** và **hành vi (phương thức)** của 1 loại thực thể
+   
+    ◦ Class mô tả cách các đối tượng sẽ tạo ra
+
+ *  **Object (Đối tượng):**
+
+    ◦ Là một thể hiện (instance) cụ thể của một class, được tạo ra từ bản thiết kế đó
+
+    ◦ Mỗi đối tượng có dữ liệu riêng nhưng chia sẻ cấu trúc và hành vi được định nghĩa trong class
+
+ * **VD thực tế:**
+
+   ◦ Class giống như bản vẽ kỹ thuật của một ô tô, mô tả các đặc điểm (màu sắc, động cơ) và hành vi (chạy, dừng)
+
+   ◦ Object là một chiếc xe cụ thể được sản xuất từ bản vẽ đó,VD: Vinfast trắng
+
+#### **10.1.2. Cấu trúc và cách sử dụng**
+
+*  **Cú pháp :** 
+   
+    ```
+    class ClassName {
+        public:
+
+        //Thuộc tính (biến thành viên)
+        Datatype attribute;
+
+        //Phương thức (hàm thành viên)
+        ReturnType method(){
+            //Logic
+        }
+    };
+    ```
+*  **Tạo đối tượng :**
+
+    ```
+    ClassName objectName;         // Tạo đối tượng
+    objectName.attribute = value; // Gán giá trị
+    objectName.method();          // Gọi phương thức
+    ```
+*  **Quyền truy cập :**
+
+    ```
+    public: Có thể truy cập từ bên ngoài class
+    private: Chỉ có thể truy cập từ bên trong class
+    protected: Truy cập được trong class và các class con(kế thừa)
+    ```
+
+#### **10.1.3. VD**
+   
+    ```
+    #include <iostream>
+    #include <string>
+    using namespace std;
+
+    class Book {
+    public:
+
+        //Thuộc tính
+        string title;
+        string author;
+
+        //Phương thức
+        void displayInfo(){
+            cout << "Book: " << title << ", Author: " << author << endl;
+        }
+    };
+
+    int main(){
+
+        //Tạo đối tượng
+        Book book1;
+        book1.title = "Harry Potter";
+        book1.author = "A";
+
+        //Sử dụng đối tượng
+        book1.displayInfo();
+
+        return 0;
+    }
+    ```
+### **10.2. Encapsulation**
+
+#### **10.2.1. Khái niệm**
+
+* **Encapsulation (Đóng gói):** 
+
+    ◦ Là nguyên tắc gói gọn dữ liệu và phương thức liên quan vào một class, đồng thời kiểm soát quyền truy cập thông qua `public`,`private`,`protected`
+
+    ◦ Mục tiêu là ẩn chi tiết triển khai và chỉ cung cấp giao diện công khai
+
+* **VD thực tế:** 
+
+    ◦ Một chiếc máy pha cà phê có nút bấm (giao diện công khai) để người dùng chọn chế độ pha, nhưng cách máy xử lý bên trong (đun nước, xay cà phê) được ẩn đi
+
+#### **10.2.2. Cơ chế và lợi ích**
+
+* **Cơ chế:** 
+
+    ◦ Sử dụng `private` để ẩn thuộc tính,ngăn truy cập trực tiếp
+
+    ◦ Cung cấp phương thức `public (getter/setter)` để truy cập hoặc sửa đổi dữ liệu một cách kiểm soát
+
+* **Lợi ích:** 
+
+    ◦ Bảo vệ dữ liệu: Ngăn chặn sửa đổi không hợp lệ (ví dụ: số dư âm trong tài khoản)
+
+    ◦ Ẩn chi tiết triển khai: Người dùng chỉ cần biết cách sử dụng, không cần hiểu nội bộ
+
+    ◦ Dễ bảo trì: Thay đổi logic bên trong không ảnh hưởng đến mã bên ngoài
+
+    ◦ Tăng tính linh hoạt: Có thể thêm kiểm tra trong getter/setter
+
+#### **10.2.3. VD**
+
+    
+    #include <iostream>
+    #include <string>
+    using namespace std;
+
+    class BankAccount {
+    private:
+        string accountHolder;
+        double balance;
+
+    public:
+        // Constructor
+        BankAccount(string holder, double initialBalance) {
+            accountHolder = holder;
+            balance = (initialBalance >= 0) ? initialBalance : 0;
+        }
+
+    // Getter
+    double getBalance() {
+        return balance;
+    }
+    string getHolder() {
+        return accountHolder;
+    }
+
+    // Setter
+    void deposit(double amount) {
+        if (amount > 0) {
+            balance += amount;
+            cout << "Deposited $" << amount << ", New Balance: $" << balance << endl;
+        } else {
+            cout << "Invalid deposit amount!" << endl;
+        }
+    }
+
+    void withdraw(double amount) {
+        if (amount > 0 && amount <= balance) {
+            balance -= amount;
+            cout << "Withdrawn $" << amount << ", New Balance: $" << balance << endl;
+        } else {
+            cout << "Invalid or insufficient funds!" << endl;
+        }
+      }
+    };
+
+    int main() {
+        BankAccount account("Alice", 1000);
+        cout << "Account Holder: " << account.getHolder() 
+         << ", Balance: $" << account.getBalance() << endl;
+        account.deposit(200);    // Deposited $200, New Balance: $1200
+        account.withdraw(300);   // Withdrawn $300, New Balance: $900
+        account.withdraw(1000);  // Invalid or insufficient funds!
+        // account.balance = -500; // Lỗi biên dịch vì balance là private
+
+        return 0;
+    }
+    
+#### **10.2.4. Các lưu ý**
+
+* **Getter/Setter:** Sử dụng để kiểm soát truy cập, nhưng tránh lạm dụng
+
+* **Ẩn thông tin:** Chỉ công khai những gì cần thiết, giữ các chi tiết triển khai ở chế độ private.
+
+### **10.3. Abstraction**
+
+#### **10.3.1. Khái niệm**
+
+* **Abstraction (Trừu tượng hóa):** 
+
+    ◦ Là quá trình ẩn các chi tiết phức tạp và chỉ hiển thị các tính năng cần thiết của đối tượng
+
+    ◦ Trong C++, trừu tượng hóa thường được thực hiện qua abstract class (lớp trừu tượng) hoặc interface (trong các ngôn ngữ như Java).
+
+* **VD thực tế:** 
+
+    ◦ Khi sử dụng máy tính, bạn chỉ cần biết cách mở ứng dụng (giao diện), không cần hiểu cách phần cứng hoạt động bên trong.
+
+#### **10.3.2. Cơ chế và cách triển khai**
+
+* **Cơ chế:** 
+
+    ◦ Sử dụng `abstract class` với `p`ure virtual function (= 0)` để định nghĩa giao diện mà không cung cấp triển khai cụ thể.
+
+    ◦ Các lớp con kế thừa và triển khai chi tiết.
+
+* **Cách triển khai:** 
+
+    ```
+    class AbstractClass {
+    public:
+        virtual void someMethod() = 0; // Pure virtual function
+    };
+
+    ```
+
+#### **10.3.3. VD**
+
+    
+    #include <iostream>
+    using namespace std;
+
+    class Shape {
+    public:
+        virtual float getArea() = 0; // Pure virtual function
+        virtual void display() = 0;  // Pure virtual function
+    };
+
+    class Circle : public Shape {
+    private:
+        float radius;
+
+    public:
+        Circle(float r) : radius(r) {}
+
+        float getArea() override {
+        return 3.14 * radius * radius;
+        }
+
+    void display() override {
+        cout << "Circle, Area: " << getArea() << endl;
+        }
+    };
+
+    class Square : public Shape {
+    private:
+        float side;
+
+    public:
+        Square(float s) : side(s) {}
+
+    float getArea() override {
+        return side * side;
+    }
+
+    void display() override {
+        cout << "Square, Area: " << getArea() << endl;
+        }
+    };
+
+    int main() {
+        Shape* shapes[2];
+        shapes[0] = new Circle(5);
+        shapes[1] = new Square(4);
+
+        for (int i = 0; i < 2; i++) {
+            shapes[i]->display();
+            delete shapes[i];
+        }
+    // Output:
+    // Circle, Area: 78.5
+    // Square, Area: 16
+
+    return 0;
+    }
+    
+### **10.4. Polymorphism**
+
+#### **10.4.1. Khái niệm**
+
+* **Polymorphism (Đa hình):** 
+
+    ◦ Cho phép các đối tượng thuộc các lớp khác nhau được xử lý thông qua một giao diện chung, nhưng hành vi cụ thể phụ thuộc vào lớp của đối tượng
+
+    ◦ Có 2 loại chính
+
+    ```
+    Compile-time Polymorphism (Đa hình thời biên dịch): Thông qua function overloading hoặc operator overloading.
+
+    Run-time Polymorphism (Đa hình thời chạy): Thông qua virtual function và kế thừa.
+
+    ```
+
+* **VD thực tế:** 
+
+    ◦ Một nút bấm "Play" trên ứng dụng âm nhạc có thể phát nhạc MP3 hoặc video, tùy thuộc vào loại tệp.
+
+#### **10.4.2. Các loại Polymorphism**
+
+* **Compile-time Polymorphism:** 
+
+    ◦ Function Overloading: Nhiều hàm cùng tên nhưng khác tham số
+
+    ◦ Operator Overloading: Định nghĩa lại ý nghĩa của toán tử (như +)
+
+
+* **Run-time Polymorphism:** 
+
+    ◦ Sử dụng virtual function và con trỏ/tham chiếu để gọi phương thức của lớp con.
+    
+
+#### **10.4.3. VD**
+
+    
+    #include <iostream>
+    using namespace std;
+
+    class Animal {
+    public:
+        virtual void makeSound() {
+            cout << "Some generic animal sound" << endl;
+        }
+    };
+
+    class Dog : public Animal {
+    public:
+        void makeSound() override {
+            cout << "Woof Woof!" << endl;
+        }
+    };
+
+    class Cat : public Animal {
+    public:
+        void makeSound() override {
+            cout << "Meow Meow!" << endl;
+        }
+    };
+
+    int main() {
+        Animal* animals[2];
+        animals[0] = new Dog();
+        animals[1] = new Cat();
+
+        for (int i = 0; i < 2; i++) {
+            animals[i]->makeSound();
+            delete animals[i];
+        }
+    // Output:
+    // Woof Woof!
+    // Meow Meow!
+
+    return 0;
+    }   
+
+### **10.5. Inheritance**
+
+#### **10.5.1 Khái niệm**
+
+* **Inheritance (Kế thừa):** 
+
+    ◦ Cho phép một lớp (lớp con) thừa hưởng các thuộc tính và phương thức của một lớp khác (lớp cha). Điều này thúc đẩy tái sử dụng mã và thiết lập quan hệ "is-a" (là một)
+
+
+* **VD thực tế:** 
+
+    ◦ Một lớp Dog là một loại Animal, nên Dog có thể kế thừa các đặc điểm chung của Animal (như tên, tuổi) và thêm các đặc điểm riêng (như giống chó).
+
+#### **10.5.2. Cơ chế và các loại kế thừa**
+
+* **Cơ chế:** 
+
+    ◦ Lớp con kế thừa lớp cha bằng từ khóa `: public`
+
+    ◦ Lớp con có thể ghi đè (override) phương thức của lớp cha hoặc thêm mới
+
+
+* **Các loại kế thừa:** 
+
+    ◦ Single Inheritance: Một lớp con kế thừa từ một lớp cha.
+
+    ◦ Multiple Inheritance: Một lớp con kế thừa từ nhiều lớp cha (C++ hỗ trợ, nhưng phức tạp).
+
+    ◦ Multilevel Inheritance: Lớp con kế thừa từ lớp cha, lớp cha lại kế thừa từ lớp khác.
+
+    ◦ Hierarchical Inheritance: Nhiều lớp con kế thừa từ một lớp cha.
+    
+* **Cú pháp:**
+    ```
+    class Base {
+    public:
+        void baseMethod() {}
+    };
+    class Derived : public Base {
+    public:
+        void derivedMethod() {}
+    };
+
+
+    ```
+#### **10.5.3. VD**
+
+    
+    #include <iostream>
+    #include <string>
+    using namespace std;
+
+    class Person {
+    protected:
+        string name;
+        int age;
+
+    public:
+        Person(string n, int a) : name(n), age(a) {}
+
+        void display() {
+            cout << "Name: " << name << ", Age: " << age << endl;
+        }
+    };
+
+    class Student : public Person {
+    private:
+        string studentId;
+
+    public:
+        Student(string n, int a, string id) : Person(n, a), studentId(id) {}
+
+    void display() {
+        Person::display();
+        cout << "Student ID: " << studentId << endl;
+        }
+    };
+
+    class Teacher : public Person {
+    private:
+        string subject;
+
+    public:
+        Teacher(string n, int a, string sub) : Person(n, a), subject(sub) {}
+
+    void display() {
+        Person::display();
+        cout << "Subject: " << subject << endl;
+        }
+    };
+
+    int main() {
+        Student student("Alice", 20, "S123");
+        Teacher teacher("Bob", 35, "Math");
+
+        student.display();
+    // Output:
+    // Name: Alice, Age: 20
+    // Student ID: S123
+
+    teacher.display();
+    // Output:
+    // Name: Bob, Age: 35
+    // Subject: Math
+
+    return 0;
+    } 
+
+#### **10.5.4. Lưu ý**
+
+* Sử dụng protected thay vì public cho thuộc tính cần chia sẻ với lớp con.
+
+* Đảm bảo quan hệ "is-a" hợp lý, nếu không, xem xét sử dụng composition (has-a).
+     </details> 
+
+
+
+
+
