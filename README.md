@@ -3255,13 +3255,13 @@ int main() {
    
     ◦ Class mô tả cách các đối tượng sẽ tạo ra
 
- *  **Object (Đối tượng):**
+*  **Object (Đối tượng):**
 
     ◦ Là một thể hiện (instance) cụ thể của một class, được tạo ra từ bản thiết kế đó
 
     ◦ Mỗi đối tượng có dữ liệu riêng nhưng chia sẻ cấu trúc và hành vi được định nghĩa trong class
 
- * **VD thực tế:**
+* **VD thực tế:**
 
    ◦ Class giống như bản vẽ kỹ thuật của một ô tô, mô tả các đặc điểm (màu sắc, động cơ) và hành vi (chạy, dừng)
 
@@ -3278,26 +3278,19 @@ int main() {
         //Thuộc tính (biến thành viên)
         Datatype attribute;
 
+        //Constructor
+        ClassName(Datatype param1, Datatype param2){
+            attribute = param1;
+            //Khởi tạo thuộc tính
+        }
+
         //Phương thức (hàm thành viên)
         ReturnType method(){
             //Logic
         }
     };
     ```
-*  **Tạo đối tượng :**
 
-    ```
-    ClassName objectName;         // Tạo đối tượng
-    objectName.attribute = value; // Gán giá trị
-    objectName.method();          // Gọi phương thức
-    ```
-*  **Quyền truy cập :**
-
-    ```
-    public: Có thể truy cập từ bên ngoài class
-    private: Chỉ có thể truy cập từ bên trong class
-    protected: Truy cập được trong class và các class con(kế thừa)
-    ```
 
 #### **10.1.3. VD**
    
@@ -3346,219 +3339,189 @@ int main() {
 
     ◦ Một chiếc máy pha cà phê có nút bấm (giao diện công khai) để người dùng chọn chế độ pha, nhưng cách máy xử lý bên trong (đun nước, xay cà phê) được ẩn đi
 
-#### **10.2.2. Cơ chế và lợi ích**
+#### **10.2.2.Quyền truy cập**
 
-* **Cơ chế:** 
+* **public**: Có thể truy cập từ bên ngoài class
+* **private**: Chỉ có thể truy cập từ bên trong class
+* **protected**: Truy cập được trong class và các class con(kế thừa)
 
-    ◦ Sử dụng `private` để ẩn thuộc tính,ngăn truy cập trực tiếp
+#### **10.2.3. Getter và Setter**
 
-    ◦ Cung cấp phương thức `public (getter/setter)` để truy cập hoặc sửa đổi dữ liệu một cách kiểm soát
+* **Getter**: Phương thức công khai trả về giá trị của thuộc tính riêng tư, thường có const để không thay đổi đối tượng.
+* **Setter**: Phương thức công khai để sửa đổi thuộc tính riêng tư, thường kèm kiểm tra hợp lệ.
 
-* **Lợi ích:** 
 
-    ◦ Bảo vệ dữ liệu: Ngăn chặn sửa đổi không hợp lệ (ví dụ: số dư âm trong tài khoản)
-
-    ◦ Ẩn chi tiết triển khai: Người dùng chỉ cần biết cách sử dụng, không cần hiểu nội bộ
-
-    ◦ Dễ bảo trì: Thay đổi logic bên trong không ảnh hưởng đến mã bên ngoài
-
-    ◦ Tăng tính linh hoạt: Có thể thêm kiểm tra trong getter/setter
-
-#### **10.2.3. VD**
+#### **10.2.4. VD**
 
     
     #include <iostream>
     #include <string>
     using namespace std;
 
-    class BankAccount {
+    class Person {
     private:
-        string accountHolder;
-        double balance;
+        string name;
+        int age;
 
     public:
         // Constructor
-        BankAccount(string holder, double initialBalance) {
-            accountHolder = holder;
-            balance = (initialBalance >= 0) ? initialBalance : 0;
+        Person(string name, int age) {
+            setName(name);
+            setAge(age);
         }
 
-    // Getter
-    double getBalance() {
-        return balance;
-    }
-    string getHolder() {
-        return accountHolder;
-    }
+        // Getter
+        string getName() const { 
+            return name; 
+            }
+        int getAge() const { 
+            return age; 
+            }
 
-    // Setter
-    void deposit(double amount) {
-        if (amount > 0) {
-            balance += amount;
-            cout << "Deposited $" << amount << ", New Balance: $" << balance << endl;
-        } else {
-            cout << "Invalid deposit amount!" << endl;
+        // Setter
+        void setName(string name) {
+            if (!name.empty()) this->name = name;
+            else this->name = "Unknown";
         }
-    }
+        void setAge(int age) {
+            if (age >= 0) this->age = age;
+            else this->age = 0;
+        }
 
-    void withdraw(double amount) {
-        if (amount > 0 && amount <= balance) {
-            balance -= amount;
-            cout << "Withdrawn $" << amount << ", New Balance: $" << balance << endl;
-        } else {
-            cout << "Invalid or insufficient funds!" << endl;
+        void introduce() {
+            cout << "Tôi là " << name << ", " << age << " tuổi" << endl;
         }
-      }
     };
 
     int main() {
-        BankAccount account("Alice", 1000);
-        cout << "Account Holder: " << account.getHolder() 
-         << ", Balance: $" << account.getBalance() << endl;
-        account.deposit(200);    // Deposited $200, New Balance: $1200
-        account.withdraw(300);   // Withdrawn $300, New Balance: $900
-        account.withdraw(1000);  // Invalid or insufficient funds!
-        // account.balance = -500; // Lỗi biên dịch vì balance là private
-
+        Person person("Nam", 25);
+        person.introduce(); // Tôi là Nam, 25 tuổi
+        person.setAge(-5); // Không hợp lệ, age = 0
+        person.setName(""); // Không hợp lệ, name = Unknown
+        person.introduce(); // Tôi là Unknown, 0 tuổi
+        cout << "Tên: " << person.getName() << ", Tuổi: " << person.getAge() << endl;
         return 0;
     }
     
-#### **10.2.4. Các lưu ý**
-
-* **Getter/Setter:** Sử dụng để kiểm soát truy cập, nhưng tránh lạm dụng
-
-* **Ẩn thông tin:** Chỉ công khai những gì cần thiết, giữ các chi tiết triển khai ở chế độ private.
-
-### **10.3. Abstraction**
+### **10.3. Kế thừa (Inheritance)**
 
 #### **10.3.1. Khái niệm**
 
-* **Abstraction (Trừu tượng hóa):** 
+* **Kế thừa (Inheritance):** 
 
-    ◦ Là quá trình ẩn các chi tiết phức tạp và chỉ hiển thị các tính năng cần thiết của đối tượng
+    ◦ Cho phép một lớp con (derived class) thừa hưởng thuộc tính và phương thức của lớp cha (base class), thiết lập quan hệ "is-a" (là một).
 
-    ◦ Trong C++, trừu tượng hóa thường được thực hiện qua abstract class (lớp trừu tượng) hoặc interface (trong các ngôn ngữ như Java).
+    ◦ Mục tiêu: Tái sử dụng mã, mở rộng chức năng.
 
 * **VD thực tế:** 
 
-    ◦ Khi sử dụng máy tính, bạn chỉ cần biết cách mở ứng dụng (giao diện), không cần hiểu cách phần cứng hoạt động bên trong.
+    ◦ Một lớp Dog là một loại Animal, nên Dog có thể kế thừa các đặc điểm chung của Animal (như tên, tuổi) và thêm các đặc điểm riêng (như giống chó).
 
-#### **10.3.2. Cơ chế và cách triển khai**
+#### **10.3.2. Các loại kế thừa**
 
-* **Cơ chế:** 
+* **Single Inheritance:** 
 
-    ◦ Sử dụng `abstract class` với `p`ure virtual function (= 0)` để định nghĩa giao diện mà không cung cấp triển khai cụ thể.
+    ◦ Một lớp con kế thừa từ một lớp cha.
 
-    ◦ Các lớp con kế thừa và triển khai chi tiết.
+* **Multiple Inheritance:** 
 
-* **Cách triển khai:** 
+    ◦ Lớp con kế thừa từ lớp cha, lớp cha kế thừa từ lớp khác.
 
-    ```
-    class AbstractClass {
-    public:
-        virtual void someMethod() = 0; // Pure virtual function
-    };
+* **Multilevel Inheritance:**
 
-    ```
+    ◦ Lớp con kế thừa từ lớp cha, lớp cha kế thừa từ lớp khác.
 
-#### **10.3.3. VD**
+* **Hierarchical Inheritance:**
+
+    ◦ Nhiều lớp con kế thừa từ một lớp cha.
+
+#### **10.3.3. Cú pháp**
 
     
+    class Base {
+    public:
+        void baseMethod() {}
+    };
+    class Derived : public Base {
+    public:
+        void derivedMethod() {}
+    }
+    
+
+#### **10.3.4. VD**
+
+    ```
     #include <iostream>
+    #include <string>
     using namespace std;
 
-    class Shape {
-    public:
-        virtual float getArea() = 0; // Pure virtual function
-        virtual void display() = 0;  // Pure virtual function
-    };
-
-    class Circle : public Shape {
-    private:
-        float radius;
+    class Person {
+    protected:
+        string name;
+        int age;
 
     public:
-        Circle(float r) : radius(r) {}
-
-        float getArea() override {
-        return 3.14 * radius * radius;
-        }
-
-    void display() override {
-        cout << "Circle, Area: " << getArea() << endl;
+        Person(string name, int age) : name(name), age(age) {}
+        void display() {
+            cout << "Name: " << name << ", Age: " << age << endl;
         }
     };
 
-    class Square : public Shape {
+    class Student : public Person {
     private:
-        float side;
+        string studentId;
 
     public:
-        Square(float s) : side(s) {}
-
-    float getArea() override {
-        return side * side;
-    }
-
-    void display() override {
-        cout << "Square, Area: " << getArea() << endl;
+        Student(string name, int age, string id) : Person(name, age), studentId(id) {}
+        void display() {
+            Person::display();
+            cout << "Student ID: " << studentId << endl;
         }
     };
 
     int main() {
-        Shape* shapes[2];
-        shapes[0] = new Circle(5);
-        shapes[1] = new Square(4);
+        Student student("Alice", 20, "S123");
+        student.display();
+        // Output:
+        // Name: Alice, Age: 20
+        // Student ID: S123
+        return 0;
+    }    
 
-        for (int i = 0; i < 2; i++) {
-            shapes[i]->display();
-            delete shapes[i];
-        }
-    // Output:
-    // Circle, Area: 78.5
-    // Square, Area: 16
-
-    return 0;
-    }
+    ```
     
-### **10.4. Polymorphism**
+### **10.4. Đa hình (Polymorphism)**
 
 #### **10.4.1. Khái niệm**
 
-* **Polymorphism (Đa hình):** 
+* **Đa hình (Polymorphism):** 
 
-    ◦ Cho phép các đối tượng thuộc các lớp khác nhau được xử lý thông qua một giao diện chung, nhưng hành vi cụ thể phụ thuộc vào lớp của đối tượng
+    ◦ Cho phép một lớp (lớp con) thừa hưởng các thuộc tính và phương thức của một lớp khác (lớp cha). Điều này thúc đẩy tái sử dụng mã và thiết lập quan hệ "is-a" (là một)
+   
+* **Có 2 loại:** 
 
-    ◦ Có 2 loại chính
+    ◦ **Compile-time Polymorphism:** Thông qua nạp chồng hàm (function overloading) hoặc nạp chồng toán tử (operator overloading).
 
-    ```
-    Compile-time Polymorphism (Đa hình thời biên dịch): Thông qua function overloading hoặc operator overloading.
+    ◦ **Run-time Polymorphism:** Thông qua hàm ảo (virtual function) và kế thừa.
 
-    Run-time Polymorphism (Đa hình thời chạy): Thông qua virtual function và kế thừa.
+#### **10.4.2. Compile-time Polymorphism**
 
-    ```
+* **Function Overloading:** 
 
-* **VD thực tế:** 
+    ◦ Nhiều hàm cùng tên nhưng khác tham số.
 
-    ◦ Một nút bấm "Play" trên ứng dụng âm nhạc có thể phát nhạc MP3 hoặc video, tùy thuộc vào loại tệp.
+* **Operator Overloading:** 
 
-#### **10.4.2. Các loại Polymorphism**
-
-* **Compile-time Polymorphism:** 
-
-    ◦ Function Overloading: Nhiều hàm cùng tên nhưng khác tham số
-
-    ◦ Operator Overloading: Định nghĩa lại ý nghĩa của toán tử (như +)
-
-
-* **Run-time Polymorphism:** 
-
-    ◦ Sử dụng virtual function và con trỏ/tham chiếu để gọi phương thức của lớp con.
-    
-
-#### **10.4.3. VD**
+    ◦ Định nghĩa lại ý nghĩa của toán tử (như +, <<).
 
     
+#### **10.4.3. Run-time Polymorphism**
+
+*  Sử dụng từ khóa `virtual` và con trỏ/tham chiếu để gọi phương thức của lớp con.
+   
+#### **10.4.4. VD**
+
+    ```
     #include <iostream>
     using namespace std;
 
@@ -3587,64 +3550,54 @@ int main() {
         Animal* animals[2];
         animals[0] = new Dog();
         animals[1] = new Cat();
-
         for (int i = 0; i < 2; i++) {
             animals[i]->makeSound();
             delete animals[i];
         }
-    // Output:
-    // Woof Woof!
-    // Meow Meow!
-
-    return 0;
+        // Output:
+        // Woof Woof!
+        // Meow Meow!
+        return 0;
     }   
 
-### **10.5. Inheritance**
+    ```
+### **10.5. Hàm khởi tạo (Constructor)**
 
-#### **10.5.1 Khái niệm**
+#### **10.5.1. Khái niệm**
 
-* **Inheritance (Kế thừa):** 
+* **Hàm khởi tạo (Constructor):** 
 
-    ◦ Cho phép một lớp (lớp con) thừa hưởng các thuộc tính và phương thức của một lớp khác (lớp cha). Điều này thúc đẩy tái sử dụng mã và thiết lập quan hệ "is-a" (là một)
+    ◦  Là phương thức đặc biệt, được gọi tự động khi đối tượng được tạo, dùng để khởi tạo thuộc tính.
+   
+* **Đặc điểm:** 
 
+    ◦ Tên trùng với lớp, không có kiểu trả về.
 
-* **VD thực tế:** 
+    ◦ Có thể overload với các tham số khác nhau.
 
-    ◦ Một lớp Dog là một loại Animal, nên Dog có thể kế thừa các đặc điểm chung của Animal (như tên, tuổi) và thêm các đặc điểm riêng (như giống chó).
+    ◦ Nếu không định nghĩa, trình biên dịch cung cấp constructor mặc định không tham số.
 
-#### **10.5.2. Cơ chế và các loại kế thừa**
+#### **10.5.2. Các loại constructor**
 
-* **Cơ chế:** 
+* **Constructor mặc định:** 
 
-    ◦ Lớp con kế thừa lớp cha bằng từ khóa `: public`
+    ◦ Không tham số, khởi tạo giá trị mặc định.
 
-    ◦ Lớp con có thể ghi đè (override) phương thức của lớp cha hoặc thêm mới
+* **Constructor có tham số:** 
 
+    ◦ Khởi tạo với giá trị cụ thể.
 
-* **Các loại kế thừa:** 
+* **Copy Constructor:**
 
-    ◦ Single Inheritance: Một lớp con kế thừa từ một lớp cha.
+    ◦ Sao chép dữ liệu từ một đối tượng khác.
 
-    ◦ Multiple Inheritance: Một lớp con kế thừa từ nhiều lớp cha (C++ hỗ trợ, nhưng phức tạp).
+* **Move Constructor (C++11):**
 
-    ◦ Multilevel Inheritance: Lớp con kế thừa từ lớp cha, lớp cha lại kế thừa từ lớp khác.
+    ◦ Chuyển tài nguyên từ đối tượng tạm thời.
 
-    ◦ Hierarchical Inheritance: Nhiều lớp con kế thừa từ một lớp cha.
     
-* **Cú pháp:**
-    ```
-    class Base {
-    public:
-        void baseMethod() {}
-    };
-    class Derived : public Base {
-    public:
-        void derivedMethod() {}
-    };
-
-
-    ```
 #### **10.5.3. VD**
+
 
     
     #include <iostream>
@@ -3652,67 +3605,333 @@ int main() {
     using namespace std;
 
     class Person {
-    protected:
+    private:
         string name;
         int age;
 
     public:
-        Person(string n, int a) : name(n), age(a) {}
+        // Constructor mặc định
+        Person() : name("Unknown"), age(0) {}
+
+        // Constructor có tham số
+        Person(string name, int age) : name(name), age(age) {}
+
+        // Copy Constructor
+        Person(const Person& other) : name(other.name), age(other.age) {}
+
+        void introduce() {
+            cout << "Tôi là " << name << ", " << age << " tuổi" << endl;
+        }
+    };
+
+    int main() {
+        Person person1; // Constructor mặc định
+        Person person2("Nam", 25); // Constructor có tham số
+        Person person3 = person2; // Copy constructor
+        person1.introduce(); // Tôi là Unknown, 0 tuổi
+        person2.introduce(); // Tôi là Nam, 25 tuổi
+        person3.introduce(); // Tôi là Nam, 25 tuổi
+        return 0;
+    }
+
+### **10.6. Hàm hủy (Destructor)**
+
+#### **10.6.1. Khái niệm**
+
+* **Hàm hủy (Destructor):** 
+
+    ◦  Là phương thức đặc biệt, được gọi tự động khi đối tượng bị hủy (ra khỏi phạm vi hoặc dùng delete).
+   
+* **Đặc điểm:** 
+
+    ◦ Tên là `~ClassName()`, không tham số, không kiểu trả về.
+
+    ◦ Dùng để dọn dẹp tài nguyên (bộ nhớ động, file, kết nối mạng).
+
+    ◦ Trình biên dịch cung cấp destructor mặc định nếu không định nghĩa.
+
+
+#### **10.6.2. VD**
+
+    #include <iostream>
+    #include <string>
+    using namespace std;
+
+    class Person {
+    private:
+        string name;
+        int* data; // Bộ nhớ động
+
+    public:
+        Person(string name, int value) : name(name) {
+            data = new int(value);
+            cout << "Constructor called for " << name << endl;
+        }
+
+        ~Person() {
+            delete data; // Giải phóng bộ nhớ
+            cout << "Destructor called for " << name << endl;
+        }
+
+        void display() {
+            cout << "Name: " << name << ", Data: " << *data << endl;
+        }
+    };
+
+    int main() {
+        Person person("Nam", 25);
+        person.display(); // Name: Nam, Data: 25
+        // Destructor tự động gọi khi person ra khỏi phạm vi
+        return 0;
+    }
+
+### **10.7. Nạp chồng toán tử (Operator Overloading)**
+
+#### **10.7.1. Khái niệm**
+
+* **Operator Overloading:** 
+
+    ◦  Nạp chồng toán tử cho phép định nghĩa lại ý nghĩa của các toán tử (+, <<, ==, v.v.) cho các lớp do người dùng định nghĩa.
+   
+    ◦ Thuộc compile-time polymorphism.
+
+
+#### **10.7.2. Cú pháp**
+
+    ReturnType operatorOp(const ClassName& other) {
+        // Logic
+    }
+
+#### **10.7.3.VD**
+
+    #include <iostream>
+    #include <string>
+    using namespace std;
+
+    class Vector2D {
+    public:
+        int x, y;
+
+        Vector2D(int x, int y) : x(x), y(y) {}
+
+        // Nạp chồng toán tử +
+        Vector2D operator+(const Vector2D& other) const {
+            return Vector2D(x + other.x, y + other.y);
+        }
+
+        // Nạp chồng toán tử <<
+        friend ostream& operator<<(ostream& os, const Vector2D& vec) {
+            os << "(" << vec.x << ", " << vec.y << ")";
+            return os;
+        }
+    };
+
+    int main() {
+        Vector2D v1(1, 2), v2(3, 4);
+        Vector2D v3 = v1 + v2; // Nạp chồng toán tử +
+        cout << "v1: " << v1 << endl; // Nạp chồng toán tử <<
+        cout << "v2: " << v2 << endl;
+        cout << "v1 + v2: " << v3 << endl;
+        // Output:
+        // v1: (1, 2)
+        // v2: (3, 4)
+        // v1 + v2: (4, 6)
+        return 0;
+    }
+
+    =>
+    Toán tử + được nạp chồng để cộng hai vector.
+    Toán tử << được nạp chồng (dùng friend) để in đối tượng Vector2D.
+
+### **10.8. Kỹ thuật khởi tạo (Uniform Initialization)**
+
+#### **10.8.1. Khái niệm**
+
+* **Uniform Initialization:** 
+
+    ◦  Uniform Initialization (C++11) cung cấp cách khởi tạo thống nhất cho các kiểu dữ liệu, sử dụng dấu `{}`.
+   
+    ◦ Ngăn chặn lỗi ép kiểu (type narrowing).
+
+    ◦ Dễ đọc, thống nhất cho mọi kiểu dữ liệu.
+
+
+#### **10.8.2. Cú pháp**
+
+    ClassName obj{param1, param2}; // Uniform initialization
+
+#### **10.8.3.VD**
+
+    #include <iostream>
+    #include <string>
+    using namespace std;
+
+    class Person {
+    public:
+        string name;
+        int age;
+
+        Person(string name, int age) : name(name), age(age) {}
+        void display() {
+            cout << "Name: " << name << ", Age: " << age << endl;
+        }
+    };
+
+    int main() {
+        // Uniform initialization
+        Person person1{"Nam", 25};
+        person1.display(); // Name: Nam, Age: 25
+
+        // Khởi tạo mảng
+        int arr[]{1, 2, 3};
+        cout << "Array: ";
+        for (int x : arr) cout << x << " "; // Array: 1 2 3
+        cout << endl;
+
+        // Khởi tạo biến
+        int x{5};
+        cout << "x: " << x << endl; // x: 5
+        return 0;
+    }
+
+### **10.9. Con trỏ this**
+
+#### **10.9.1. Khái niệm**
+
+
+* Con trỏ this là một con trỏ đặc biệt, trỏ đến đối tượng hiện tại của lớp.
+   
+* Phân biệt giữa thuộc tính lớp và tham số có cùng tên.
+
+* Trả về chính đối tượng hiện tại (hữu ích trong nạp chồng toán tử hoặc phương thức chuỗi).
+
+
+#### **10.9.2. VD**
+
+
+    #include <iostream>
+    #include <string>
+    using namespace std;
+
+    class Person {
+    private:
+        string name;
+        int age;
+
+    public:
+        Person(string name, int age) {
+            this->name = name; // Phân biệt với tham số
+            this->age = age;
+        }
+
+        Person& setName(string name) {
+            this->name = name;
+            return *this; // Trả về đối tượng hiện tại
+        }
 
         void display() {
             cout << "Name: " << name << ", Age: " << age << endl;
         }
     };
 
-    class Student : public Person {
-    private:
-        string studentId;
+    int main() {
+        Person person("Nam", 25);
+        person.display(); // Name: Nam, Age: 25
+        person.setName("Lan").display(); // Name: Lan, Age: 25
+        return 0;
+    }
 
+### **10.10. Thành viên tĩnh (Static Member)**
+
+#### **10.10.1. Khái niệm**
+
+
+* Thành viên tĩnh thuộc về lớp, không thuộc về đối tượng cụ thể, được chia sẻ giữa tất cả các đối tượng.
+   
+* Bao gồm:
+
+    ◦ **Biến tĩnh:** Được khai báo bằng static, khởi tạo ngoài lớp.
+
+    ◦ **Phương thức tĩnh:** Chỉ truy cập biến tĩnh hoặc thực hiện logic không phụ thuộc vào đối tượng.
+
+
+#### **10.10.2. VD**
+
+
+    #include <iostream>
+    #include <string>
+    using namespace std;
+
+    class Person {
     public:
-        Student(string n, int a, string id) : Person(n, a), studentId(id) {}
+        static int count; // Biến tĩnh
+        string name;
 
-    void display() {
-        Person::display();
-        cout << "Student ID: " << studentId << endl;
+        Person(string name) : name(name) {
+            count++;
+        }
+
+        ~Person() {
+            count--;
+        }
+
+        static void showCount() {
+            cout << "Số đối tượng Person: " << count << endl;
         }
     };
 
-    class Teacher : public Person {
+    // Khởi tạo biến tĩnh
+    int Person::count = 0;
+
+    int main() {
+        Person::showCount(); // Số đối tượng Person: 0
+        Person p1("Nam");
+        Person::showCount(); // Số đối tượng Person: 1
+        Person p2("Lan");
+        Person::showCount(); // Số đối tượng Person: 2
+        return 0;
+    }
+
+### **10.11. Phương thức const**
+
+#### **10.11.1. Khái niệm**
+
+
+* Phương thức const là phương thức không thay đổi trạng thái của đối tượng (không sửa đổi thuộc tính).
+   
+* Được đánh dấu bằng từ khóa const sau khai báo phương thức.
+
+* Dùng trong getter hoặc các phương thức chỉ đọc dữ liệu.
+    
+#### **10.11.2. VD**
+
+
+    #include <iostream>
+    #include <string>
+    using namespace std;
+
+    class Person {
     private:
-        string subject;
+        string name;
+        int age;
 
     public:
-        Teacher(string n, int a, string sub) : Person(n, a), subject(sub) {}
+        Person(string name, int age) : name(name), age(age) {}
 
-    void display() {
-        Person::display();
-        cout << "Subject: " << subject << endl;
+        void display() const {
+            cout << "Name: " << name << ", Age: " << age << endl;
+            // name = "Test"; // Lỗi biên dịch, vì phương thức const
         }
     };
 
     int main() {
-        Student student("Alice", 20, "S123");
-        Teacher teacher("Bob", 35, "Math");
+        Person person("Nam", 25);
+        person.display(); // Name: Nam, Age: 25
+        return 0;
+    }
 
-        student.display();
-    // Output:
-    // Name: Alice, Age: 20
-    // Student ID: S123
+</details> 
 
-    teacher.display();
-    // Output:
-    // Name: Bob, Age: 35
-    // Subject: Math
-
-    return 0;
-    } 
-
-#### **10.5.4. Lưu ý**
-
-* Sử dụng protected thay vì public cho thuộc tính cần chia sẻ với lớp con.
-
-* Đảm bảo quan hệ "is-a" hợp lý, nếu không, xem xét sử dụng composition (has-a).
-     </details> 
 
 
 
