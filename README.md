@@ -3582,10 +3582,36 @@ int main() {
 * **Constructor mặc định:** 
 
     ◦ Không tham số, khởi tạo giá trị mặc định.
+  
+    ◦ Có dùng danh sách khởi tạo
 	 ```
 	 ClassName(): member1(value1), member2(value2), ... {
      //Thân hàm
   	 }
+     ```
+     ```
+     #include <iostream>
+	 #include <string>
+
+	 class Person {
+	 public:
+    	std::string name; // Thành viên không tĩnh
+    	int age;          // Thành viên không tĩnh
+    	static int count; // Thành viên tĩnh
+
+     Person() : name("Unknown"), age(0) { // Constructor mặc định với danh sách khởi tạo
+        count++;
+        std::cout << "So doi tuong: " << count << std::endl;
+    	}
+	 };
+
+	 int Person::count = 0;
+     ```
+     ◦ Không dùng danh sách khởi tạo
+     ```
+     ClassName(){
+      //Thân hàm
+     }
      ```
 * **Constructor có tham số:** 
 
