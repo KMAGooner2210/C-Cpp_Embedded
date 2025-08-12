@@ -3582,20 +3582,46 @@ int main() {
 * **Constructor mặc định:** 
 
     ◦ Không tham số, khởi tạo giá trị mặc định.
-
+	 ```
+	 ClassName(): member1(value1), member2(value2), ... {
+     //Thân hàm
+  	 }
+     ```
 * **Constructor có tham số:** 
 
     ◦ Khởi tạo với giá trị cụ thể.
-
+    ```
+	ClassName(Type1 param1, Type2 param2, ...) : member1(param1), member2(param2), ...{
+    //Thân hàm
+    } 
+    ```
 * **Copy Constructor:**
 
     ◦ Sao chép dữ liệu từ một đối tượng khác.
-
+	```
+    ClassName(const ClassName& other) : member1(other.member1), member2(other.member2), ... {
+    //Thân hàm
+ 	}
+ 	```
+    ```
+	const ClassName&: Tham chiếu hằng đến một đối tượng của cùng lớp (ClassName), đảm bảo không sửa đổi đói tượng được sao chép
+    other: Tên tham số đại diện cho đối tượng được sao chép 
+    ```
 * **Move Constructor (C++11):**
 
     ◦ Chuyển tài nguyên từ đối tượng tạm thời.
-
-    
+    ```
+    ClassName(ClassName&& other) noexcept : member1(std::move(other.member1)), member2(std::move(other.member2)), ... {
+    //Thân hàm (thường đặt lại trạng thái của other)
+    }
+    ```
+    ```
+	ClassName&&: Tham chiếu rvalue (rvalue reference) đến một đối tượng tạm thời của lớp ClassName.
+    other: Tên tham số đại diện cho đối tượng tạm thời.
+    noexcept: (Tùy chọn, nhưng khuyến nghị) Đảm bảo constructor không ném ngoại lệ, tối ưu hóa hiệu suất.
+    Danh sách khởi tạo, sử dụng std::move để chuyển tài nguyên từ other sang đối tượng mới.
+    std::move: Chuyển đổi other.member thành rvalue để kích hoạt chuyển giao tài nguyên.
+    ```
 #### **10.5.3. VD**
 
 
