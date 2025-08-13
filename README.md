@@ -3422,19 +3422,101 @@ int main() {
 * **Single Inheritance:** 
 
     ◦ Một lớp con kế thừa từ một lớp cha.
+      ```
+	  class Parent {
+      public:
+      	//Thuộc tính và phương thức lớp cha
+      	void parentMethod(){
+      	//Logic
+      	}
+      };
 
+	  class Child : public Parent {
+      public:
+      	//Thuộc tính và phương thức của lớp con
+        void childMethod(){
+  		//Logic
+  		}
+  	  };
+  	  ```
 * **Multiple Inheritance:** 
 
     ◦ Lớp con kế thừa từ lớp cha, lớp cha kế thừa từ lớp khác.
+	```
+	class Parent1 {
+    public:
+ 		//Thuộc tính và phương thức của Parent1
+ 		void method1(){
+ 		//Logic
+ 		}
+ 	};
 
+ 	class Parent2 {
+ 	public:
+ 		//Thuộc tính và phương thức của parent2
+ 		void method2(){
+ 		//Logic
+ 		}
+ 	};
+
+ 	class Child : public Parent1, public Parent2 {
+ 	public:
+ 		//Thuộc tính và phương thức của lớp con
+ 		void childMethod(){
+ 		//Logic
+ 		}
+ 	};
+ 	```
 * **Multilevel Inheritance:**
 
     ◦ Lớp con kế thừa từ lớp cha, lớp cha kế thừa từ lớp khác.
+	```
+	class Grandparent {
+ 	public:
+ 		void grantparentMethod(){
+ 		//Logic
+ 		}
+ 	};
 
+ 	class Parent : public Grandparent {
+ 	public:
+ 		void parentMethod(){
+ 		//Logic
+ 		}
+ 	};
+
+ 	class Child : public Parent {
+ 	public:
+ 		void childMethod(){
+ 		//Logic
+ 		}
+ 	};
+ 	```
 * **Hierarchical Inheritance:**
 
     ◦ Nhiều lớp con kế thừa từ một lớp cha.
+	```
+	class Parent {
+ 	public:
+ 		void parentMethod(){
+ 		//Logic
+ 		}
+ 	};
 
+ 	class Child1 : public Parent {
+ 	public:
+ 		void child1Method(){
+ 		//Logic;
+ 		}
+ 	};
+
+ 	class Child2 : public Parent {
+ 	public:
+ 		void child2Method(){
+ 		//Logic;
+ 		}
+ 	};
+ 	```
 #### **10.3.3. Cú pháp**
 
     
