@@ -3422,7 +3422,8 @@ int main() {
 * **Single Inheritance:** 
 
     ◦ Một lớp con kế thừa từ một lớp cha.
-      ```
+  
+      
 	  class Parent {
       public:
       	//Thuộc tính và phương thức lớp cha
@@ -3438,7 +3439,7 @@ int main() {
   		//Logic
   		}
   	  };
-  	  ```
+  	  
 * **Multiple Inheritance:** 
 
     ◦ Lớp con kế thừa từ lớp cha, lớp cha kế thừa từ lớp khác.
