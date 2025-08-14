@@ -3901,8 +3901,15 @@ int main() {
 
 #### **10.8.2. Cú pháp**
 
-    ClassName obj{param1, param2}; // Uniform initialization
+    Type var{value};            //Khởi tạo biến         
+    Type obj{param1, param2};   //Khởi tạo đối tượng    
+    Type arr[]{value1, value2}; //Khởi tạo mảng        
+    ClassName obj[];            //Khởi tạo mặc định
 
+    
+ ◦ `{}` có thể chứa danh sách giá trị hoặc để trống (khởi tạo mặc định).
+
+ ◦ Hỗ trợ khởi tạo với `std::initializer_list` cho các lớp hoặc container
 #### **10.8.3.VD**
 
     #include <iostream>
