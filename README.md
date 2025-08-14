@@ -3829,8 +3829,16 @@ int main() {
     ◦  Nạp chồng toán tử cho phép định nghĩa lại ý nghĩa của các toán tử (+, <<, ==, v.v.) cho các lớp do người dùng định nghĩa.
    
     ◦ Thuộc compile-time polymorphism.
+  
+	```
+	Bình thường, các toán tử này chỉ hoạt động với các kiểu dữ liệu cơ bản như int, float, double. Ví dụ: 3 + 5 sẽ cho ra kết quả là 8.
+    Nhưng nếu bạn có một lớp tự định nghĩa, chẳng hạn như lớp Vector2D (đại diện cho một vector 2 chiều), bạn có thể định nghĩa toán tử + để cộng hai vector theo cách bạn muốn.
+ 	```
+	◦ Tại sao lại cần nạp chồng toán tử ?
 
-
+	```
+	Nó giúp mã nguồn trở nên trực quan hơn. Thay vì viết một hàm như v1.add(v2) để cộng hai vector, bạn có thể viết v1 + v2
+ 	```
 #### **10.7.2. Cú pháp**
 
     ReturnType operatorOp(const ClassName& other) {
