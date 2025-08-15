@@ -3271,7 +3271,7 @@ int main() {
 
 *  **Cú pháp :** 
    
-    
+    ```
     class ClassName {
         public: // Phần công khai (có thể truy cập từ ngoài)
       
@@ -3289,14 +3289,14 @@ int main() {
             //Logic
         }
     };
-    
+    ```
 * **Để tạo object:** `ClassName obj(param1, param2)`
 
 * **Truy cập:** `obj.attribute;` hoặc `obj.method();`
 
 #### **10.1.3. VD**
    
-    ```
+    
     #include <iostream>
     #include <string>
     using namespace std;
@@ -3326,7 +3326,7 @@ int main() {
 
         return 0;
     }
-    ```
+    
 ### **10.2. Encapsulation**
 
 #### **10.2.1. Khái niệm**
