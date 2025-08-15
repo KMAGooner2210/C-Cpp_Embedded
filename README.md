@@ -3271,14 +3271,14 @@ int main() {
 
 *  **Cú pháp :** 
    
-    ```
+    
     class ClassName {
-        public:
-
+        public: // Phần công khai (có thể truy cập từ ngoài)
+      
         //Thuộc tính (biến thành viên)
         Datatype attribute;
 
-        //Constructor
+        //Constructor (hàm khởi tạo)
         ClassName(Datatype param1, Datatype param2){
             attribute = param1;
             //Khởi tạo thuộc tính
@@ -3289,8 +3289,10 @@ int main() {
             //Logic
         }
     };
-    ```
+    
+* **Để tạo object:** `ClassName obj(param1, param2)`
 
+* **Truy cập:** `obj.attribute;` hoặc `obj.method();`
 
 #### **10.1.3. VD**
    
@@ -3348,8 +3350,10 @@ int main() {
 #### **10.2.3. Getter và Setter**
 
 * **Getter**: Phương thức công khai trả về giá trị của thuộc tính riêng tư, thường có const để không thay đổi đối tượng.
+
 * **Setter**: Phương thức công khai để sửa đổi thuộc tính riêng tư, thường kèm kiểm tra hợp lệ.
 
+* **Lưu ý:** Sử dụng getter/setter để tuân thủ encapsulation, tránh truy cập trực tiếp private attributes.
 
 #### **10.2.4. VD**
 
@@ -3402,7 +3406,75 @@ int main() {
         cout << "Tên: " << person.getName() << ", Tuổi: " << person.getAge() << endl;
         return 0;
     }
+
+#### **10.2.5. Friend Function và Friend Class (Hàm bạn và Lớp bạn)**
+
+* **Friend:** 
     
+    ◦ Cho phép một hàm hoặc lớp khác truy cập vào các thành viên private/ protected của class, mà không cần làm chúng public
+    
+    ◦ Đây là ngoại lệ của encapsulation, dùng khi cần hợp tác chặt chẽ giữa các class, nhưng không lạm dụng để tránh phá vỡ tính đóng gói.
+
+* **Friend Function (Hàm bạn):** 
+    
+    ◦ Một hàm bên ngoài class được khai báo là friend, có thể truy cập private data
+
+    ◦ Cú pháp
+    
+    ```
+    friend ReturnType functionName(ClassName& obj); (khai báo trong class)
+    ```
+* **Friend Class (Lớp bạn):** 
+    
+    ◦ Một class khác được khai báo là friend,tất cả phương thức của nó có thể truy cập private data
+
+    ◦ Cú pháp
+    
+    ```
+    friend class OtherClass; (khai báo trong class)
+    ```
+
+* **VD:** 
+
+    ```
+    #include <iostream>
+    #include <string>
+    using namespace std;
+
+    class Person {
+    private:
+        string secret = "This is private!";  // Dữ liệu riêng tư
+
+    public:
+        // Khai báo hàm friend
+        friend void showSecret(Person& p);  // Hàm bạn
+
+        // Khai báo lớp friend
+        friend class FriendClass;
+    };
+
+    // Định nghĩa hàm friend (bên ngoài class)
+    void showSecret(Person& p) {
+        cout << "Friend function accesses: " << p.secret << endl;
+    }
+
+    class FriendClass {
+    public:
+        void accessSecret(Person& p) {
+            cout << "Friend class accesses: " << p.secret << endl;
+        }
+    };
+
+    int main() {
+        Person person;
+        showSecret(person);  // Output: Friend function accesses: This is private!
+        
+        FriendClass fc;
+        fc.accessSecret(person);  // Output: Friend class accesses: This is private!
+        
+        return 0;
+    }
+    ```
 ### **10.3. Kế thừa (Inheritance)**
 
 #### **10.3.1. Khái niệm**
@@ -3579,19 +3651,23 @@ int main() {
 
 * **Đa hình (Polymorphism):** 
 
-    ◦ Cho phép một lớp (lớp con) thừa hưởng các thuộc tính và phương thức của một lớp khác (lớp cha). Điều này thúc đẩy tái sử dụng mã và thiết lập quan hệ "is-a" (là một)
+    ◦ Cho phép các đối tượng của các lớp khác nhau (nhưng có quan hệ kế thừa) được xử lý như đối tượng của lớp cha, nhưng hành vi thực tế phụ thuộc vào lớp con. Nghĩa là "một giao diện, nhiều cách triển khai".
    
 * **Có 2 loại:** 
 
-    ◦ **Compile-time Polymorphism:** Thông qua nạp chồng hàm (function overloading) hoặc nạp chồng toán tử (operator overloading).
+    ◦ **Compile-time Polymorphism:** Quyết định lúc biên dịch, qua function overloading hoặc operator overloading.
 
-    ◦ **Run-time Polymorphism:** Thông qua hàm ảo (virtual function) và kế thừa.
+    ◦ **Run-time Polymorphism:** Quyết định lúc chạy, qua virtual function và override.
 
 #### **10.4.2. Compile-time Polymorphism**
 
 * **Function Overloading:** 
 
     ◦ Nhiều hàm cùng tên nhưng khác tham số.
+
+    ```
+    void print(int x); void print(string s);
+    ```
 
 * **Operator Overloading:** 
 
@@ -3600,7 +3676,9 @@ int main() {
     
 #### **10.4.3. Run-time Polymorphism**
 
-*  Sử dụng từ khóa `virtual` và con trỏ/tham chiếu để gọi phương thức của lớp con.
+*  Sử dụng từ khóa `virtual` trong `lớp cha`, và `override (C++11)` trong `lớp con` để ghi đè. Dùng con trỏ hoặc tham chiếu đến lớp cha để gọi.
+
+* Lưu ý: Không virtual thì gọi phương thức cha (không đa hình động).
    
 #### **10.4.4. VD**
 
@@ -3776,6 +3854,10 @@ int main() {
 * **Hàm hủy (Destructor):** 
 
     ◦  Là phương thức đặc biệt, được gọi tự động khi đối tượng bị hủy (ra khỏi phạm vi hoặc dùng delete).
+
+* **Lưu ý:**
+    
+    ◦ Destructor chỉ có một, không overload được. Virtual destructor cần nếu có kế thừa để gọi đúng destructor con.
    
 * **Đặc điểm:** 
 
@@ -3834,57 +3916,106 @@ int main() {
 	Bình thường, các toán tử này chỉ hoạt động với các kiểu dữ liệu cơ bản như int, float, double. Ví dụ: 3 + 5 sẽ cho ra kết quả là 8.
     Nhưng nếu bạn có một lớp tự định nghĩa, chẳng hạn như lớp Vector2D (đại diện cho một vector 2 chiều), bạn có thể định nghĩa toán tử + để cộng hai vector theo cách bạn muốn.
  	```
-	◦ Tại sao lại cần nạp chồng toán tử ?
 
-	```
-	Nó giúp mã nguồn trở nên trực quan hơn. Thay vì viết một hàm như v1.add(v2) để cộng hai vector, bạn có thể viết v1 + v2
- 	```
+* **Lưu ý:**
+
+   ◦  Không thay đổi thứ tự ưu tiên toán tử.
+
+   ◦  Không nạp chồng một số toán tử như `::, .*, sizeof.`
+
+   ◦  Có hai loại: **Member operator (trong class)** và **Non-member (friend operator, hữu ích cho toán tử như <<).**
+
+* **Các loại toán tử phổ biến:**
+
+   ◦  Nhị nguyên: + , - , * , / , == , != , < , > , = (gán)
+
+   ◦  Đơn nguyên: ++ , -- , ! , - (âm)
+
+   ◦  Khác: [] (index), () (gọi hàm), -> (con trỏ)
+
 #### **10.7.2. Cú pháp**
 
-    ReturnType operatorOp(const ClassName& other) {
-        // Logic
-    }
+* **Member:** `ReturnType operator+(const ClassName& other) const { ... }`
+
+* **Friend:** `friend ReturnType operator+(const ClassName& a, const ClassName& b);`
+
+* **Trả về:** Thường là object mới hoặc tham chiếu (&) cho hiệu suất.
 
 #### **10.7.3.VD**
 
+    ```
     #include <iostream>
-    #include <string>
     using namespace std;
 
     class Vector2D {
     public:
         int x, y;
 
-        Vector2D(int x, int y) : x(x), y(y) {}
+        // Constructor với giá trị mặc định
+        Vector2D(int x = 0, int y = 0) : x(x), y(y) {}
 
-        // Nạp chồng toán tử +
+        // Toán tử +: Cộng hai vector
         Vector2D operator+(const Vector2D& other) const {
             return Vector2D(x + other.x, y + other.y);
         }
 
-        // Nạp chồng toán tử <<
+        // Toán tử -: Trừ hai vector
+        Vector2D operator-(const Vector2D& other) const {
+            return Vector2D(x - other.x, y - other.y);
+        }
+
+        // Toán tử ==: So sánh hai vector
+        bool operator==(const Vector2D& other) const {
+            return x == other.x && y == other.y;
+        }
+
+        // Toán tử ++: Tăng x, y lên 1 (prefix)
+        Vector2D& operator++() {
+            x++; y++; // Tăng x, y
+            return *this; // Trả về chính vector sau khi tăng
+        }
+
+        // Toán tử <<: Xuất vector ra màn hình
         friend ostream& operator<<(ostream& os, const Vector2D& vec) {
             os << "(" << vec.x << ", " << vec.y << ")";
             return os;
         }
+
+        // Toán tử >>: Nhập vector từ bàn phím
+        friend istream& operator>>(istream& is, Vector2D& vec) {
+            cout << "Nhap x, y: ";
+            is >> vec.x >> vec.y;
+            return is;
+        }
     };
 
     int main() {
+        // Tạo hai vector
         Vector2D v1(1, 2), v2(3, 4);
-        Vector2D v3 = v1 + v2; // Nạp chồng toán tử +
-        cout << "v1: " << v1 << endl; // Nạp chồng toán tử <<
-        cout << "v2: " << v2 << endl;
-        cout << "v1 + v2: " << v3 << endl;
-        // Output:
-        // v1: (1, 2)
-        // v2: (3, 4)
-        // v1 + v2: (4, 6)
+
+        // Thử toán tử +
+        cout << "v1 + v2 = " << v1 + v2 << endl; // (4, 6)
+
+        // Thử toán tử -
+        cout << "v2 - v1 = " << v2 - v1 << endl; // (2, 2)
+
+        // Thử toán tử ==
+        if (v1 == Vector2D(1, 2)) {
+            cout << "v1 bang (1, 2)" << endl; // In ra
+        }
+
+        // Thử toán tử ++
+        ++v1; // Tăng v1 thành (2, 3)
+        cout << "Sau ++v1, v1 = " << v1 << endl;
+
+        // Thử toán tử nhập
+        Vector2D v3;
+        cin >> v3; // Ví dụ nhập: 5 6
+        cout << "Vector vua nhap: " << v3 << endl;
+
         return 0;
     }
-
-    =>
-    Toán tử + được nạp chồng để cộng hai vector.
-    Toán tử << được nạp chồng (dùng friend) để in đối tượng Vector2D.
+    ```
 
 ### **10.8. Kỹ thuật khởi tạo (Uniform Initialization)**
 
@@ -4081,6 +4212,8 @@ int main() {
     }
 
 </details> 
+
+
 
 
 
