@@ -4214,6 +4214,349 @@ int main() {
 </details> 
 
 
+<details>
+	<summary><strong>BÀI 11: Kế thừa, Interface, Abstract Class</strong></summary>
+
+## **BÀI 11: Kế thừa, Interface, Abstract Class**
+
+### **11.1. Multiple Inheritance & Diamond Problem**
+
+#### **11.1.1. Khái niệm**
+
+*  **Multiple Inheritance (Kế thừa đa cấp):** 
+   
+    ◦ Một lớp con (derived class) có thể kế thừa từ nhiều lớp cha (bases classes) cùng lúc
+   
+    ◦ Tuy nhiên, kế thừa đa cấp có thể dẫn đến vấn đề **Diamond Problem**
+
+*  **Diamond Problem:**
+
+    <img width="214" height="199" alt="Image" src="https://github.com/user-attachments/assets/bbebbfb2-d25b-4ae2-9a97-8e69c2046c4b" />
+
+
+    ◦ Xảy ra khi một lớp con kế thừa từ hai lớp cha, mà hai lớp cha này lại cùng kế thừa từ một lớp ông
+
+    ◦ Điều này có thể tạo ra bản sao của lớp ông trong lớp con, gây xung đột khi truy cập thành viên của lớp ông
+
+    => Trong trường hợp này, lớp Z kế thừa từ X và Y, cả X và Y đều kế thừa từ A, dẫn đến việc Z có thể chứa 2 bản sao của A
+
+
+#### **11.1.2. Giải pháp: Virtual Inheritance**
+
+* Sử dụng từ khóa `virtual` khi kế thừa để đảm bảo chỉ có một bản sao duy nhất của lớp ông trong lớp con
+
+*  **Cú pháp :** 
+   
+    ```
+    class A { /* ... */ };
+    class X : virtual public A { /* ... */ };
+    class Y : virtual public A { /* ... */ };
+    class Z : public X, public Y { /* ... */ };
+    ```
+* Với `virtual Inheritance` , chỉ một bản sao của lớp A được chia sẻ giữa X và Y, tránh xung đột
+
+#### **11.1.3. VD**
+   
+
+    #include <iostream>
+    using namespace std;
+
+    class A {
+    public:
+
+        void show() { cout << "Class A" << endl; }
+    };
+
+    class X : virtual public A {};
+    class Y : virtual public A {};
+    class Z : public X, public Y {};
+
+    int main(){
+    
+        Z z;
+        z.show();       // Không gây lỗi do chỉ có 1 bản sao của A
+        return 0;
+    }
+
+* Lưu ý: Nếu không dùng virtual, trình biên dịch sẽ báo lỗi hoặc yêu cầu xác định rõ ràng `(e.g., d.X::show())`.
+
+### **11.2. Virtual Function, Pure Virtual, vtable**
+
+#### **11.2.1. Virtual Function**
+
+* **Virtual Function (Hàm ảo):** 
+
+    ◦ Là hàm được khai báo với từ khóa `virtual` trong lớp cha, cho phép đa hình runtime
+
+    ◦ Khi hàm ảo được gọi thông qua con trỏ hoặc tham chiếu của lớp cha,hàm con sẽ được thực thi nếu nó ghi đè (override)
+
+
+* **vtable (Virtual Table):** 
+
+    ◦ Là bảng con trỏ hàm được tạo bởi trình biên dịch để lưu trữ địa chỉ của các hàm ảo
+
+    ◦ Mỗi đối tượng của lớp có hàm ảo sẽ chứa một con trỏ đến vtable, giúp xác định hàm nào sẽ được gọi tại runtime
+
+#### **11.2.2. Pure Virtual Function**
+
+* **Pure Virtual Function (Hàm ảo thuần túy)**: 
+
+    ◦ Là hàm ảo không có triển khai trong lớp cha, được khai báo với `=0`
+
+    ◦ Lớp chứa hàm ảo thuần túy trỏ thành **abstact class**, không thể tạo đối tượng trực tiếp
+
+    ◦ Mục đích: Buộc các lớp con phải triển khai hàm này
+
+
+* **Cú pháp**: 
+
+    ```
+    class Base {
+    public:
+        virtual void func() = 0;    //Hàm ảo thuần túy
+    }
+
+    ```
+* **VD**: 
+
+    ```
+    #include <iostream>
+    using namespace std;
+
+    class Animal {
+    public:
+        virtual void makeSound() = 0; // Pure virtual function
+        virtual ~Animal() {} // Virtual destructor
+    };
+
+    class Dog : public Animal {
+    public:
+        void makeSound() override {
+            cout << "Woof Woof!" << endl;
+        }
+    };
+
+    class Cat : public Animal {
+    public:
+        void makeSound() override {
+            cout << "Meow Meow!" << endl;
+        }
+    };
+
+    int main() {
+        Animal* animals[] = { new Dog(), new Cat() };
+        for (Animal* animal : animals) {
+            animal->makeSound();
+            delete animal;
+        }
+        // Output:
+        // Woof Woof!
+        // Meow Meow!
+        return 0;
+    }
+
+    ```
+
+### **11.3. Interface Design**
+
+#### **11.3.1. Khái niệm**
+
+* **Interface (Giao diện):** 
+
+    ◦ Trong C++, giao diện được mô phỏng bằng cách sử dụng lớp trừu tượng chỉ chứa các hàm ảo thuần túy (`=0`)
+
+    ◦ Giao diện định nghĩa contract mà các lớp con phải tuân thủ
+
+* **Mục đích:** 
+
+    ◦ Tách biệt giao diện (chức năng) và triển khai (cách thực hiện)
+
+    ◦ Dễ dàng bảo trì, mở rộng, và thay thế triển khai mà không ảnh hưởng đến mã sử dụng giao diện.
+
+#### **11.3.2. Cú pháp**
+
+    
+    class Interface {
+    public: 
+        virtual void method1() = 0;
+        virtual void method2() = 0;
+        virtual ~Interface() {}  // Virtual destructor
+    }
+ 	
+#### **11.3.3. VD**
+
+    
+    #include <iostream>
+    using namespace std;
+
+    class Drawable {
+    public:
+        virtual void draw() = 0;
+        virtual ~Drawable() {}
+    };
+
+    class Circle : public Drawable {
+    public:
+        void draw() override {
+            cout << "Drawing a circle" << endl;
+        }
+    };
+
+    class Rectangle : public Drawable {
+    public:
+        void draw() override {
+            cout << "Drawing a rectangle" << endl;
+        }
+    };
+
+    int main() {
+        Drawable* shapes[] = { new Circle(), new Rectangle() };
+        for (Drawable* shape : shapes) {
+            shape->draw();
+            delete shape;
+        }
+        // Output:
+        // Drawing a circle
+        // Drawing a rectangle
+        return 0;
+    }
+    
+
+
+
+### **11.4. Object Slicing, Upcasting & Downcasting**
+
+#### **11.4.1. Object Slicing**
+
+* **Object Slicing:** 
+
+    ◦ Xảy ra khi một đối tượng của lớp con được gán trực tiếp cho một biến của lớp cha
+
+    ◦ Phần dữ liệu và hành vi đặc trưng của lớp con sẽ bị mất, chỉ giữ lại phần thuộc về lớp cha
+
+* **Nguyên nhân:**
+
+    ◦ Gán giá trị (value copy) thay vì sử dụng con trỏ hoặc hàm tham chiếu
+   
+* **VD:** 
+
+    ```
+    #include <iostream>
+    using namespace std;
+
+    class Base {
+    public:
+        virtual void show() { cout << "Base" << endl; }
+    };
+
+    class Derived : public Base {
+    public:
+        void show() override { cout << "Derived" << endl; }
+        void extra() { cout << "Extra function" << endl; }
+    };
+
+    int main() {
+        Derived derived;
+        Base base = derived; // Object slicing
+        base.show(); // Output: Base
+        // base.extra(); // Lỗi: extra() không tồn tại trong Base
+        return 0;
+    }
+
+    ```
+
+#### **11.4.2. Upcasting**
+
+* **Upcasting:** 
+
+    ◦ Chuyển một con trỏ hoặc tham chiếu từ lớp con lên lớp cha. Đây là quá trình an toàn và tự động, vì lớp con luôn là một loại của lớp cha (quan hệ "is-a").
+
+
+* **Cú pháp:** 
+
+    ```
+    Derived derived;
+    Base* base = &derived; // Upcasting
+
+    ```
+
+* **VD:**
+
+    ```
+    #include <iostream>
+    using namespace std;
+
+    class Base {
+    public:
+        virtual void show() { cout << "Base" << endl; }
+    };
+
+    class Derived : public Base {
+    public:
+        void show() override { cout << "Derived" << endl; }
+    };
+
+    int main() {
+        Derived derived;
+        Base* base = &derived; // Upcasting
+        base->show(); // Output: Derived (do virtual function)
+        return 0;
+    }
+
+    ```
+#### **11.4.3. Downcasting**
+
+*  **Downcasting:** 
+
+    ◦ Chuyển một con trỏ hoặc tham chiếu từ lớp cha xuống lớp con. Đây là quá trình không an toàn, cần sử dụng `dynamic_cast` để kiểm tra tính hợp lệ tại runtime.
+
+*  **Cú pháp:**
+
+    ```
+    Base* base = new Derived();
+    Derived* derived = dynamic_cast<Derived*>(base);
+
+    ```
+   
+#### **11.4.4. VD**
+
+    ```
+    #include <iostream>
+    using namespace std;
+
+    class Base {
+    public:
+        virtual void show() { cout << "Base" << endl; }
+        virtual ~Base() {}
+    };
+
+    class Derived : public Base {
+    public:
+        void show() override { cout << "Derived" << endl; }
+        void extra() { cout << "Extra function" << endl; }
+    };
+
+    int main() {
+        Base* base = new Derived();
+        Derived* derived = dynamic_cast<Derived*>(base);
+        if (derived) {
+            derived->show(); // Output: Derived
+            derived->extra(); // Output: Extra function
+        } else {
+            cout << "Downcast failed" << endl;
+        }
+        delete base;
+        return 0;
+    }
+    ```
+
+* **Lưu ý:** Nếu `dynamic_cast` thất bại (base không thực sự trỏ đến Derived), con trỏ trả về sẽ là nullptr.
+
+
+
+</details> 
+
+
 
 
 
