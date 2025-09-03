@@ -4556,6 +4556,400 @@ int main() {
 
 </details> 
 
+<details>
+	<summary><strong>BÀI 12: Smart Pointer & RAII</strong></summary>
+
+## **BÀI 12: Smart Pointer & RAII**
+
+### **12.1. Smart Pointer**
+
+#### **12.1.1. Khái niệm**
+
+*  **Smart Pointer** là các lớp trong C++ (thư viện `<memory>`) quản lý bộ nhớ động một cách tự động, giúp tránh rò rỉ bộ nhớ và lỗi con trỏ
+
+*  Chúng thay thế cho việc sử dụng con trỏ thô `(new/delete)` bằng cách tự động giải phóng tài nguyên khi không còn được sử dụng
+
+*  Có 3 loại chính 
+
+    ◦ **std::unique_ptr:** 
+    
+       Sở hữu duy nhất một đối tượng, tự động giải phóng khi ra khỏi phạm vi
+       Không thể sao chép, chỉ có thể di chuyển (move) 
+
+    ◦ **std::shared_ptr:**
+       
+       Sở hữu chia sẻ, sử dụng bộ đếm tham chiếu (reference count) để theo dõi số lượng con trỏ sở hữu đối tượng
+       Đối tượng được giải phóng khi bộ đếm về 0
+       
+    ◦ **std::weak_ptr:**
+
+       Tham chiếu yếu, không sở hữu đối tượng, dùng để tránh vòng tham chiếu (circular dependency) với `shared_ptr`
+
+
+#### **12.1.2. std::unique_ptr**
+
+*  **Tại sao dùng unique_ptr :**
+   
+    ◦ Khi bạn muốn một tài nguyên chỉ có một chủ sở hữu duy nhất, tránh việc nhiều nơi cùng can thiệp
+
+    ◦ Đảm bảo tài nguyên được giải phóng tự động khi `unique_ptr` ra khỏi scope
+
+    ◦ Ngăn chặn sao chép ngoài ý muốn (khác với `shared_ptr`,`unique_ptr` không cho copy)
+
+    ◦ Phù hợp với
+
+    => Quản lý tài nguyên độc quyền (file handle, socket, thiết bị ngoại vi)
+
+    => Sử dụng trong RAII để chắc chắn giải phóng bộ nhớ
+    
+    => Trả về đối tượng từ hàm mà không cần lo lắng về copy
+
+*  **Đặc điểm :**
+
+    ◦ Chỉ một `unique_ptr` có thể sở hữu một đối tượng tại một thời điểm
+
+    ◦ Không thể sao chép (copy), chỉ có thể di chuyển (move) quyền sở hữu
+
+    ◦ Tự động gọi delete khi unique_ptr ra khỏi phạm vi 
+
+*  **Cú pháp :** 
+   
+    ```
+    std::unique_ptr<Type> ptr = std::make_unique<Type>(params);
+    ```
+
+*  **Các hàm thành viên thường dùng :**
+
+   ◦ **get()** : Trả về con trỏ thô
+
+   ```
+   auto p = std::make_unique<int>(10);
+   int* raw = p.get();
+   std::cout << *raw << std::endl;  //In: 10
+   ```
+
+   ◦ **release()** : Trả về con trỏ thô và bỏ quyền sở hữu (không tự xóa)
+
+   ```
+   auto p = std::make_unique<int>(20);
+   int* raw = p.release();
+   std::cout << *raw << std::endl;  //In: 20
+   delete raw; //Phải tự xóa
+   ```
+
+   ◦ **reset()**  : Thay đổi đối tượng đang quản lý (giải phóng cái cũ nếu có)
+
+   ```
+   auto p = std::make_unique<int>(30);
+   p.reset(new int(40));
+   std::cout << *p << std::endl;   //In: 40
+
+   ```
+
+   ◦ **swap()** : Hoán đổi hai `unique_ptr`
+
+   ```
+   auto p1 = std::make_unique<int>(1);
+   auto p2 = std::make_unique<int>(2);
+   p1.swap(p2);
+   std::cout << *p1 << " " << *p2 << std::endl; //In: 2 1
+   ```
+
+   ◦ `operator*` và `operator->` : Truy cập đối tượng như con trỏ thường
+
+   ```
+   struct Test { 
+       void hi(){ 
+           std::cout << "Hi\n"; 
+           } 
+    };
+
+   auto p = std::make_unique<Test>();
+   (*p).hi();   // dùng *
+   p->hi();     // dùng ->
+   ```
+
+
+*  **VD:**
+
+    ```
+    #include <iostream>
+    #include <memory>
+    using namespace std;
+
+    class File {
+    public:
+        File(string name)  {
+            cout << "Mo file: " << name << endl;
+        }
+        ~File(){
+            cout << "Dong file" << endl;
+        }
+        void write(string msg){
+            cout << "Ghi: " << msg << endl;
+        }
+    };
+    int main(){
+        unique_ptr<File> f = make_unique<File>("data.txt");
+        f->write("Xin chao");
+
+        //Chuyen quyen so huu
+        unique_ptr<File> f2 = move(f);
+        if(!f) cout << "f khong con giu file\n";
+
+        f2->write("Noi dung moi");
+        return 0;
+    }
+    ```
+
+    ```
+    Mở file: data.txt
+    Ghi: Xin chao
+    f không còn giữ file
+    Ghi: Noi dung moi
+    Đóng file
+
+    ```
+
+#### **12.1.3. std::shared_ptr**
+
+*  **Tại sao dùng shared_ptr :**
+   
+    ◦ Nếu dùng con trỏ thường (vd: Motorbike* ), ta sẽ phải tự nhớ khi nào cần xóa, nguy cơ double delete hoặc memory leak
+
+    => shared_ptr giải quyết vấn đề bằng reference counting, khi không còn ai giữ tự động `delete` đối tượng
+
+    => Dùng shared_ptr khi nhiều module cùng ghi vào một file logger (file log)
+    
+    => Nhiều client cùng dùng chung một kết nối cơ sở dữ liệu
+
+    => Nhiều đối tượng cùng trỏ tới một cấu hình (config)
+
+*  **Đặc điểm :**
+
+    ◦ Nhiều `shared_ptr` có thể sở hữu cùng một đối tượng
+
+    ◦ Sử dụng bộ đếm tham chiếu (reference count) để quản lý vòng đời đối tượng
+
+    ◦ Đối tượng được giải phóng khi bộ đếm về 0
+
+*  **Cú pháp :**
+    
+    ```
+    std::shared_ptr<Type> ptr = std::make_shared<Type>(params);
+    ```
+
+*  **Các hàm thành viên thường dùng :**
+
+   ◦ **use_count()** : Trả về số `shared_ptr` đang cùng quản lý đối tượng
+
+   ```
+   auto p1 = std::make_shared<int>(10);
+   auto p2 = p1; // cùng quản lý
+   std::cout << p1.use_count() << std::endl;  //In: 2
+   ```
+
+   ◦ **reset()** : Bỏ quản lý đối tượng hiện tại (giảm reference count đi 1, nếu về 0 thì hủy đối tượng)
+
+   ```
+   auto p = std::make_shared<int>(42);
+   p.reset();  //bỏ quản lý -> đối tượng bị hủy
+   std::cout << (p ? "con giu" : "da reset") << std::endl;
+
+   ```
+
+   ◦ **get()** : Trả về con trỏ thô (Type*) đang được quản lý
+
+   ```
+   auto p = std::make_shared<int>(100);
+   int* raw = p.get();  //Lấy con trỏ thô
+   std::cout << *raw << std::endl;
+
+   ```
+
+   ◦ **`operator *` và operator->** : Truy cập đối tượng giống như con trỏ thường 
+
+   ```
+   struct Test {
+       void hello(){
+           std::cout << "Hi\n";
+       }
+   };
+
+   auto p = std::make_shared<Test>();
+   (*p).hello();  //Dùng operator*
+   p->hello();    //Dùng operator->
+
+
+   ```
+
+   ◦ **unique()** : Trả về `true` nếu chỉ có 1 `shared_ptr` quản lý đối tượng
+
+   ```
+   auto p1 = std::make_shared<int>(7);
+   std::cout << p1.unique() << std::endl;  // true (chỉ p1 giữ)
+   
+   auto p2 = p1;
+   std::cout << p1.unique() << std::endl;  // false
+
+   ```
+
+   ◦ `swap()` : Hoan đổi 2 `shared_ptr` với nhau
+
+   ```
+   auto p1 = std::make_shared<int>(1);
+   auto p2 = std::make_shared<int>(2);
+
+   p1.swap(p2);
+   std::cout << *p1 " " << *p2 << std::endl; //In 2 1
+
+   ```
+
+*  **VD:**
+
+    ```
+    #include <iostream>
+    #include <memory>
+
+    class Motorbike {
+    public:
+        Motorbike(std::string model) : model(model) {
+            std::cout << "Mua xe: " << model << std::endl;
+        }
+        ~Motorbike(){
+            std::cout << "Ban xe: " << model << std::endl;
+        }
+        void use(const std::string& user){
+            std::cout << user << " dang chay xe " << model << std::endl;
+        }
+    private:
+        std::string model;
+    };
+
+    int main(){
+        auto bike = std::make_shared<Motorbike>("Honda");
+        // use_count = 1 (chỉ có bike)
+
+        {
+            auto user1 = bike; 
+            auto user2 = bike;
+            user1->use("Tung");
+            user2->use("Binh");
+            std::cout << "So nguoi dang dung: " << bike.use_count() << std::endl;
+            //use_count = 3 (bike, user1, user2)
+        }
+
+        std::cout << "Con lai: " << bike.use_count() << std::endl;
+
+    }
+    ```
+
+#### **12.1.4. std::weak_ptr**
+
+*  **Tại sao dùng weak_ptr :**
+   
+    ◦ shared_ptr dùng reference count để quản lý đối tượng
+
+    ◦ Nếu 2 đối tượng tham chiếu lẫn nhau bằng shared_ptr, reference count sẽ không bao giờ về 0 => gây ra memory leak
+
+    => Dùng weak_ptr cho mối quan hệ không sở hữu
+
+    => Dùng weak_ptr không làm tăng reference count, chỉ quan sát đối tượng
+    
+    => Khi đối tượng bị hủy ,`weak_ptr` sẽ tự động trở thành `expired()`
+
+    => Dùng trong các quan hệ kiểu Cha-con, Cache hoặc observer
+
+*  **Đặc điểm :**
+
+    ◦ Không sở hữu đối tượng, không làm tăng bộ đếm tham chiếu
+
+    ◦ Dùng để tham chiếu đến đối tượng được quản lý bởi `shared_ptr` mà không kéo dài vòng đời của nó
+
+    ◦ Hữu ích để phá vỡ **circular dependency**
+
+*  **Cú pháp :**
+    
+    ```
+    std::weak_ptr<Type> weak = shared_ptr;
+    ```
+
+*  **Các hàm thành viên thường dùng :**
+
+   ◦ **expired()** : Kiểm tra xem đối tượng đã bị hủy chưa
+
+   ```
+   auto sp = std::make_shared<int>(10);
+   std::weak_ptr<int> wp = sp;
+
+   std::cout << (wp.expired() ? "het" : "con") << std::endl; // In: con
+   sp.reset();
+   std::cout << (wp.expired() ? "het" : "con") << std::endl; // In: het
+   ```
+
+   ◦ **lock()** : Lấy `shared_ptr` từ `weak_ptr` (nếu còn sống)
+
+   ```
+    auto sp = std::make_shared<int>(20);
+    std::weak_ptr<int> wp = sp;
+
+    if(auto p = wp.lock())    // lock tạo shared_ptr
+        std::cout << *p << std::endl;   // In: 20
+
+
+   ```
+
+   ◦ **use_count()** : Số `shared_ptr` đang quản lý đối tượng
+
+   ```
+   auto sp = std::make_shared<int>(30);
+   std::weak_ptr<int> wp = sp;
+   
+   std::cout << wp.use_count() << std::endl;  //In 1
+   ```
+
+   ◦ **reset()** : Bỏ quan sát đối tượng (không ảnh hưởng đến đối tượng)
+
+   ```
+    auto sp = std::make_shared<int>(40);
+    std::weak_ptr<int> wp = sp;
+
+    wp.reset();   // wp không quan sát nữa
+    std::cout << (wp.expired() ? "het" : "con") << std::endl; // In: het
+
+   ```
+
+*  **VD:**
+
+    ```
+    #include <iostream>
+    #include <memory>
+    using namespace std;
+
+    class Parent;  // khai báo trước
+
+    class Child {
+    public:
+        weak_ptr<Parent> parent; 
+        ~Child(){ cout << "Child destroyed\n"; }
+    };
+
+    class Parent {
+    public:
+        shared_ptr<Child> child;
+        ~Parent(){ cout << "Parent destroyed\n"; }
+    };
+
+    int main(){
+        auto p = make_shared<Parent>();
+        p->child = make_shared<Child>();
+        p->child->parent = p;  
+
+        cout << "End main\n";
+    }
+
+    ```
+</details> 
 
 
 
