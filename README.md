@@ -4567,7 +4567,7 @@ int main() {
 
 *  **Smart Pointer** là các lớp trong C++ (thư viện `<memory>`) quản lý bộ nhớ động một cách tự động, giúp tránh rò rỉ bộ nhớ và lỗi con trỏ
 
-*  Chúng thay thế cho việc sử dụng con trỏ thô `(new/delete)` bằng cách tự động giải phóng tài nguyên khi không còn được sử dụng
+*  Chúng thay thế cho việc sử dụng con trỏ thô `(new/delete)` bằng cách tự động giải phóng tài nguyên khi không còn được sử dụng, dựa trên cơ chế RAII.
 
 *  Có 3 loại chính 
 
@@ -4610,11 +4610,12 @@ int main() {
 
     ◦ Không thể sao chép (copy), chỉ có thể di chuyển (move) quyền sở hữu
 
-    ◦ Tự động gọi delete khi unique_ptr ra khỏi phạm vi 
+    ◦ Tự động gọi `delete` khi unique_ptr ra khỏi phạm vi hoặc khi gọi reset()
 
 *  **Cú pháp :** 
    
     ```
+    #include <memory>
     std::unique_ptr<Type> ptr = std::make_unique<Type>(params);
     ```
 
@@ -4622,92 +4623,92 @@ int main() {
 
    ◦ **get()** : Trả về con trỏ thô
 
-   ```
-   auto p = std::make_unique<int>(10);
-   int* raw = p.get();
-   std::cout << *raw << std::endl;  //In: 10
-   ```
+   
+        auto p = std::make_unique<int>(10);
+        int* raw = p.get();
+        std::cout << *raw << std::endl;  //In: 10
+   
 
    ◦ **release()** : Trả về con trỏ thô và bỏ quyền sở hữu (không tự xóa)
 
-   ```
-   auto p = std::make_unique<int>(20);
-   int* raw = p.release();
-   std::cout << *raw << std::endl;  //In: 20
-   delete raw; //Phải tự xóa
-   ```
+   
+        auto p = std::make_unique<int>(20);
+        int* raw = p.release();
+        std::cout << *raw << std::endl;  //In: 20
+        delete raw; //Phải tự xóa
+   
 
    ◦ **reset()**  : Thay đổi đối tượng đang quản lý (giải phóng cái cũ nếu có)
 
-   ```
-   auto p = std::make_unique<int>(30);
-   p.reset(new int(40));
-   std::cout << *p << std::endl;   //In: 40
+   
+        auto p = std::make_unique<int>(30);
+        p.reset(new int(40));
+        std::cout << *p << std::endl;   //In: 40
 
-   ```
+   
 
    ◦ **swap()** : Hoán đổi hai `unique_ptr`
 
-   ```
-   auto p1 = std::make_unique<int>(1);
-   auto p2 = std::make_unique<int>(2);
-   p1.swap(p2);
-   std::cout << *p1 << " " << *p2 << std::endl; //In: 2 1
-   ```
+   
+        auto p1 = std::make_unique<int>(1);
+        auto p2 = std::make_unique<int>(2);
+        p1.swap(p2);
+        std::cout << *p1 << " " << *p2 << std::endl; //In: 2 1
+   
 
    ◦ `operator*` và `operator->` : Truy cập đối tượng như con trỏ thường
 
-   ```
-   struct Test { 
-       void hi(){ 
-           std::cout << "Hi\n"; 
-           } 
-    };
+   
+        struct Test { 
+            void hi(){ 
+                std::cout << "Hi\n"; 
+                } 
+            };
 
-   auto p = std::make_unique<Test>();
-   (*p).hi();   // dùng *
-   p->hi();     // dùng ->
-   ```
+        auto p = std::make_unique<Test>();
+        (*p).hi();   // dùng *
+        p->hi();     // dùng ->
+   
 
 
 *  **VD:**
 
-    ```
-    #include <iostream>
-    #include <memory>
-    using namespace std;
+    
+        #include <iostream>
+        #include <memory>
+        using namespace std;
 
-    class File {
-    public:
-        File(string name)  {
-            cout << "Mo file: " << name << endl;
+        class File {
+        public:
+            File(string name)  {
+                cout << "Mo file: " << name << endl;
+            }
+            ~File(){
+                cout << "Dong file" << endl;
+            }
+            void write(string msg){
+                cout << "Ghi: " << msg << endl;
+            }
+        };
+        int main(){
+            unique_ptr<File> f = make_unique<File>("data.txt");
+            f->write("Xin chao");
+
+            //Chuyen quyen so huu
+            unique_ptr<File> f2 = move(f);
+            if(!f) cout << "f khong con giu file\n";
+
+            f2->write("Noi dung moi");
+            return 0;
         }
-        ~File(){
-            cout << "Dong file" << endl;
-        }
-        void write(string msg){
-            cout << "Ghi: " << msg << endl;
-        }
-    };
-    int main(){
-        unique_ptr<File> f = make_unique<File>("data.txt");
-        f->write("Xin chao");
-
-        //Chuyen quyen so huu
-        unique_ptr<File> f2 = move(f);
-        if(!f) cout << "f khong con giu file\n";
-
-        f2->write("Noi dung moi");
-        return 0;
-    }
-    ```
+    
 
     ```
-    Mở file: data.txt
-    Ghi: Xin chao
-    f không còn giữ file
-    Ghi: Noi dung moi
-    Đóng file
+        Mở file: data.txt
+        Ghi: Xin chao
+        f không còn giữ file
+        Ghi: Noi dung moi
+        Đóng file
 
     ```
 
@@ -4735,114 +4736,114 @@ int main() {
 
 *  **Cú pháp :**
     
-    ```
-    std::shared_ptr<Type> ptr = std::make_shared<Type>(params);
-    ```
+        #include <memory>
+        std::shared_ptr<Type> ptr = std::make_shared<Type>(params);
+    
 
 *  **Các hàm thành viên thường dùng :**
 
    ◦ **use_count()** : Trả về số `shared_ptr` đang cùng quản lý đối tượng
 
-   ```
-   auto p1 = std::make_shared<int>(10);
-   auto p2 = p1; // cùng quản lý
-   std::cout << p1.use_count() << std::endl;  //In: 2
-   ```
+   
+        auto p1 = std::make_shared<int>(10);
+        auto p2 = p1; // cùng quản lý
+        std::cout << p1.use_count() << std::endl;  //In: 2
+   
 
    ◦ **reset()** : Bỏ quản lý đối tượng hiện tại (giảm reference count đi 1, nếu về 0 thì hủy đối tượng)
 
-   ```
-   auto p = std::make_shared<int>(42);
-   p.reset();  //bỏ quản lý -> đối tượng bị hủy
-   std::cout << (p ? "con giu" : "da reset") << std::endl;
+   
+        auto p = std::make_shared<int>(42);
+        p.reset();  //bỏ quản lý -> đối tượng bị hủy
+        std::cout << (p ? "con giu" : "da reset") << std::endl;
 
-   ```
+   
 
    ◦ **get()** : Trả về con trỏ thô (Type*) đang được quản lý
 
-   ```
-   auto p = std::make_shared<int>(100);
-   int* raw = p.get();  //Lấy con trỏ thô
-   std::cout << *raw << std::endl;
+   
+        auto p = std::make_shared<int>(100);
+        int* raw = p.get();  //Lấy con trỏ thô
+        std::cout << *raw << std::endl;
 
-   ```
+   
 
    ◦ **`operator *` và operator->** : Truy cập đối tượng giống như con trỏ thường 
 
-   ```
-   struct Test {
-       void hello(){
-           std::cout << "Hi\n";
-       }
-   };
+   
+        struct Test {
+            void hello(){
+                std::cout << "Hi\n";
+            }
+        };
 
-   auto p = std::make_shared<Test>();
-   (*p).hello();  //Dùng operator*
-   p->hello();    //Dùng operator->
+        auto p = std::make_shared<Test>();
+        (*p).hello();  //Dùng operator*
+        p->hello();    //Dùng operator->
 
 
-   ```
+   
 
    ◦ **unique()** : Trả về `true` nếu chỉ có 1 `shared_ptr` quản lý đối tượng
 
-   ```
-   auto p1 = std::make_shared<int>(7);
-   std::cout << p1.unique() << std::endl;  // true (chỉ p1 giữ)
    
-   auto p2 = p1;
-   std::cout << p1.unique() << std::endl;  // false
+        auto p1 = std::make_shared<int>(7);
+        std::cout << p1.unique() << std::endl;  // true (chỉ p1 giữ)
+        
+        auto p2 = p1;
+        std::cout << p1.unique() << std::endl;  // false
 
-   ```
+   
 
    ◦ `swap()` : Hoan đổi 2 `shared_ptr` với nhau
 
-   ```
-   auto p1 = std::make_shared<int>(1);
-   auto p2 = std::make_shared<int>(2);
+   
+        auto p1 = std::make_shared<int>(1);
+        auto p2 = std::make_shared<int>(2);
 
-   p1.swap(p2);
-   std::cout << *p1 " " << *p2 << std::endl; //In 2 1
+        p1.swap(p2);
+        std::cout << *p1 " " << *p2 << std::endl; //In 2 1
 
-   ```
+   
 
 *  **VD:**
 
-    ```
-    #include <iostream>
-    #include <memory>
+    
+        #include <iostream>
+        #include <memory>
 
-    class Motorbike {
-    public:
-        Motorbike(std::string model) : model(model) {
-            std::cout << "Mua xe: " << model << std::endl;
-        }
-        ~Motorbike(){
-            std::cout << "Ban xe: " << model << std::endl;
-        }
-        void use(const std::string& user){
-            std::cout << user << " dang chay xe " << model << std::endl;
-        }
-    private:
-        std::string model;
-    };
+        class Motorbike {
+        public:
+            Motorbike(std::string model) : model(model) {
+                std::cout << "Mua xe: " << model << std::endl;
+            }
+            ~Motorbike(){
+                std::cout << "Ban xe: " << model << std::endl;
+            }
+            void use(const std::string& user){
+                std::cout << user << " dang chay xe " << model << std::endl;
+            }
+        private:
+            std::string model;
+        };
 
-    int main(){
-        auto bike = std::make_shared<Motorbike>("Honda");
-        // use_count = 1 (chỉ có bike)
+        int main(){
+            auto bike = std::make_shared<Motorbike>("Honda");
+            // use_count = 1 (chỉ có bike)
 
-        {
-            auto user1 = bike; 
-            auto user2 = bike;
-            user1->use("Tung");
-            user2->use("Binh");
-            std::cout << "So nguoi dang dung: " << bike.use_count() << std::endl;
-            //use_count = 3 (bike, user1, user2)
-        }
+            {
+                auto user1 = bike; 
+                auto user2 = bike;
+                user1->use("Tung");
+                user2->use("Binh");
+                std::cout << "So nguoi dang dung: " << bike.use_count() << std::endl;
+                //use_count = 3 (bike, user1, user2)
+            }
 
-        std::cout << "Con lai: " << bike.use_count() << std::endl;
+            std::cout << "Con lai: " << bike.use_count() << std::endl;
 
     }
-    ```
+    
 
 #### **12.1.4. std::weak_ptr**
 
@@ -4864,91 +4865,92 @@ int main() {
 
     ◦ Không sở hữu đối tượng, không làm tăng bộ đếm tham chiếu
 
-    ◦ Dùng để tham chiếu đến đối tượng được quản lý bởi `shared_ptr` mà không kéo dài vòng đời của nó
+    ◦ Phải dùng `lock()` để truy cập đối tượng (tạo `shared_ptr` tạm thời).
 
-    ◦ Hữu ích để phá vỡ **circular dependency**
+    ◦ rở thành `expired()` khi đối tượng bị hủy.
 
 *  **Cú pháp :**
     
-    ```
-    std::weak_ptr<Type> weak = shared_ptr;
-    ```
+    
+        #include <memory>
+        std::weak_ptr<Type> weak = shared_ptr;
+    
 
 *  **Các hàm thành viên thường dùng :**
 
    ◦ **expired()** : Kiểm tra xem đối tượng đã bị hủy chưa
 
-   ```
-   auto sp = std::make_shared<int>(10);
-   std::weak_ptr<int> wp = sp;
+   
+        auto sp = std::make_shared<int>(10);
+        std::weak_ptr<int> wp = sp;
 
-   std::cout << (wp.expired() ? "het" : "con") << std::endl; // In: con
-   sp.reset();
-   std::cout << (wp.expired() ? "het" : "con") << std::endl; // In: het
-   ```
+        std::cout << (wp.expired() ? "het" : "con") << std::endl; // In: con
+        sp.reset();
+        std::cout << (wp.expired() ? "het" : "con") << std::endl; // In: het
+   
 
    ◦ **lock()** : Lấy `shared_ptr` từ `weak_ptr` (nếu còn sống)
 
-   ```
-    auto sp = std::make_shared<int>(20);
-    std::weak_ptr<int> wp = sp;
+   
+        auto sp = std::make_shared<int>(20);
+        std::weak_ptr<int> wp = sp;
 
-    if(auto p = wp.lock())    // lock tạo shared_ptr
-        std::cout << *p << std::endl;   // In: 20
+        if(auto p = wp.lock())    // lock tạo shared_ptr
+            std::cout << *p << std::endl;   // In: 20
 
 
-   ```
+   
 
    ◦ **use_count()** : Số `shared_ptr` đang quản lý đối tượng
 
-   ```
-   auto sp = std::make_shared<int>(30);
-   std::weak_ptr<int> wp = sp;
    
-   std::cout << wp.use_count() << std::endl;  //In 1
-   ```
+        auto sp = std::make_shared<int>(30);
+        std::weak_ptr<int> wp = sp;
+        
+        std::cout << wp.use_count() << std::endl;  //In 1
+   
 
    ◦ **reset()** : Bỏ quan sát đối tượng (không ảnh hưởng đến đối tượng)
 
-   ```
-    auto sp = std::make_shared<int>(40);
-    std::weak_ptr<int> wp = sp;
+   
+        auto sp = std::make_shared<int>(40);
+        std::weak_ptr<int> wp = sp;
 
-    wp.reset();   // wp không quan sát nữa
-    std::cout << (wp.expired() ? "het" : "con") << std::endl; // In: het
+        wp.reset();   // wp không quan sát nữa
+        std::cout << (wp.expired() ? "het" : "con") << std::endl; // In: het
 
-   ```
+   
 
 *  **VD:**
 
-    ```
-    #include <iostream>
-    #include <memory>
-    using namespace std;
+    
+        #include <iostream>
+        #include <memory>
+        using namespace std;
 
-    class Parent;  // khai báo trước
+        class Parent;  // khai báo trước
 
-    class Child {
-    public:
-        weak_ptr<Parent> parent; 
-        ~Child(){ cout << "Child destroyed\n"; }
-    };
+        class Child {
+        public:
+            weak_ptr<Parent> parent; 
+            ~Child(){ cout << "Child destroyed\n"; }
+        };
 
-    class Parent {
-    public:
-        shared_ptr<Child> child;
-        ~Parent(){ cout << "Parent destroyed\n"; }
-    };
+        class Parent {
+        public:
+            shared_ptr<Child> child;
+            ~Parent(){ cout << "Parent destroyed\n"; }
+        };
 
-    int main(){
-        auto p = make_shared<Parent>();
-        p->child = make_shared<Child>();
-        p->child->parent = p;  
+        int main(){
+            auto p = make_shared<Parent>();
+            p->child = make_shared<Child>();
+            p->child->parent = p;  
 
-        cout << "End main\n";
-    }
+            cout << "End main\n";
+        }
 
-    ```
+    
 </details> 
 
 
