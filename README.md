@@ -1,50 +1,129 @@
-# PHẦN 1: C Advanced
+# PHẦN 1: C ADVANCED
 <details>
-	<summary><strong>BÀI 1: Compiler Process (Quy trình biên dịch)</strong></summary>
+	<summary><strong>BÀI 1: COMPILER PROCESS VÀ C STANDARD</strong></summary>
 
-## **Bài 1: Compiler Process(Quy trình biên dịch)**
+## **BÀI 1: COMPILER PROCESS VÀ C STANDARD**
 
-### **Compiler GCC-Quy trình biên dịch**
+### **I. Compiler GCC-Quy trình biên dịch**
 
-#### Trình biên dịch GCC là công cụ phổ biến để biên dịch mã C/C++.Quá trình biên dịch một file .c thành file thực thi thì thường trải qua 4 giai đoạn chính
+#### **1.1. Khái niệm**
 
- *  **1.Preprocessing (Tiền xử lý):** 
+* Trình biên dịch GCC (GNU Compiler Collection) là công cụ phổ biến để biên dịch mã C/C++
+
+* Quá trình biên dịch một file .c thành file thực thi thường trải qua 4 giai đoạn chính.: **Preprocessing, Compilation, Assembly, Linking**
+
+#### **1.2. Giai đoạn 1: Preprocessing (Tiền xử lý)**
+
+*  **Mô tả:** Xử lý các chỉ thị tiền xử lý (#include, #define, #ifdef,...).
    
-    ◦ Xử lý các **chỉ thị tiền xử lý** (#include, #define, #ifdef,...). Có các chức năng như loại bỏ comment, thay thế macro, chèn nội dung file header. 
+*  **Output:** Thường là file `.i`
+
+*  **VD các lệnh:** 
+
+    ◦ Tiền xử lý file source.c
+
+        gcc -E source.c -o source.i
+
+    ◦ Xem kết quả tiền xử lý
+
+        cat source.i | head -20  # xem 20 dòng đầu
+
+    ◦ Tiền xử lý với cảnh báo đầy đủ
+
+        gcc -E -Wall source.c -o source.i
+
+#### **1.3. Giai đoạn 2: Compilation (Biên dịch)**
+
+*  **Mô tả:** Dịch mã C đã qua tiền xử lý thành mã Assembly (ngôn ngữ assembly).
    
-    ◦ Output thường là **file.i**
+*  **Output:** Thường là file `.s`
 
- *  **2.Compilation (Biên dịch):**
+*  **VD các lệnh:** 
 
-    ◦ Dịch mã C đã qua mã tiền xử lý thành mã **Assembly**
+    ◦ Biên dịch từ file .i sang assembly
 
-    ◦ Output thường là **file.s**
+        gcc -S source.i -o source.s
 
- * **3.Assembly (Assembler):**
+    ◦ Hoặc biên dịch trực tiếp từ .c sang .s
 
-   ◦ Dịch mã Assembly thành **mã máy** dưới dạng object code
+        gcc -S source.c -o source.s
 
-   ◦ Output thường là **file.o** hoặc **file.obj**
+    ◦ Biên dịch với thông tin debug
 
- * **4.Linking (Liên kết):**
+        gcc -S -g source.c -o source.s
 
-   ◦ Kết hợp object code từ các file nguồn khác nhau và các thư viện (static/dynamic library) để tạo thành file thực thi cuối cùng
+    ◦ Xem mã assembly
+
+        cat source.s
+
+#### **1.4. Giai đoạn 3: Assembly**
+
+*  **Mô tả:** Dịch mã Assembly thành mã máy dưới dạng object code (binary).
+   
+*  **Output:** Thường là file `.o` hoặc `.obj`
+
+*  **VD các lệnh:** 
+
+    ◦ Dịch assembly sang object code
+
+        gcc -c source.s -o source.o
+
+    ◦ Hoặc dịch trực tiếp từ .c sang .o
+
+        gcc -c source.c -o source.o
+
+    ◦ Kiểm tra file object
+
+        file source.o
+
+    ◦ Xem disassembly
+
+        objdump -d source.o
+
+#### **1.5. Giai đoạn 4: Linking**
+
+*  **Mô tả:** Kết hợp object code từ các file nguồn khác nhau và các thư viện (static/dynamic library) để tạo thành file thực thi cuối cùng.
+   
+*  **Output:** File thực thi (ví dụ: `.exe`)
+
+*  **VD các lệnh:** 
+
+    ◦ Liên kết một file object
+
+        gcc source.o -o executable
+
+    ◦ Liên kết nhiều file object
+
+        gcc main.o utils.o math.o -o program
+
+    ◦ Liên kết với thư viện math
+
+        gcc source.o -o calculator -lm
+
+    ◦ Liên kết với thư viện static
+
+        gcc source.o -o app -static
 
 
+### **II.The Preprocessor - Tiền xử lý trong C**
 
-### **The Preprocessor - Tiền xử lý trong C**
+#### **2.1. Khái niệm**
 
-#### Bộ tiền xử lý là giai đoạn đầu tiên của quá trình biên dịch.Nó hoạt động dựa trên các chỉ thị(directives) bắt đầu bằng dấu #
+* Bộ tiền xử lý là giai đoạn đầu tiên của quá trình biên dịch.Nó hoạt động dựa trên các chỉ thị(directives) bắt đầu bằng dấu `#`
 
-* **#include<file>:** Chèn nội dung file header của hệ thống
+* Nó biến đổi mã nguồn trước khi biên dịch chính thức, giúp mã linh hoạt và portable.
+
+#### **2.2. Các chỉ thị tiền xử lý cơ bản**
+
+* **#include <file>:** Chèn nội dung file header của hệ thống
 
   VD: `#include <iostream>`
 
-* **#include"file":** Chèn nội dung file header do người dùng định nghĩa
+* **#include "file":** Chèn nội dung file header do người dùng định nghĩa
 
   VD:  `#include "my_utility.h"`
 
-* **#define NAME value:** Định nghĩa macro dạng hằng số.Mọi ký hiệu NAME sau đó sẽ được thay bằng value
+* **#define NAME value:** Định nghĩa macro dạng hằng số.Mọi ký hiệu `NAME` sau đó sẽ được thay bằng `value`
 
   VD: `#define MAX_SIZE 100`
 
@@ -57,225 +136,340 @@
   VD: `#undef MAX_SIZE`
 
 * **#ifdef NAME, #ifndef NAME, #if expression, #else, #elif expression, #endif**
-```
-  #ifdef _WIN64
-  // Mã chỉ biên dịch trên hệ thống Windows 64-bit
-  #define PLATFORM "Windows 64-bit"
-  #elif __linux__
-  // Mã chỉ biên dịch trên Linux
-  #define PLATFORM "Linux"
-  #else
-  // Mã cho các hệ thống khác
-  #define PLATFORM "Unknown"
-  #endif
-```
 
-* Các macro dựng sẵn: __FILE__(tên file hiện tại), __LINE__(tên dòng hiện tại), __DATE__, __TIME__
+        #ifdef _WIN64
+        // Mã chỉ biên dịch trên hệ thống Windows 64-bit
+        #define PLATFORM "Windows 64-bit"
+        #elif __linux__
+        // Mã chỉ biên dịch trên Linux
+        #define PLATFORM "Linux"
+        #else
+        // Mã cho các hệ thống khác
+        #define PLATFORM "Unknown"
+        #endif
 
-```
-#include <stdio.h>
+#### **2.3. Built-in Macros**
 
-int main() {
-    printf("File: %s\n", __FILE__);
-    printf("Line: %d\n", __LINE__);
-    printf("Date: %s\n", __DATE__);
-    printf("Time: %s\n", __TIME__);
-    return 0;
-}
-```
-```
-File: example.c
-Line: 5
-Date: May 06 2025
-Time: 14:30:00
-```
+* C cung cấp các macro tự động để hỗ trợ debug và logging:
 
-### **C coding Standard & Misra C**
+  ◦ `__FILE__`: Tên file hiện tại.
 
-#### **Coding Standard**
+  ◦ `__LINE__`: Số dòng hiện tại.
 
-  Là bộ quy tắc và hướng dẫn về cách viết mã nguồn
+  ◦ `__DATE__`: Ngày biên dịch.
 
-* **1.Quy tắc đặt tên**
+  ◦ `__TIME__`: Giờ biên dịch.
 
-  ◦ Sử dụng tên biến/hàm rõ ràng,mang tính mô tả, tránh viết tắt khó hiểu
+        #include <stdio.h>
 
-  ◦ Quy ước camelCase hay snake_case phải được nhất quán trong dự án
+        int main() {
+            printf("File: %s\n", __FILE__);
+            printf("Line: %d\n", __LINE__);
+            printf("Date: %s\n", __DATE__);
+            printf("Time: %s\n", __TIME__);
+            return 0;
+        }
 
-  ◦ Các hằng số thường viết hoa với dấu gạch dưới `MAX_BUFFER_SIZE`
+        //Output
 
-* **2.Thụt lề và định dạng**
+        File: example.c
+        Line: 5
+        Date: May 06 2025
+        Time: 14:30:00
 
-  ◦ Sử dụng spaces hoặc tab nhất quán (thường là 2 hoặc 4 spaces)
+#### **2.4. Built-in Macros**
 
-  ◦ Đặt dấu `{` `}` theo kiểu Allman hoặc K&R ,nhưng phải thống nhất
+* `#error` và `#warning:` Báo lỗi hoặc cảnh báo trong preprocessing.
 
-  VD: Kiểu Allman
-  ```
-  if(condition)
-  {
-    //code
-  }
-  ```
+  ◦ Kiểm tra phiên bản C
 
-  VD: Kiểu K&R 
-  ```
-  if(condition){
-    //code
-  }
-  ```
+        #if !defined(__STDC_VERSION__) || __STDC_VERSION__ < 201112L
+        #error "This code requires C11 or later. Please use -std=c11 flag."
+        #endif
 
-  #### **Misra C**
+  ◦ Kiểm tra compiler
 
-  * Là bộ coding standard nghiêm ngặt dùng để phát triển chủ yếu cho ngành công nghiệp ô tô và hệ thống nhúng yêu cầu độ tin cậy cao 
+        #ifndef __GNUC__
+        #warning "This code is optimized for GCC. Other compilers may not work optimally."
+        #endiff
 
-  * Tránh các hành vi không xác định, không xác định cụ thể, và cấu trúc các ngôn ngữ C tiềm ẩn rủi ro
-   
-  * **Quy tắc 8.1(MISRA C:2012): Kiểu dữ liệu tường trình**
+  ◦ Kiểm tra kiến trúc
 
-     ◦ Yêu cầu khai báo kiểu dữ liệu rõ ràng tránh sử dụng các kiểu mặc định như int không ký hiệu
+        #if !defined(__x86_64__) && !defined(__aarch64__)
+        #error "Unsupported architecture. Only x86_64 and ARM64 are supported."
+        #endif
 
-     ◦ VD sai:
+* `Variadic Macros (C99+):` Macro với số lượng tham số biến đổi, hữu ích cho logging.
 
-     ```
-     int x = 10; //không rõ signed hay unsigned
-     ```
+  ◦ Basic logging macro
 
-     ◦ VD đúng:
+        #define LOG(fmt, ...) printf("[%s:%d] " fmt "\n", __FILE__, __LINE__, ##__VA_ARGS__)
 
-     ```
-     int32_t x = 10; //Rõ ràng là signed 32 bit
-     ```
+  ◦ Logging với levels
 
-  * **Quy tắc 12.1(MISRA C:2012): Sử dụng dấu () để đảm bảo thứ tự ưu tiên**
+        #define LOG_ERROR(fmt, ...) fprintf(stderr, "ERROR: " fmt "\n", ##__VA_ARGS__)
+        #define LOG_WARN(fmt, ...)  printf("WARN:  " fmt "\n", ##__VA_ARGS__)
+        #define LOG_INFO(fmt, ...)  printf("INFO:  " fmt "\n", ##__VA_ARGS__)
+        #define LOG_DEBUG(fmt, ...) printf("DEBUG: " fmt "\n", ##__VA_ARGS__)
 
-     ◦ Tránh dựa vào thứ tự ưu tiên của toán tử
+  ◦ Conditional debugging
 
-     ◦ VD sai:
+        #ifdef DEBUG
+        #define DBG(fmt, ...) printf("DBG: " fmt "\n", ##__VA_ARGS__)
+        #else
+        #define DBG(fmt, ...) // Trở thành no-op khi không debug
+        #endif
 
-     ```
-     if (a + b * c > d)
-     ```
+  ◦ Assert với thông tin chi tiết
 
-     ◦ VD đúng:
+        #define ASSERT(condition, fmt, ...) \
+            do { \
+                if (!(condition)) { \
+                    fprintf(stderr, "ASSERT FAILED [%s:%d]: " fmt "\n", \
+                            __FILE__, __LINE__, ##__VA_ARGS__); \
+                    abort(); \
+                } \
+            } while(0)
 
-     ```
-     if ((a + (b*c)) > d)
-     ```
+  ◦ Macro để đo thời gian
 
-  * **Quy tắc 17.7(MISRA C:2012): Kiểm tra giá trị trả về của hàm**
+        #define TIME_EXECUTION(code) \
+            do { \
+                clock_t start = clock(); \
+                code; \
+                clock_t end = clock(); \
+                printf("Execution time: %.2f ms\n", \
+                    ((double)(end - start) * 1000.0) / CLOCKS_PER_SEC); \
+            } while(0)
 
-     ◦ Giá trị trả về của hàm không được bỏ qua trừ khi khi được ghi chú rõ ràng
+### **III.C coding Standard & Misra C**
 
-     ◦ VD sai:
+#### **3.1.Quy tắc đặt tên**
 
-     ```
-     printf("Hello"); //không kiểm tra giá trị trả về
-     ```   
+* Sử dụng tên biến/hàm rõ ràng,mang tính mô tả, tránh viết tắt khó hiểu
 
-     ◦ VD đúng:
+* Quy ước camelCase hay snake_case phải được nhất quán trong dự án
 
-     ```
-     int result = printf("Hello");
+* Các hằng số thường viết hoa với dấu gạch dưới `MAX_BUFFER_SIZE`
 
-     if(result < 0) {
-       //Xử lý lỗi
-     }
+#### **3.2.Thụt lề và định dạng**
 
-  * **Quy tắc 21.1(MISRA C:2012): Cấm cấp phát bộ nhớ động**
+* Sử dụng spaces hoặc tab nhất quán (thường là 2 hoặc 4 spaces)
 
-     ◦ Các hàm như **malloc,free** bị cấm vì gây rò rỉ trong hệ thống nhúng
+* Đặt dấu `{ }` theo kiểu Allman hoặc K&R ,nhưng phải thống nhất
 
-     ◦ Thay vào đó sử dụng bộ nhớ tĩnh hoặc stack
-
-     ◦ Bộ nhớ tĩnh: tồn tại suốt vòng đời chương trình,chỉ khởi tạo 1 lần
-
-     ```
-     static uint8_t static_buffer[128]={0};
-
-     //Hàm sử dụng bộ nhớ tĩnh
-     void a_buffer(uint8_t input){
-       if(input >= 128){
-         printf("Input too large for static buffer");
-         return;
-       }
-       static_buffer[0] = input;
-       printf("Static_buffer[0]= %u\n",static_buffer[0]);
-     }
-     ```
-
-     ◦ Bộ nhớ stack: tồn tại trong phạm vi hàm, khởi tạo mỗi lần hàm gọi
-
-     ```
-     void b_buffer(uint8_t input){
-       uint8_t stack_buffer[128] = {0};
-       if (input >= 128){
-         printf("Input too large for static buffer");
-         return;
-       }
-       stack_buffer[0] = input;
-       printf("Stack_buffer[0]= %u\n",stack_buffer[0]);
-     }
-     
-     ```
-
-  * **Quy tắc 9.1(MISRA C:2012): Khởi tạo biến**
-
-     ◦ Tất cả biến phải được khởi tạo trước khi sử dụng để tránh undefined behavior
-
-     ◦ VD sai:
-
-     ```
-     int x;
-     if (x == 0) //x chưa khởi tạo
-     ```
-
-     ◦ VD đúng:
-
-     ```
-     int x = 0;
-     if (x == 0)
-     ```
-  * **Quy tắc 14.4(MISRA C:2012): Hạn chế sử dụng goto**
-
-     ◦ goto chỉ được phép trong các trường hợp đặc biệt như xử lý lỗi thống nhất
-
-     ```
-     if(error_condition){
-       goto cleanup;
-     }
-     cleanup;
-     ```
-
-  * **Quy tắc 5.3(MISRA C:2012): Biến/hàm nội bộ nên là static**
-
-     ◦ Các biến hoặc hàm chỉ sử dụng trong 1 fie nên được khai báo static để tránh xung đột tên
-
-     ```
-     static int cter = 10;
-     static void inter_function(void){
-       counter++;
-     }
-     ```
+*  VD: Kiểu Allman
   
-  * **Quy tắc 16.3(MISRA C:2012): Mỗi file.c nên có file.h tương ứng**
+        if(condition)
+        {
+            //code
+        }
+  
 
+*  VD: Kiểu K&R 
+  
+        if(condition){
+            //code
+        }
+
+#### **3.3.Error Handling**
+
+##### **3.3.1. Khái niệm**
+
+* `errno` là biến global được định nghĩa trong `<errno.h>`
+
+* Thread-safe trong các hệ thống hiện đại
+
+* Mỗi thread có errno riêng
+
+* Được set tự động bởi các hàm thư viện chuẩn khi có lỗi
+
+##### **3.3.2. Các hàm xử lý lỗi**
+
+* Trả về string mô tả lỗi từ errno
+
+        char *strerror(int errnum);
+
+* In thông báo lỗi ra stderr
+
+        void perror(const char *s);
+
+* VD:
+
+        FILE *fp = fopen("nonexistent.txt", "r");
+        if (fp == NULL) {
+            perror("fopen failed");  // In: "fopen failed: No such file or directory"
+            printf("Error code: %d, Message: %s\n", errno, strerror(errno));
+        }
+
+* Được set tự động bởi các hàm thư viện chuẩn khi có lỗi
+  
+
+##### **3.3.3. Các loại error codes phổ biến**
+
+* **EACCES** - Permission denied
+
+* **EEXIST** - File already exists  
+
+* **EINVAL** - Invalid argument
+
+* **ENOENT** - No such file or directory
+
+* **ENOMEM** - Out of memory
+
+* **ERANGE** - Math result not representable
+
+
+#### **3.4. Misra C**
+
+##### **3.4.1. Khái niệm**
+
+* Là bộ coding standard nghiêm ngặt dùng để phát triển chủ yếu cho ngành công nghiệp ô tô và hệ thống nhúng yêu cầu độ tin cậy cao 
+
+* Tránh các hành vi không xác định, không xác định cụ thể, và cấu trúc các ngôn ngữ C tiềm ẩn rủi ro
+   
+##### **3.4.2.Quy tắc 8.1(MISRA C:2012): Kiểu dữ liệu tường trình**
+
+* Yêu cầu khai báo kiểu dữ liệu rõ ràng tránh sử dụng các kiểu mặc định như int không ký hiệu
+
+* VD sai:
+
+         int x = 10; //không rõ signed hay unsigned
+
+* VD đúng:
+
+         int32_t x = 10; //Rõ ràng là signed 32 bit
+     
+
+##### **3.4.3.Quy tắc 12.1(MISRA C:2012): Sử dụng dấu () để đảm bảo thứ tự ưu tiên**
+
+* Tránh dựa vào thứ tự ưu tiên của toán tử
+
+* VD sai:
+
+         if (a + b * c > d)
+
+* VD đúng:
+
+         if ((a + (b*c)) > d)
+
+
+##### **3.4.4.Quy tắc 17.7(MISRA C:2012): Kiểm tra giá trị trả về của hàm**
+
+* Giá trị trả về của hàm không được bỏ qua trừ khi khi được ghi chú rõ ràng
+
+* VD sai:
+
+        printf("Hello"); //không kiểm tra giá trị trả về
+       
+* VD đúng:
+
+    
+        int result = printf("Hello");
+
+        if(result < 0) {
+        //Xử lý lỗi
+        }
+
+##### **3.4.5.Quy tắc 21.1(MISRA C:2012): Cấm cấp phát bộ nhớ động**
+
+* Các hàm như **malloc,free** bị cấm vì gây rò rỉ trong hệ thống nhúng
+
+* Thay vào đó sử dụng bộ nhớ tĩnh hoặc stack
+
+* Bộ nhớ tĩnh: tồn tại suốt vòng đời chương trình,chỉ khởi tạo 1 lần
+
+     
+        static uint8_t static_buffer[128]={0};
+
+        //Hàm sử dụng bộ nhớ tĩnh
+        void a_buffer(uint8_t input){
+        if(input >= 128){
+            printf("Input too large for static buffer");
+            return;
+        }
+        static_buffer[0] = input;
+        printf("Static_buffer[0]= %u\n",static_buffer[0]);
+        }
+     
+
+* Bộ nhớ stack: tồn tại trong phạm vi hàm, khởi tạo mỗi lần hàm gọi
+
+     
+        void b_buffer(uint8_t input){
+        uint8_t stack_buffer[128] = {0};
+        if (input >= 128){
+            printf("Input too large for static buffer");
+            return;
+        }
+        stack_buffer[0] = input;
+        printf("Stack_buffer[0]= %u\n",stack_buffer[0]);
+        }
+    
+    
+
+##### **3.4.6.Quy tắc 9.1(MISRA C:2012): Khởi tạo biến**
+
+* Tất cả biến phải được khởi tạo trước khi sử dụng để tránh undefined behavior
+
+* VD sai:
+
+        int x;
+        if (x == 0) //x chưa khởi tạo
+     
+* VD đúng:
+
+
+        int x = 0;
+        if (x == 0)
+
+##### **3.4.7.Quy tắc 14.4(MISRA C:2012): Hạn chế sử dụng goto**
+
+* goto chỉ được phép trong các trường hợp đặc biệt như xử lý lỗi thống nhất
+
+     
+        if(error_condition){
+        goto cleanup;
+        }
+        cleanup;
+     
+
+##### **3.4.8.Quy tắc 5.3(MISRA C:2012): Biến/hàm nội bộ nên là static**
+
+* Các biến hoặc hàm chỉ sử dụng trong 1 fie nên được khai báo static để tránh xung đột tên
+
+     
+        static int cter = 10;
+        static void inter_function(void){
+        counter++;
+        }
+     
+  
+##### **3.4.9.Quy tắc 16.3(MISRA C:2012): Mỗi file.c nên có file.h tương ứng**
+
+* Header file định nghĩa prototypes và guards (`#ifndef HEADER_H #define HEADER_H ... #endif`).
+
+        #ifndef MY_MODULE_H
+        #define MY_MODULE_H
+        void my_function(void);
+        #endif
+        
      </details> 
-
 <details>
-	<summary><strong>BÀI 2: Advanced Function Concepts and Debug</strong></summary>
+	<summary><strong>BÀI 2: ADVANCED FUNCTION CONCEPTS AND DEBUG</strong></summary>
 
-## **Bài 2: Advanced Function Concepts and Debug**
+## **Bài 2: ADVANCED FUNCTION CONCEPTS AND DEBUG**
 
-### **2.1.Variadic Functions: Hàm có số lượng tham số không cố định**
+### **I.Variadic Functions**
 
-#### **2.1.1.Định nghĩa**
+#### **1.1.Định nghĩa**
 
-*  Variadic Functions cho phép định nghĩa hàm nhận số lượng tham số thay đổi.
+*  Cho phép định nghĩa hàm với số lượng tham số không cố định, đánh dấu bằng `...` ở cuối danh sách tham số
 
 *  Triển khai thông qua thư viện <stdarg.h>, cung cấp các macro và kiểu dữ liệu để xử lý danh sách tham số biến thiên.
 
-#### **2.1.2.Thành phần chính**
+#### **1.2.Thành phần chính**
+
 *  **va_list:** 
    
     ◦ Đây là một kiểu dữ liệu đặc biệt dùng để lưu trữ danh sách tham số biến thiên. 
@@ -306,7 +500,7 @@ Time: 14:30:00
     ◦ Nó đảm bảo giải phóng mọi tài nguyên được cấp phát bởi `va_start` và phải được gọi trước khi hàm kết thúc
 
    
-#### **2.1.3.Quy tắc và lưu ý**
+#### **1.3.Quy tắc và lưu ý**
 
 * **Tham số cố định:** Hàm này phải có ít nhất một tham số cố định trước dấu `...` .Tham số thường được dùng để xác định số lượng hoặc kiểu của các tham số biến thiên
 
@@ -315,42 +509,43 @@ Time: 14:30:00
 * **Không thể đếm trực tiếp số tham số:** Không có cách nào để tự động biết được số lượng tham số biến thiên, trừ khi sử dụng một tham số cố định để chỉ định
 
 * **Cấu trúc chung:**
- ```
- #include<stdarg.h>
+ 
+        #include<stdarg.h>
 
- return_type Function_name(fixed_arg,...){
-   va_list ap;
-   va_start(ap, fixed_arg);
-   //Xử lý các tham số biến thiên bằng va_arg
-   va_end(ap);
-   return result;
- } 
- ```
+        return_type Function_name(fixed_arg, ...){
+            va_list ap;
+            va_start(ap, fixed_arg);
+            //Xử lý các tham số biến thiên bằng va_arg
+            va_end(ap);
+            return result;
+        } 
+ 
  * **VD:**
- ```
- #include<stdio.h>
- #include<stdarg.h>
+ 
+        #include<stdio.h>
+        #include<stdarg.h>
 
- int sum(int count, ...){
-   va_list ap;           // Khai báo khởi tạo va_list
-   va_start(ap, count);  // Khởi tạo va_list với tham số cố định cuối cùng là count
+        int sum(int count, ...){
+            va_list ap;           // Khai báo khởi tạo va_list
+            va_start(ap, count);  // Khởi tạo va_list với tham số cố định cuối cùng là count
 
-   int total =0;
-   for(int i=0; i < count; i++){
-     total += va_arg(ap,int);
-   }
+            int total = 0;
+            for(int i = 0; i < count; i++){
+                total += va_arg(ap,int);
+            }
 
-   va_end(ap);
-   return total;
- }
+            va_end(ap);
+            return total;
+        }
 
- int main(){
-   printf("Sum of 1,2,3: %d\n",sum(3, 1, 2, 3));
-   printf("Sum ofn 10,20,30,40: %d\n",sum(4, 10, 20, 30, 40));
-   return 0;
- }
- ```
-#### **2.1.5.Khi không sử dụng Variadic Function**
+        int main(){
+            printf("Sum of 1,2,3: %d\n",sum(3, 1, 2, 3));
+            printf("Sum ofn 10,20,30,40: %d\n",sum(4, 10, 20, 30, 40));
+            return 0;
+        }
+ 
+#### **1.4.Khi không sử dụng Variadic Function**
+
 *   **Cú pháp phức tạp khi gọi hàm:**
 
     ◦ Người dùng phải tạo một mảng (int numbers[] = {1, 2, 3}) trước khi gọi hàm, ngay cả khi chỉ cần truyền một vài số.
@@ -358,13 +553,16 @@ Time: 14:30:00
     ◦ Điều này làm tăng số lượng mã lệnh và giảm tính trực quan so với cách gọi đơn giản của variadic functions, như sum(3, 1, 2, 3).
 
 *   **Thiếu tính linh hoạt:**
+
     ◦ Nếu muốn truyền các số riêng lẻ (không phải từ một mảng có sẵn), người dùng phải tự xây dựng mảng trước. 
+
     ◦ Ví dụ, không thể gọi trực tiếp sum_array(1, 2, 3) mà phải làm như sau:
-```
-  int temp[] = {1, 2, 3};
-  sum_array(temp, 3);
-  Với variadic functions, bạn chỉ cần gọi sum(3, 1, 2, 3) mà không cần tạo mảng trung gian.
-```
+
+        int temp[] = {1, 2, 3};
+        sum_array(temp, 3);
+
+        Với variadic functions, bạn chỉ cần gọi sum(3, 1, 2, 3) mà không cần tạo mảng trung gian.
+
 
 *  **Khó xử lý các tham số không đồng nhất:**
 
@@ -378,17 +576,37 @@ Time: 14:30:00
 
     ◦ Với variadic functions, bạn có thể sử dụng chuỗi định dạng hoặc các tham số cố định để chỉ định kiểu, như trong `printf("%d %f %s", 42, 3.14, "hello")`
 
-### **2.2. Inline Functions (Hàm nội tuyến)**
-#### **2.2.1.Định nghĩa**
+### **II. Inline Functions**
 
-*  Từ khóa inline gợi ý trình biên dịch thay thế lời gọi hàm bằng nội dung thân hàm tại điểm gọi, thay vì thực hiện lời gọi hàm thông thường.
+#### **2.1.Định nghĩa**
 
-*  Mục đích: Giảm chi phí gọi hàm (lưu trữ trạng thái, chuyển ngăn xếp), tăng hiệu suất, đặc biệt trong hệ thống nhúng yêu cầu thời gian thực.
+*  Từ khóa `inline` gợi ý trình biên dịch thay thế lời gọi hàm bằng nội dung thân hàm tại điểm gọi, thay vì thực hiện lời gọi hàm thông thường.
 
-#### **2.2.2.Đặc điểm**
+*  **Mục đích:** Giảm chi phí gọi hàm (lưu trữ trạng thái, chuyển ngăn xếp), tăng hiệu suất, đặc biệt trong hệ thống nhúng yêu cầu thời gian thực.
+
+
+#### **2.2.Đặc điểm**
+
 *  **Không đảm bảo:** 
    
     ◦ Trình biên dịch có thể bỏ qua gợi ý inline nếu hàm quá lớn hoặc không phù hợp. 
+
+        #include <math.h>
+
+        inline double complex_calculation(double x) {
+            double result = 0.0;
+            for(int i = 0; i < 100; ++i) {
+                result += sin(x) * cos(x);
+            }
+            return result;
+        }
+
+        int main() {
+            double a = complex_calculation(1.57);
+            return 0;
+        }
+    
+    
    
 *  **Ứng dụng:**
 
@@ -398,300 +616,552 @@ Time: 14:30:00
 
     ◦ Tăng kích thước mã trong file thực thi do nội dung hàm được sao chép tại mỗi điểm gọi.
 
+        inline int calculate(int a, int b) {
+            return (a + b) * (a - b);
+        }
+
+        int main() {
+            int x1 = calculate(5, 3);   // Trở thành: (5 + 3) * (5 - 3)
+            int x2 = calculate(10, 2);  // Trở thành: (10 + 2) * (10 - 2)  
+            int x3 = calculate(7, 4);   // Trở thành: (7 + 4) * (7 - 4)
+            int x4 = calculate(8, 1);   // Trở thành: (8 + 1) * (8 - 1)
+            
+            return x1 + x2 + x3 + x4;
+        }
+
 * **Vị trí bộ nhớ:**
 
-    ◦ Mã hàm inline thường nằm trong Text Segment.
-   
-#### **2.2.3.Cú pháp**
+    ◦ Mã hàm inline thường nằm trong Text Segment, không có địa chỉ hàm riêng.
 
-```
-inline return_type function_name(parameters) {
-    // Thân hàm
-}
-```
-#### **2.2.4.VD**
+        #include <stdio.h>
 
-```
-#include <stdio.h>
+        inline int multiply(int a, int b) {
+            return a * b;
+        }
 
-inline uint16_t square(uint16_t x) {
-    return x * x;
-}
+        int main() {
+            int result = multiply(3, 4);  // Trở thành: int result = 3 * 4;
+            
+            // LỖI: Không thể lấy địa chỉ hàm inline
+            // int (*func_ptr)(int, int) = &multiply;
+            
+            printf("Result: %d\n", result);
+            return 0;
+        }
 
-int main() {
-    uint16_t result = square(5); // Trình biên dịch thay thế bằng 5 * 5
-    printf("Square: %u\n", result); // In: Square: 25
-    return 0;
-}
-```
-#### **2.2.5.Lưu ý**
+#### **2.3.Cú pháp**
 
-* **Kích thước hàm:** Chỉ nên sử dụng inline cho hàm nhỏ để tránh tăng kích thước mã.
+
+        inline return_type function_name(parameters) {
+            // Thân hàm
+        }
+
+#### **2.4.VD**
+
+
+        #include <stdio.h>
+
+        inline uint16_t square(uint16_t x) {
+            return x * x;
+        }
+
+        int main() {
+            uint16_t result = square(5); // Trình biên dịch thay thế bằng 5 * 5
+            printf("Square: %u\n", result); // In: Square: 25
+            return 0;
+        }
+
+#### **2.5.Lưu ý**
+
+* **Kích thước hàm:** Chỉ inline hàm < 10 dòng để tránh tăng kích thước mã.
 
 * **Tính tương thích:** Một số trình biên dịch nhúng (như GCC) yêu cầu khai báo inline trong file header hoặc cùng file với lời gọi.
 
 * **Hiệu suất:** Hữu ích trong hệ thống nhúng cho các hàm điều khiển phần cứng hoặc xử lý ngắt nhanh.
 
-### **2.3.Assert - Kiểm tra lỗi với Assert**
+### **III.Assert**
 
-#### **2.3.1.Định nghĩa**
+#### **3.1.Định nghĩa**
 
-* Để kiểm tra các giả định và gỡ lỗi ta sử dụng Macro Assert được định nghĩa trong thư viện `<assert.h>`.Macro này giúp phát hiện lỗi lập trình tại thời điểm chạy bằng cách kiểm tra các biểu thức logic
+* **Macro** `assert(expression)` :
 
-#### **2.3.2.Các thành phần chính của assert** 
+    ◦ Kiểm tra biểu thức tại runtime, nếu false (0), in lỗi và dừng chương trình qua `abort`
+
+* **Mục đích:**
+
+    ◦ Phát hiện bug trong development, không ảnh hưởng release (vô hiệu hóa bằng `NDEBUG`)   
+
+#### **3.2.Thành phần chính** 
 
 * **assert(expression):**
 
-    ◦ Macro này kiểm tra giá trị của biểu thức `expression` tại thời điểm chạy
+    ◦ Đánh giá biểu thức; thành công thì tiếp tục, thất bị thì in thông báo chi tiết (file, line, function)
 
-    ◦ Nếu `expression` trả về `0`(sai), chương trình sẽ in thông báo lỗi(bao gồm biểu thức sai, tên file,số dòng và có thể tên hàm) và gọi `abort()` để dừng chương trình
+        #include <stdio.h>
+        #include <assert.h>
 
-    ◦ Nếu `expression` trả về giá trị `khác 0`(đúng), chương trình tiếp tục chạy bình thường
+        int divide(int a, int b) {
+            assert(b != 0);  // Đảm bảo không chia cho 0
+            return a / b;
+        }
+
+        int main() {
+            int result = divide(10, 2);  // Thành công: tiếp tục
+            printf("Result: %d\n", result);
+            
+            result = divide(10, 0);     // Thất bại: dừng chương trình
+            return 0;
+        }
+
+        // Output:
+
+        Assertion failed: (b != 0), function divide, file test.c, line 5.
 
 * **Thông báo lỗi:**
 
-    ◦ Khi `assert` thất bại, thông báo lỗi cung cấp thông tin chi tiết để định vị lỗi
+    ◦ Ví dụ: Assertion failed: (ptr != NULL), function myFunc, file main.c, line 42.
 
-    VD: 
+* **Vô hiệu hóa:**
 
-  ```
-  Assertion Failed: (ptr != null), function myFunction, file example.c, line 42
-  ```
+    ◦ Định nghĩa `#define NDEBUG` trước `#include <assert.h>` để bỏ qua assert trong release
 
-* **Vô hiệu hóa assert:**
 
-    ◦  Khi định nghĩa macro `NDEBUG` trong chế độ biên dịch release, mọi `assert` sẽ bị vô hiệu hóa, và biểu thức trong `assert` sẽ không được thực thi
+        #define NDEBUG  // VÔ HIỆU HÓA TẤT CẢ ASSERT - ĐẶT TRƯỚC KHI INCLUDE
+        #include <stdio.h>
+        #include <assert.h>
 
-    ◦  Điều này đảm bảo `assert` không gây ảnh hưởng đến hiệu suất của chương trình
+        void check_values(int x) {
+            assert(x > 0);      // Bị vô hiệu hóa
+            assert(x < 100);    // Bị vô hiệu hóa  
+            printf("x = %d\n", x);
+        }
 
-#### **2.3.3.Mục đích và cách sử dụng** 
+        int main() {
+            check_values(-5);   // Vẫn chạy bình thường dù giá trị sai
+            check_values(200);  // Vẫn chạy bình thường
+            printf("All assertions are disabled!\n");
+            return 0;
+        }
 
-* **Kiểm tra điều kiện tiên quyết(preconditions):**
+        //Output:
+
+        x = -5
+        x = 200
+        All assertions are disabled!        
+
+
+#### **3.3.Mục đích và cách sử dụng** 
+
+* **Preconditions: Kiểm tra đầu vào**
 
     ◦  Đảm bảo các điều kiện phải đúng trước khi thực thi hàm,ví dụ: con trỏ NULL,chỉ số mảng hợp lệ
 
     ◦  VD: `assert(ptr!=NULL);`
 
-* **Kiểm tra điều kiện hậu quyết(postconditions):**
+* **Postconditions: Kiểm tra đầu ra**
 
     ◦ Đảm bảo các điều kiện phải đúng sau khi thực thi,ví dụ: giá trị trả về nằm trong khoảng mong đợi
 
     ◦ VD: `assert(result >=0);`
 
-* **Kiểm tra bất biến(invariants):**
+* **Invariants: Kiểm tra trạng thái cố định**
 
     ◦ Đảm bảo các điều kiện luôn đúng tại một thời điểm cụ thể trong chương trình, ví dụ: biến đếm không âm
 
     ◦ VD: `assert(counter>=0);`
 
-#### **2.3.4. Cú pháp**
-```
-#include <assert.h>
+#### **3.4. Cú pháp**
 
-return_type function_name(parameters) {
-    assert(condition); // Kiểm tra điều kiện
-    // Xử lý logic
-    return result;
-}
-```
-#### **2.3.5. VD**
-```
-#include <stdio.h>
-#include <assert.h>
+        #include <assert.h>
 
-void print_array(int* arr, int size) {
-    assert(arr != NULL); // Precondition: Con trỏ không được NULL
-    assert(size > 0);    // Precondition: Kích thước phải dương
-    for (int i = 0; i < size; i++) {
-        printf("%d ", arr[i]);
-    }
-    printf("\n");
-}
+        return_type function_name(parameters) {
+            assert(condition); // Kiểm tra điều kiện
+            // Xử lý logic
+            return result;
+        }
 
-int main() {
-    int numbers[] = {1, 2, 3};
-    print_array(numbers, 3); // In: 1 2 3
-    print_array(NULL, 0);    // Lỗi Assert
-    return 0;
-}
-```
-#### **2.3.6. Lưu ý**
-* Không sử dụng cho logic chương trình:
+#### **3.5. VD**
+
+        #include <stdio.h>
+        #include <assert.h>
+
+        void print_array(int* arr, int size) {
+            assert(arr != NULL); // Precondition: Con trỏ không được NULL
+            assert(size > 0);    // Precondition: Kích thước phải dương
+            for (int i = 0; i < size; i++) {
+                printf("%d ", arr[i]);
+            }
+            printf("\n");
+        }
+
+        int main() {
+            int numbers[] = {1, 2, 3};
+            print_array(numbers, 3); // In: 1 2 3
+            print_array(NULL, 0);    // Lỗi Assert
+            return 0;
+        }
+
+#### **3.6. Lưu ý**
+
+* **Không sử dụng cho logic chương trình:**
 
     ◦ Vì assert bị vô hiệu hóa trong chế độ release, không đặt mã logic quan trọng trong assert (e.g., assert(x = 5);).
+
+        #include <stdio.h>
+        #include <assert.h>
+
+        //CÁCH SAI - DÙNG ASSIGNMENT TRONG ASSERT
+
+        void bad_example(int x) {
+            assert(x = 5);  // Gán x = 5 thay vì so sánh!
+            printf("x = %d\n", x);
+        }
+
+        //CÁCH ĐÚNG - TÁCH BIỆT KIỂM TRA VÀ GÁN GIÁ TRỊ
+
+        void good_example(int x) {
+            // Kiểm tra điều kiện
+            assert(x == 5);
+            
+            // Logic gán giá trị riêng (nếu cần)
+            x = 10;
+            printf("x = %d\n", x);
+        }
+
+        int main() {
+            bad_example(3);   // Vẫn chạy nhưng sai logic!
+            good_example(5);  // Chạy đúng
+            return 0;
+        }
 
 * Không dùng cho lỗi runtime thông thường:
 
     ◦ assert chỉ dùng để phát hiện lỗi lập trình trong giai đoạn phát triển, không phù hợp cho lỗi runtime như input sai (dùng if-else hoặc try-catch).
 
+        #include <stdio.h>
+        #include <stdlib.h>
+        #include <assert.h>
+
+        // CÁCH SAI - DÙNG ASSERT CHO INPUT NGƯỜI DÙNG
+        int bad_divide(int a, int b) {
+            assert(b != 0);  // Nguy hiểm: bị disable trong release!
+            return a / b;
+        }
+
+        // CÁCH ĐÚNG - DÙNG IF-ELSE CHO RUNTIME ERROR
+        int good_divide(int a, int b) {
+            if (b == 0) {
+                fprintf(stderr, "Error: Division by zero!\n");
+                exit(EXIT_FAILURE);
+                // Hoặc return giá trị đặc biệt/error code
+            }
+            return a / b;
+        }
+
+        // CÁCH TỐT HƠN - DÙNG ASSERT KẾT HỢP ERROR HANDLING
+        int better_divide(int a, int b) {
+            // Assert cho developer errors (internal logic)
+            assert(a != INT_MIN || b != -1);  // Tránh tràn số
+            
+            // Error handling cho runtime errors
+            if (b == 0) {
+                fprintf(stderr, "Runtime Error: Division by zero\n");
+                exit(EXIT_FAILURE);
+            }
+            
+            return a / b;
+        }
+
+        int main() {
+            int x, y;
+            printf("Enter two numbers: ");
+            scanf("%d %d", &x, &y);
+            
+            // good_divide(x, y);    //  An toàn
+            // bad_divide(x, y);     //  Nguy hiểm khi dùng NDEBUG
+            better_divide(x, y);     //  Tốt nhất
+            
+            return 0;
+        }
+
 * Khi không sử dụng Assert:
 
     ◦ Phải tự viết if-else để kiểm tra lỗi, làm tăng độ dài và phức tạp mã:
-```
-if (ptr == NULL) {
-    fprintf(stderr, "Error: NULL pointer in file %s, line %d\n", __FILE__, __LINE__);
-    exit(1);
-}
-```
+
+
+        if (ptr == NULL) {
+            fprintf(stderr, "Error: NULL pointer in file %s, line %d\n", __FILE__, __LINE__);
+            exit(1);
+        }
+
 
 </details> 
 <details>
-	<summary><strong>BÀI 3: Advanced Pointers</strong></summary>
+	<summary><strong>BÀI 3: ADVANCED POINTER</strong></summary>
 
-## **Bài 3: Advanced Pointers**
+## **BÀI 3: ADVANCED POINTER**
 
-### **3.1.Function Pointers - Con trỏ hàm**
+### **I.Function Pointers - Con trỏ hàm**
 
-#### **3.1.1.Định nghĩa**
+#### **1.1.Định nghĩa**
 
-Là một loại con trỏ đặc biệt trong C, thay vì trỏ đến dữ liệu như (`int*` hay `char*`), nó **trỏ đến địa chỉ một hàm** trong bộ nhớ 
+* Con trỏ hàm là một loại con trỏ đặc biệt trỏ đến địa chỉ của hàm thay vì trỏ đến dữ liệu như (`int*` hay `char*`)
 
- *  **Mục đích:** 
+*  **Mục đích:** 
    
     ◦  Lưu trữ địa chỉ của hàm để gọi hàm đó tại runtime
    
     ◦  Cho phép truyền hàm như một tham số(callback) hoặc lưu trữ trong cấu trúc dữ liệu
 
-    ◦  Hỗ trợ lập trình linh hoạt, như chọn hàm để thực thi dựa trên điều kiện hoặc triển khai mẫu thiết kế
+    ◦  Triển khai pattern như Strategy hoặc State Machine
 
  *  **Đặc điểm:**
 
-    ◦ Hàm trong C có địa chỉ cố định trong bộ nhớ, và con trỏ hàm lưu địa chỉ này
+    ◦ Hàm có địa chỉ cố định trong bộ nhớ (Text Segment)
 
     ◦ Con trỏ hàm phải khớp với **kiểu trả về(return type)** và **danh sách tham số** của hàm mà nó trỏ tới
 
+#### **1.2.Cú pháp khai báo**
 
-
-   
-#### **3.1.2.Cú pháp khai báo**
-
-
- * `return_type (*pointer_name)(parameter_types);`
+        `return_type (*pointer_name)(parameter_types);`
  
-    ◦ **return_type:** Kiểu dữ liệu mà hàm trả về(VD: `int`,`void`, `double`)
+* **return_type:** Kiểu dữ liệu mà hàm trả về(VD: `int`,`void`, `double`)
 
-    ◦ **pointer_name:** Tên của con trỏ hàm, được bao quanh bởi dấu `(*...)`
+* **pointer_name:** Tên của con trỏ hàm, được bao quanh bởi dấu `*`
 
-    ◦ **parameter_type:** Danh sách các kiểu tham số mà hàm có thể nhận
-    ```
-    int  (*opera)(int, int);
-    void (*callback)(void);
-    double (*compute)(float, int);
-    ```
-  **=> Dấu `*(pointer_name)` là cần thiết để phân biệt con trỏ hàm với hàm thông thường, nếu không có dấu `*`, khai báo sẽ trở thành function prototype thay vì con trỏ**
+* **parameter_type:** Danh sách các kiểu tham số mà hàm có thể nhận
 
-#### **3.1.3.Gán giá trị cho con trỏ hàm**
+        int (*opera)(int, int);     // Con trỏ đến hàm nhận 2 int, trả int
+        void (*callback)(void);     // Con trỏ đến hàm không tham số, không trả về
+        double (*compute)(float, int);      // Con trỏ đến hàm nhận float và int, trả double
 
- * Để gán một hàm cho con trỏ hàm, có thể sử dụng tên hàm(hoặc địa chỉ hàm)
 
- ```
- pointer_name = function_name;
- // hoặc
- pointer_name = &function_name;
- ```
+*  => **Dấu `*(pointer_name)` là cần thiết** để phân biệt `con trỏ hàm` với `hàm thông thường`, nếu không có dấu `*`, khai báo sẽ trở thành function prototype thay vì con trỏ
 
- VD:
- ```
- #include<stdio.h>
+#### **1.3.Gán giá trị cho con trỏ hàm**
 
- int add(int a, int b){
-   return a + b;
- }
- int main(){
-   int (*opera)(int,int);
-   opera = add;
-   return 0;
- }
- ```
+* Để gán một hàm cho con trỏ hàm, có thể sử dụng tên hàm hoặc &function_name
 
-#### **3.1.4.Gọi hàm thông qua con trỏ**
+ 
+        pointer_name = function_name;
+        // hoặc
+        pointer_name = &function_name;
+ 
 
- * Có 2 cách để gọi hàm thông qua con trỏ hàm 
- ```
- (*pointer_name)(arguments);
- //hoặc
- pointer_name(arguments);
- ```
- VD:
- ```
- #include<stdio.h>
- int add(int a, int b){
-   return a+b;
- }
- int main(){
-   int (*opera)(int,int);
-   opera = add;
-   printf("Result: %d\n",opera(5,3));
-   printf("Result: %d\n",(*opera)(5,3));
-   return 0;
- }
- }
- ```
+* VD:
+ 
+        #include<stdio.h>
 
- #### **3.1.5.Ứng dụng**
+        int add(int a, int b){
+            return a + b;
+        }
 
-  * **Callbacks:**
+        int main(){
+
+            int (*opera)(int, int);
+            opera = add;        // Hoặc opera = &add;
+            return 0;
+        }
+ 
+
+#### **1.4.Gọi hàm thông qua con trỏ**
+
+* Có 2 cách để gọi hàm thông qua con trỏ hàm 
+
+ 
+        (*pointer_name)(arguments);     // Dereference rõ ràng
+        //hoặc
+        pointer_name(arguments);        // Ngầm định
+ 
+
+* VD:
+
+        #include<stdio.h>
+
+        int multiply(int a, int b){
+            return a * b;
+        }
+
+        int subtract(int a, int b){
+            return a - b;
+        }
+
+        int max(int a, int b){
+            return (a > b) ? a : b;
+        }
+
+        int main(){
+
+            int (*operation)(int, int);
+
+            operation = multiply;
+            printf("5 * 3 = %d\n", operation(5, 3));        // 15
+
+            operation = multiply;
+            printf("5 - 3 = %d\n", operation(5, 3));        // 2
+
+            operation = max;
+            printf("max(5, 3) = %d\n", operation(5, 3));    // 5
+
+            return 0;
+        }
+
+#### **1.5.Ứng dụng**
+
+* **Callbacks:**
    
     ◦ Truyền một hàm làm tham số cho hàm khác để gọi lại sau này
 
     ◦ VD: Hàm `qsort` trong thư viện chuẩn C
 
-    ```
-    #include<stdlib.h>
+    
+        #include <stdlib.h>
+        #include <stdio.h>
 
-    int compare(const void* a, const void* b){
-      return (*(int*)a) - (*(int*)b);
-    }
+        int compare(const void* a, const void* b) {
+            return (*(int*)a - *(int*)b);
+        }
 
-    int main(){
-      int arr[]={5,2,8,1};
-      qsort(arr, 4, sizeof(int), compare);
-    }
-    ```
+        int main() {
+            int arr[] = {5, 2, 8, 1};
+            qsort(arr, 4, sizeof(int), compare);
+            for (int i = 0; i < 4; i++) printf("%d ", arr[i]);  // 1 2 5 8
+            return 0;
+        }
+    
 
-  * **State Machines:**
+* **State Machines:**
 
     ◦ Dùng con trỏ hàm để biểu diễn các trạng thái và hành vi trong máy trạng thái
 
     ◦ VD: Một chương trình chuyển đổi dựa trên trạng thái đầu vào
 
-    ```
-    void state1(){
-      printf("In state1\n");
-    }
-    void state2(){
-      printf("In state2\n");
-    }
-    void (*current_state)() = state1;
-    ```
+    
+        #include <stdio.h>
 
-  * **Strategy Pattern:**
+        void state1() { 
+            printf("In state 1\n"); 
+            }
+        void state2() { 
+            printf("In state 2\n"); 
+            }
 
-    ◦ Cho phép chọn thuật toán hoặc hành vi tại runtime
+        int main() {
+            void (*current_state)() = state1;
+            current_state();  // In: In state 1
+            current_state = state2;
+            current_state();  // In: In state 2
+            return 0;
+        }
+    
 
-  * **Lưu trữ hàm trong cấu trúc dữ liệu:**
+* **Array của con trỏ hàm: Lưu nhiều hàm**
 
-    ◦ Lưu con trỏ hàm trong mảng hoặc cấu trúc để gọi động
+        #include <stdio.h>
 
-      VD: Mảng con trỏ hàm để xử lý các lệnh
-      ```
-      int (*opera[])(int,int)={add,subtract};
-      int result = opera[0](5,3); //Gọi add
-      ```
-   #### **3.1.6.Lưu ý**
-
-   * Kiểm tra khớp kiểu
-
-   * Kiểm tra NULL
+        int add(int a, int b) { 
+            return a + b; 
+            }
+        int subtract(int a, int b) {
+             return a - b; 
+            }
 
 
-### **3.2.Void Pointers - Con trỏ void**
+        int main() {
+            int (*operations[])(int, int) = {add, subtract};
+            printf("%d\n", operations[0](5, 3));  // 8
+            printf("%d\n", operations[1](5, 3));  // 2
+            return 0;
+        }
 
-#### **3.2.1.Định nghĩa**
+* **Typedef cho con trỏ hàm:**
 
- * Con trỏ void`(void*)` là một loại con trỏ đặc biệt trong C,được gọi là con trỏ "generic" vì nó **có thể trỏ đến bất kỳ kiểu dữ liệu nào(int,char,float,struct,...)** mà không bị ràng buộc bởi kiểu cụ thể
+        typedef int (*Operation)(int, int);
+        Operation opera = add;
 
- * **Mục đích:**
+#### **1.6.Lưu ý**
+
+* **Kiểm tra khớp kiểu**
+
+        #include <stdio.h>
+
+        int add(int a, int b) { 
+            return a + b; 
+            }
+        float divide(float a, float b) { 
+            return a / b; 
+            }
+
+        int main() {
+            // CON TRỎ SAI KIỂU - UNDEFINED BEHAVIOR
+            int (*wrong_ptr)(int, int) = (int(*)(int,int))divide;  // Ép kiểu nguy hiểm
+            
+            int result = wrong_ptr(5, 2);  // UB! Hàm divide mong đợi float
+            printf("Wrong result: %d\n", result); 
+            
+            return 0;
+        }
+
+* **Kiểm tra NULL**
+
+        #include <stdio.h>
+
+        int multiply(int a, int b) { return a * b; }
+
+        int main() {
+            int (*operation)(int, int) = NULL;  // Khởi tạo NULL
+            
+            // KHÔNG KIỂM TRA NULL - CRASH NẾU operation LÀ NULL
+            // printf("Result: %d\n", operation(5, 3));  // SEGFAULT!
+            
+            // KIỂM TRA NULL TRƯỚC KHI GỌI
+            if (operation != NULL) {
+                printf("Result: %d\n", operation(5, 3));
+            } else {
+                printf("Operation is NULL!\n");
+            }
+            
+            // Gán hàm hợp lệ
+            operation = multiply;
+            
+            if (operation != NULL) {
+                printf("Result: %d\n", operation(5, 3));  // 15
+            }
+            
+            return 0;
+        }
+
+* **Quên `*` trong khai báo**
+
+        #include <stdio.h>
+
+        int add(int a, int b) { 
+            return a + b; 
+            }
+
+        int main() {
+            // QUÊN * TRONG KHAI BÁO CON TRỎ HÀM
+            // int opera(int, int) = add;  // LỖI BIÊN DỊCH!
+            
+            // KHAI BÁO ĐÚNG
+            int (*opera)(int, int) = add;
+            
+            // GỌI SAI THAM SỐ
+            // printf("Result: %d\n", opera(5));  // LỖI: thiếu tham số
+            
+            // GỌI ĐÚNG THAM SỐ
+            printf("Result: %d\n", opera(5, 3));  // 8
+            
+            return 0;
+        }
+
+### **II.Void Pointers - Con trỏ void**
+
+#### **2.1.Định nghĩa**
+
+* Con trỏ void`(void*)` là một loại con trỏ đặc biệt trong C,được gọi là con trỏ "generic" vì nó **có thể trỏ đến bất kỳ kiểu dữ liệu nào(int,char,float,struct,...)** mà không bị ràng buộc bởi kiểu cụ thể
+
+* **Mục đích:**
 
    ◦ Cho phép xử lý dữ liệu một cách tổng quát, mà không cần biết trước kiểu dữ liệu
 
@@ -701,347 +1171,535 @@ Là một loại con trỏ đặc biệt trong C, thay vì trỏ đến dữ li�
 
    ◦ **Không thể dereference trực tiếp:** Vì trình biên dịch không biết kích thước hoặc kiểu dữ liệu mà `void*` trỏ đến, nên `*void_ptr` sẽ gây lỗi biên dịch
 
+        #include <stdio.h>
+
+        int main() {
+            int x = 42;
+            void* void_ptr = &x;
+            
+            // LỖI BIÊN DỊCH: Không thể dereference void*
+            // printf("Value: %d\n", *void_ptr);
+            
+            // PHẢI ÉP KIỂU TRƯỚC
+            printf("Value: %d\n", *(int*)void_ptr);  // Ép về int* trước
+            
+            return 0;
+        }
+
+        ???
+
+        Compiler không biết: Kích thước dữ liệu (int = 4 bytes, char = 1 byte, ...)
+
    ◦ **Không hỗ trợ số học con trỏ:** Các phép toán như `void_ptr++` hoặc `void_ptr + n` không hợp lệ(hoặc không chuẩn) vì trình biên dịch không biết kích thước của kiểu dữ liệu
+
+        #include <stdio.h>
+
+        int main() {
+            int arr[] = {10, 20, 30, 40, 50};
+            void* void_ptr = arr;
+            
+            // LỖI: Số học con trỏ không hợp lệ
+            // void_ptr++;  // error: increment of void pointer
+            // void_ptr = void_ptr + 1;  // error: arithmetic on void pointer
+            
+            // PHẢI ÉP KIỂU TRƯỚC
+            int* int_ptr = (int*)void_ptr;
+            int_ptr++;  // Hợp lệ: nhảy 4 bytes
+            printf("Second element: %d\n", *int_ptr);  // 20
+            
+            return 0;
+        }
 
    ◦ **Ép kiểu:** Trước khi dereference hoặc thực hiện các thao tác, con trỏ void phải được ép kiểu sang một kiểu con trỏ cụ thể
 
-  
-#### **3.2.2.Cú pháp khai báo**
+        #include <stdio.h>
 
-```
-void *pointer_name;
-```
+        int main() {
+            float pi = 3.14159;
+            void* generic_ptr = &pi;
+            
+            // SAI: Ép kiểu không phù hợp
+            // int wrong_value = *(int*)generic_ptr;  // Interpret bits float như int
+        
+            // ĐÚNG: Ép về đúng kiểu gốc
+            float correct_value = *(float*)generic_ptr;
+            printf("Pi: %f\n", correct_value);  // 3.141590
+            
+            // VÍ DỤ ĐA KIỂU
+            int number = 100;
+            char letter = 'A';
+            
+            void* ptr;
+            
+            // Trỏ đến int
+            ptr = &number;
+            printf("As int: %d\n", *(int*)ptr);      // 100
+            
+            // Trỏ đến char  
+            ptr = &letter;
+            printf("As char: %c\n", *(char*)ptr);    // A
+            
+            return 0;
+        }
+
+  
+#### **2.2.Cú pháp khai báo**
+
+
+    void *pointer_name;
+
 * `void`: Chỉ định rằng con trỏ không gắn với kiểu dữ liệu cụ thể
 
 * `pointer_name`: Tên của con trỏ void
 
 VD:
-```
-void *generic_ptr;
-void *memory_block;
-```
 
-#### **3.2.3.Gán giá trị cho con trỏ void**
+    void *generic_ptr;
+    void *memory_block;
+
+
+#### **2.3.Gán giá trị cho con trỏ void**
 
 * Cách gán:
 
-```
-pointer_name = &variable; //Gán địa chỉ của biến
-pointer_name = another_pointer; //Gán từ con trỏ khác
-```
+        pointer_name = &variable; //Gán địa chỉ của biến
+        pointer_name = another_pointer; //Gán từ con trỏ khác
 
-VD:
 
-```
-#include<stdio.h>
-int main(){
-  int x = 42;
-  char c = 'A';
-  float f = 3.14;
+* VD:
 
-  void *ptr;
-  ptr = &x;
-  ptr = &c;
-  ptr = &f;
 
-  return 0;
-}
-```
-#### **3.2.4.Sử dụng con trỏ void**
+        #include<stdio.h>
+        int main(){
+        int x = 42;
+        char c = 'A';
+        float f = 3.14;
+
+        void *ptr;
+        ptr = &x;
+        ptr = &c;
+        ptr = &f;
+
+        return 0;
+        }
+
+#### **2.4.Sử dụng con trỏ void**
 
 * Để sử dụng con trỏ void, cần **ép kiểu** sang kiểu con trỏ cụ thể trước khi **dereference** hoặc thực hiện thao tác
 
 * **Cách sử dung:**
-```
-*(type_cast *)pointer_name; //dereference sau khi ép kiểu
-```
-VD:
-```
-#include<stdio.h>
 
-int main(){
-  int x = 42;
-  void *ptr = &x;
+        *(type_cast *)pointer_name; //dereference sau khi ép kiểu
 
-  // Ép kiểu void* sang int* để dereference
-  int *int_ptr = (int *)ptr;
-  printf("Value of x: %d\n", *int_ptr);
+* **VD:**
 
-  return 0;
-}
-```
-#### **3.2.5.Ứng dụng**
+        #include<stdio.h>
 
-**Hàm generic:**
+        int main(){
+        int x = 42;
+        void *ptr = &x;
 
-  ◦ Các hàm như `memset`,`memcpy`,`qsort` trong thư viện C sử dụng `void*` để hoạt động trên bất kỳ kiểu dữ liệu nào
+        // Ép kiểu void* sang int* để dereference
+        int *int_ptr = (int *)ptr;
+        printf("Value of x: %d\n", *int_ptr);
 
-  VD:
+        return 0;
+        }
 
-  ```
-  #include<stdlib.h>
+#### **2.5.Ứng dụng**
 
-  int compare(const void *a, const void *b){
-    return (*(int*)a) - (*(int*)b);
-  }
+* **Hàm generic:**
 
-  int main(){
-    int arr[]= {5, 2, 8, 1};
-    qsort(arr, 4, sizeof(int), compare);
-    return 0;
-  }
+    ◦ Các hàm như `memset`,`memcpy`,`qsort` trong thư viện C sử dụng `void*` để hoạt động trên bất kỳ kiểu dữ liệu nào
 
-  ```
+* VD:
 
-**Cấp phát bộ nhớ động:**
-
-  ◦ Các hàm như `malloc` và `calloc` trả về `void*` ,cho phép người dùng quyết định kiểu dữ liệu của bộ nhớ được cấp phát
-
-  VD:
-
-  ```
-  #include<stdlib>
-
-  int main(){
-    //Cấp phát bộ nhớ cho 5 mảng số nguyên
-    void *memory = malloc(5 * sizeof(int));
-    int *int_array = (int *)memory;
-
-    //Sử dụng mảng
-    for(int i = 0;i < 5; i++){
-      int_array[i] = i + 1;
-    }
-
-    //In mảng 
-    for(int i = 0;i < 5; i++){
-      printf("%d ", int_array[i]);
-    }
-
-    free(memory);
-    return 0;
-  }
-  ```
-**Truyền tham số linh hoạt:**
-
-  ◦ Dùng trong các hàm cần truyền dữ liệu mà kiểu không xác định trước 
-
-  VD:
-  ```
-  #include<stdio.h>
-  void print_data(void *data, char type){
-    if (type == 'i'){
-      printf("Integer: %d\n", *(int *)data);
-    }else if (type == 'c'){
-      printf("Char: %c\n", *(char *)data);
-    }
-  }
-
-  int main(){
-    int x = 100;
-    char c = 'Z';
-
-    print_data(&x,'i');
-    print_data(&c, 'c');
-    return 0;
-  }
-  ```
-
-  **Lưu trữ trong cấu trúc dữ liệu:**
-
-  ◦ Dùng để lưu trữ địa chỉ của các đối tượng có kiểu khác nhau trong danh sách liên kết, cây, hoặc các cấu trúc dữ liệu khác
-
-  VD:
-  ```
-  #include<stdio.h>
-
-  struct Node{
-    void *data;
-    char type;
-  }
-
-  int main(){
-    struct Node node;
-    int x = 42;
-
-    node.data = &x;
-    node.type = 'i';
-
-    printf("Data: %d\n", *(int *)node.data);
-    return 0;
-  }
-  ```
-
-  #### **3.2.6.Lưu ý**
   
-  **Kiểm tra ép kiểu:**
+        #include <stdio.h>
+        #include <string.h>
 
-   ◦ Ép kiểu sai (ví dụ: ép void* trỏ đến int thành float*) có thể gây lỗi truy cập bộ nhớ hoặc kết quả không mong muốn.
+        int main() {
+            // KHỞI TẠO MẢNG INT VỚI GIÁ TRỊ 0
+            int numbers[5];
+            memset(numbers, 0, sizeof(numbers));  // void* memset(void* ptr, int value, size_t num)
+            printf("After memset 0: ");
+            for (int i = 0; i < 5; i++) {
+                printf("%d ", numbers[i]);  // 0 0 0 0 0
+            }
+            printf("\n");
+            
+            //  KHỞI TẠO MẢNG CHAR VỚI GIÁ TRỊ 'A'
+            char text[10];
+            memset(text, 'A', sizeof(text) - 1);
+            text[9] = '\0';
+            printf("Text: %s\n", text);  // AAAAAAAAA
+            
+            // KHỞI TẠO CẤU TRÚC
+            struct Point { 
+                int x; 
+                int y; 
+                };
+            struct Point p;
+            memset(&p, -1, sizeof(p));  // Set all bytes to 0xFF
+            printf("Point: (%d, %d)\n", p.x, p.y);  // (-1, -1)
+            
+            return 0;
+        }
 
-   VD:
-   ```
-   int x = 42;
-   void *ptr = &x;
-   float *float_ptr = (float *)ptr; // Sai: Ép kiểu không đúng
-   printf("%f\n", *float_ptr);     // Kết quả không xác định
-   ```
-  **Kiểm tra NULL:**
+  
+
+* **Cấp phát bộ nhớ động:**
+
+    ◦ Các hàm như `malloc` và `calloc` trả về `void*` ,cho phép người dùng quyết định kiểu dữ liệu của bộ nhớ được cấp phát
+
+    ◦ VD:
+
+  
+        #include<stdlib>
+
+        int main(){
+            //Cấp phát bộ nhớ cho 5 mảng số nguyên
+            void *memory = malloc(5 * sizeof(int));
+            int *int_array = (int *)memory;
+
+            //Sử dụng mảng
+            for(int i = 0;i < 5; i++){
+            int_array[i] = i + 1;
+            }
+
+            //In mảng 
+            for(int i = 0;i < 5; i++){
+            printf("%d ", int_array[i]);
+            }
+
+            free(memory);
+            return 0;
+        }
+  
+* **Truyền tham số linh hoạt:**
+
+    ◦ Dùng trong các hàm cần truyền dữ liệu mà kiểu không xác định trước 
+
+    ◦ VD:
+  
+        #include<stdio.h>
+        void print_data(void *data, char type){
+            if (type == 'i'){
+            printf("Integer: %d\n", *(int *)data);
+            }else if (type == 'c'){
+            printf("Char: %c\n", *(char *)data);
+            }
+        }
+
+        int main(){
+            int x = 100;
+            char c = 'Z';
+
+            print_data(&x,'i');
+            print_data(&c, 'c');
+            return 0;
+        }
+  
+
+* **Lưu trữ trong cấu trúc dữ liệu:**
+
+    ◦ Dùng để lưu trữ địa chỉ của các đối tượng có kiểu khác nhau trong danh sách liên kết, cây, hoặc các cấu trúc dữ liệu khác
+
+    ◦ VD:
+  
+        #include <stdio.h>
+
+        struct Node {
+            void *data;
+            char type;
+        };
+
+        int main() {
+            struct Node node;
+            int x = 42;
+            node.data = &x;
+            node.type = 'i';
+            printf("Data: %d\n", *(int *)node.data);  // 42
+            return 0;
+        }
+  
+
+#### **2.6.Lưu ý**
+  
+*  **Kiểm tra ép kiểu:**
+
+    ◦ Ép kiểu sai (ví dụ: ép void* trỏ đến int thành float*) có thể gây lỗi truy cập bộ nhớ hoặc kết quả không mong muốn.
+
+    ◦ VD:
+   
+        int x = 42;
+        void *ptr = &x;
+        float *float_ptr = (float *)ptr; // Sai: Ép kiểu không đúng
+        printf("%f\n", *float_ptr);     // Kết quả không xác định
+   
+* **Kiểm tra NULL:**
 
    ◦ Con trỏ void có thể là NULL, cần kiểm tra trước khi sử dụng.
 
-   ```
-   void *ptr = NULL;
-   if (ptr != NULL) {
-    int *int_ptr = (int *)ptr;
-    printf("%d\n", *int_ptr);
-    } else {
-    printf("Pointer is NULL\n");
-    }
-   ```
+   
+        void *ptr = NULL;
+        if (ptr != NULL) {
+            int *int_ptr = (int *)ptr;
+            printf("%d\n", *int_ptr);
+            } else {
+            printf("Pointer is NULL\n");
+            }
+   
 
-  **Giải phóng bộ nhớ:**
+* **Giải phóng bộ nhớ:**
 
    ◦ Khi dùng `void*` với `malloc` hoặc `calloc`, luôn nhớ giải phóng bộ nhớ bằng `free` để tránh rò rỉ bộ nhớ.
 
-### **3.3.NULL Pointers - Con trỏ NULL**   
+### **III.NULL Pointers - Con trỏ NULL**   
 
-#### **3.3.1.Định nghĩa**
+#### **3.1.Định nghĩa**
 
-* Là một giá trị đặc biệt của con trỏ trong C/C++,biểu thị **con trỏ không trỏ đến bất kỳ địa chỉ bộ nhớ hợp lệ nào**.Nó thường được định nghĩa là `(void*)0` hoặc một macro tương đương(VD: `NULL` trong C hoặc `nullptr` trong C++)
+* Là một giá trị đặc biệt của con trỏ trong C/C++,biểu thị **con trỏ không trỏ đến bất kỳ địa chỉ bộ nhớ hợp lệ nào**.
+
+* Nó thường được định nghĩa là `(void*)0` hoặc một macro tương đương(VD: `NULL` trong C hoặc `nullptr` trong C++)
 
 * **Mục đích:**
 
-  ◦ Khởi tạo con trỏ chưa được gán giá trị,tránh việc trỏ đến địa chỉ ngẫu nhiên
+    ◦ Khởi tạo con trỏ chưa được gán giá trị,tránh việc trỏ đến địa chỉ ngẫu nhiên
 
-  ◦ Đánh dấu kết thúc của danh sách liên kết hoặc cấu trúc dữ liệu
+        #include <stdio.h>
 
-  ◦ Biểu thị trạng thái lỗi hoặc không hợp lệ khi một hàm trả về con trỏ
+        int main() {
 
-  ◦ Dùng để kiểm tra tính hợp lệ của con trỏ trước khi truy cập
+                // AN TOÀN: Khởi tạo với NULL
+
+            int *ptr = NULL;
+            
+                // NGUY HIỂM: Không khởi tạo (trỏ đến địa chỉ rác)
+
+            // int *danger_ptr;
+            // printf("%d", *danger_ptr);  // UNDEFINED BEHAVIOR!
+            
+            if (ptr == NULL) {
+                printf("Pointer is safely initialized to NULL\n");
+            }
+            
+            return 0;
+        }
+
+    ◦ Đánh dấu kết thúc của danh sách liên kết hoặc cấu trúc dữ liệu
+
+        #include <stdio.h>
+        #include <stdlib.h>
+
+        struct Node {
+            int data;
+            struct Node* next;
+        };
+
+        int main() {
+
+            // Tạo danh sách: 1 → 2 → NULL
+
+            struct Node* head = malloc(sizeof(struct Node));
+            head->data = 1;
+            head->next = malloc(sizeof(struct Node));
+            head->next->data = 2;
+            head->next->next = NULL;  // Đánh dấu kết thúc
+            
+            // Duyệt danh sách
+
+            struct Node* current = head;
+            while (current != NULL) {  // Kiểm tra NULL để dừng
+                printf("%d → ", current->data);
+                current = current->next;
+            }
+            printf("NULL\n");
+            
+            return 0;
+        }
+
+    ◦ Biểu thị trạng thái lỗi hoặc không hợp lệ khi một hàm trả về con trỏ
+
+        #include <stdio.h>
+        #include <stdlib.h>
+
+        // Hàm trả về con trỏ, NULL nếu lỗi
+
+        int* create_array(int size) {
+            if (size <= 0) {
+                return NULL;  // Biểu thị lỗi
+            }
+            return malloc(size * sizeof(int));
+        }
+
+        int main() {
+            int* arr = create_array(-5);  // Truyền size không hợp lệ
+            
+            if (arr == NULL) {
+                printf("Error: Failed to create array\n");  // Xử lý lỗi
+                return 1;
+            }
+            
+            // Chỉ sử dụng arr nếu không NULL
+            return 0;
+        }
+
+    ◦ Dùng để kiểm tra tính hợp lệ của con trỏ trước khi truy cập
+
+        #include <stdio.h>
+
+        void safe_print(int* ptr) {
+
+            // LUÔN KIỂM TRA NULL TRƯỚC KHI TRUY CẬP
+            if (ptr != NULL) {
+                printf("Value: %d\n", *ptr);
+            } else {
+                printf("Error: NULL pointer encountered\n");
+            }
+        }
+
+        int main() {
+            int x = 42;
+            int* ptr1 = &x;
+            int* ptr2 = NULL;
+            
+            safe_print(ptr1);  // Value: 42
+            safe_print(ptr2);  // Error: NULL pointer encountered
+            
+            return 0;
+        }
 
 * **Đặc điểm:**
 
-  ◦ Gía trị của NULL Pointer thường là `0` trong bộ nhớ,nhưng cách biểu diên thực tế phụ thuộc vào hệ thống
+    ◦ Gía trị của NULL Pointer thường là `0` trong bộ nhớ,nhưng cách biểu diên thực tế phụ thuộc vào hệ thống
 
-  ◦ Trong C++,`nullptr` là lựa chọn an toàn hơn `NULL`,vì nó có kiểu riêng (`std::nullptr_t`) và tránh các lỗi liên quan đến ép Kiểu
+    ◦ Trong C++,`nullptr` là lựa chọn an toàn hơn `NULL`,vì nó có kiểu riêng (`std::nullptr_t`) và tránh các lỗi liên quan đến ép Kiểu
 
-  ◦ dereference một NULL Pointer (vd: `*ptr` hoặc ptr->member`) sẽ gây lỗi **segmentation fault**
+    ◦ dereference một NULL Pointer (vd: `*ptr` hoặc ptr->member`) sẽ gây lỗi **segmentation fault**
 
-#### **3.3.2.Gán giá trị NULL**
+        #include <stdio.h>
 
-  ◦ Gán trị NULL cho con trỏ để đảm bao nó không trỏ đến địa chỉ không xác định
+        int main() {
+            int* ptr = NULL;
+            
+            //  SEGMENTATION FAULT: Truy cập bộ nhớ tại địa chỉ 0
 
-  ```
-  Trong C:
-  int *ptr;
-  ptr = NULL;
-  ```
-  ```
-  Trong C++:
-  int *ptr;
-  ptr = nullptr;
-  ```
+            // printf("Value: %d\n", *ptr);
+            // ptr->data = 10;  // Cũng gây segfault với struct
+            
+            printf("This line will print\n");
+            // Bỏ comment dòng trên để thấy segfault
+            printf("But this won't if we dereference NULL\n");
+            
+            return 0;
+        }
 
-#### **3.3.3.Kiểm tra và sử dụng NULL Pointer**
+#### **3.2.Gán giá trị NULL**
+
+* Gán trị NULL cho con trỏ để đảm bao nó không trỏ đến địa chỉ không xác định
+
+        int *ptr;
+        ptr = NULL;
+
+
+#### **3.3.Kiểm tra và sử dụng NULL Pointer**
 
 * Kiểm tra con trỏ trước khi **dereference**
   
-  ◦ Luôn kiểm tra xem con trỏ có phải là NULL hay không để tránh lỗi truy cập bộ nhớ
+    ◦ Luôn kiểm tra xem con trỏ có phải là NULL hay không để tránh lỗi truy cập bộ nhớ
 
-  ```
-  if(ptr != NULL){
-    *ptr  10;
-  }else{
-    printf("Con trỏ là NULL,không thể truy cập\n");
-  }
-  ```
-* Trong C++ với nullptr
-  ```
-  if(ptr != nullptr){
-    *ptr = 10;
-  }else{
-    std::cout <<"Con trỏ là nullptr,khong the truy cap" << std::endl;
-  }
-  ```
-
+  
+        if(ptr != NULL){
+            *ptr  10;
+        }else{
+            printf("Con trỏ là NULL,không thể truy cập\n");
+        }
+  
 * Trả về NULL từ hàm
 
-  ◦ Hàm trả về con trỏ có thể trả về `NULL` để biểu thị lỗi hoặc không tìm thấy dữ liệu
-  ```
-  int *find_element(int arr[], int size, int value) {
-    for(int i = 0; i < size; i++){
-      if(arr[i] == value){
-        return &arr[i];
-      }
-    }
-    return NULL; //không tìm thấy
-  }
-  ```
+    ◦ Hàm trả về con trỏ có thể trả về `NULL` để biểu thị lỗi hoặc không tìm thấy dữ liệu
 
-#### **3.3.4.Ứng dụng**
+  
+        int *find_element(int arr[], int size, int value) {
+            for(int i = 0; i < size; i++){
+            if(arr[i] == value){
+                return &arr[i];
+            }
+            }
+            return NULL; //không tìm thấy
+        }
+  
+
+#### **3.4.Ứng dụng**
 
 * **Khởi tạo con trỏ:**
 
-  ◦ Đảm bảo con trỏ không trỏ đến địa chỉ ngẫu nhiên trước khi được gán giá trị hợp lệ
-  ```
-  int *ptr = NULL;
-  ptr = malloc(sizeof(int));
-  ```
+    ◦ Đảm bảo con trỏ không trỏ đến địa chỉ ngẫu nhiên trước khi được gán giá trị hợp lệ
+
+  
+        int *ptr = NULL;
+        ptr = malloc(sizeof(int));
+  
 
 * **Kết thúc danh sách liên kết:**
 
-  ◦ Trong danh sách liên kết, node cuối cùng có con trỏ `next` trỏ đến `NULL`
-  ```
-  struct Node{
-    int data;
-    struct Node *next;
-  };
-  struct Node *head = NULL; 
-  ```
+    ◦ Trong danh sách liên kết, node cuối cùng có con trỏ `next` trỏ đến `NULL`
+
+  
+        struct Node{
+            int data;
+            struct Node *next;
+        };
+        struct Node *head = NULL; 
+  
 
 * **Kiểm tra lỗi:**
 
-  ◦ Hàm cấp phát bộ nhớ như `malloc` hoặc `calloc` trả về `NULL` nếu không đủ bộ nhớ
-  ```
-  int *ptr = malloc(sizeof(int) * 10);
-  if(ptr == NULL){
-    printf("Cap phat bo nho that bai\n");
-    exit(1);
-  }
-  ```
+    ◦ Hàm cấp phát bộ nhớ như `malloc` hoặc `calloc` trả về `NULL` nếu không đủ bộ nhớ
+
+  
+        int *ptr = malloc(sizeof(int) * 10);
+        if(ptr == NULL){
+            printf("Cap phat bo nho that bai\n");
+            exit(1);
+        }
+  
 
 * **Callback và hàm trả về con trỏ:**
 
-  ◦ Hàm trả về con trỏ có thể dùng `NULL` để báo trạng thái không hợp lệ
-  ```
-  void *process_data(){
-    return NULL;
-  }
-  ```
+    ◦ Hàm trả về con trỏ có thể dùng `NULL` để báo trạng thái không hợp lệ
 
-#### **3.3.5.Lưu ý**
+  
+        void *process_data(){
+            return NULL;
+        }
+  
+
+#### **3.5.Lưu ý**
 
 * **Kiểm tra NULL trước khi dereference**
   
-  Luôn kiểm tra `if(ptr != NULL)` hoặc `if(ptr)`
+    ◦ Luôn kiểm tra `if(ptr != NULL)` hoặc `if(ptr)`
 
 * **Sự khác biệt giữa C và C++**
   
-  Trong C,`NULL` là 1 macro, thường là `(void*)0`,có thể gây lỗi khi sử dụng ngữ cảnh ép kiểu
+    ◦ Trong C,`NULL` là 1 macro, thường là `(void*)0`,có thể gây lỗi khi sử dụng ngữ cảnh ép kiểu
 
 * **Tránh gán giá trị khác cho NULL**
 
 * **Giải phóng bộ nhớ**
 
-  Sau khi gọi `free(ptr)`,nên gán `ptr = NULL` để tránh sử dụng con trỏ đã được giải phóng
+    ◦ Sau khi gọi `free(ptr)`,nên gán `ptr = NULL` để tránh sử dụng con trỏ đã được giải phóng
 
-  ```
-  free(ptr);
-  ptr = NULL;
-  ```
+  
+        free(ptr);
+        ptr = NULL;
+  
 
-### **3.4.Pointer to Pointer - Con trỏ trỏ đến con trỏ**
+### **IV.Pointer to Pointer - Con trỏ trỏ đến con trỏ**
 
-#### **3.4.1.Định nghĩa**
+#### **4.1.Định nghĩa**
 
 * Là biến lưu trữ **địa chỉ của 1 biến con trỏ khác**
 
@@ -1049,799 +1707,1350 @@ int main(){
 
 * **Mục đích:**
   
-  ◦ Hỗ trợ quản lý cấu trúc dữ liệu, mảng động, danh sách liên kết
+    ◦ Hỗ trợ quản lý cấu trúc dữ liệu, mảng động, danh sách liên kết
 
-  ◦ Cho phép con trỏ được truyền vào hàm
+    ◦ Cho phép con trỏ thay đổi con trỏ gốc từ bên trong hàm
+
+            #include <stdio.h>
+            #include <stdlib.h>
+
+            // CÁCH SAI - KHÔNG THAY ĐỔI ĐƯỢC CON TRỎ GỐC
+
+            void allocate_wrong(int* ptr) {
+                ptr = malloc(sizeof(int));  // Chỉ thay đổi bản sao
+                *ptr = 42;
+                printf("Inside wrong: %d\n", *ptr);  // 42 (nhưng chỉ là bản sao)
+            }
+
+            // GIẢI PHÁP - POINTER TO POINTER 
+
+            void allocate_correct(int** ptr) {
+                *ptr = malloc(sizeof(int));  // Thay đổi con trỏ gốc
+                **ptr = 100;
+                printf("Inside correct: %d\n", **ptr);  // 100
+            }
+
+            int main() {
+                int* p = NULL;
+                
+                // CÁCH SAI
+                allocate_wrong(p);
+                // printf("After wrong: %d\n", *p);  // SEGFAULT! p vẫn là NULL
+                
+                // CÁCH ĐÚNG
+                allocate_correct(&p);    
+                printf("After correct: %d\n", *p);  // 100 - p đã được thay đổi
+                
+                free(p);
+                return 0;
+            }
+
+
+            // Output:
+
+                Inside wrong: 42
+                Inside correct: 100  
+                After correct: 100
 
 * **Đặc điểm:**
 
-  ◦ Con trỏ cấp 2(`**`) có thể trỏ đến con trỏ cấp 1 (`*`),và con trỏ cấp 1 trỏ đến dữ liệu thực tiếp
+    ◦ Con trỏ cấp 2(`**`) có thể trỏ đến con trỏ cấp 1 (`*`),và con trỏ cấp 1 trỏ đến dữ liệu thực tiếp
 
-  ◦ Hỗ trợ nhiều cấp con trỏ(vd:`***` cho con trỏ cấp 3),nhưng cấp 2 là phổ biến nhất
+    ◦ Hỗ trợ nhiều cấp con trỏ(vd:`***` cho con trỏ cấp 3),nhưng cấp 2 là phổ biến nhất
 
-* **Cú pháp**
+        #include <stdio.h>
 
-  ```
-  type **pointer_name;
-  ```
-  ◦ `type:` Kiểu dữ liệu của biến cuối cùng mà con trỏ cấp 1 trỏ tới(vd: `int`,`char`,`float`)
+        int main() {
+            int data = 42;          // Dữ liệu gốc
+            
+            //  CON TRỎ CẤP 1 - trỏ đến data
 
-  ◦ `pointer_name:` Tên con trỏ cấp 2
+            int *ptr1 = &data;
+            
+            //  CON TRỎ CẤP 2 - trỏ đến ptr1 
 
-  VD:
-  ```
-  int **ptr
-  ```
+            int **ptr2 = &ptr1;
+            
+            //  CON TRỎ CẤP 3 - trỏ đến ptr2
 
-#### **3.4.2.Gán giá trị**
+            int ***ptr3 = &ptr2;
+            
+            printf("Dữ liệu gốc: %d\n", data);           // 42
+            
+            printf("\n=== CẤP 1 ===\n");
+            printf("ptr1 = %p\n", ptr1);                 // Địa chỉ của data
+            printf("*ptr1 = %d\n", *ptr1);               // 42
+            
+            printf("\n=== CẤP 2 ===\n");
+            printf("ptr2 = %p\n", ptr2);                 // Địa chỉ của ptr1
+            printf("*ptr2 = %p\n", *ptr2);               // Địa chỉ của data  
+            printf("**ptr2 = %d\n", **ptr2);             // 42
+            
+            printf("\n=== CẤP 3 ===\n");
+            printf("ptr3 = %p\n", ptr3);                 // Địa chỉ của ptr2
+            printf("*ptr3 = %p\n", *ptr3);               // Địa chỉ của ptr1
+            printf("**ptr3 = %p\n", **ptr3);             // Địa chỉ của data
+            printf("***ptr3 = %d\n", ***ptr3);           // 42
+            
+            return 0;
+        }
+
+
+        BỘ NHỚ:
+        ┌───────────┐     ┌───────────┐     ┌───────────┐     ┌───────────┐
+        │   data    │ ← ─ │    p1     │ ← ─ │    p2     │ ← ─ │    p3     │
+        │    42     │     │ 0x1000    │     │ 0x2000    │     │ 0x3000    │
+        └───────────┘     └───────────┘     └───────────┘     └───────────┘
+        0x1000             0x2000             0x3000             0x4000
+
+        *ptr1    = data    = 42
+        **ptr2   = *ptr1   = data    = 42  
+        ***ptr3  = **ptr2  = *ptr1   = data    = 42
+
+
+* **Cú pháp:**
+
+  
+        type **pointer_name;
+  
+    ◦ `type:` Kiểu dữ liệu của biến cuối cùng mà con trỏ cấp 1 trỏ tới(vd: `int`,`char`,`float`)
+
+    ◦ `pointer_name:` Tên con trỏ cấp 2
+
+* **VD:**
+
+        #include <stdio.h>
+
+        int main() {
+            int x = 10;
+            int *ptr = &x;                  // Cấp 1
+            int **ptr_to_ptr = &ptr;        // Cấp 2
+            return 0;
+        }
+
+
+#### **4.2.Gán giá trị**
 
 * Gán địa chỉ của một con trỏ cấp 1 cho con trỏ cấp 2
 
-```
-pointer_name = &pointer_level_1;
-```
-VD:
-```
-int x = 10;
-int *ptr = &x;
-int **ptr_to_ptr = &ptr;
-```
-#### **3.4.3.Truy cập giá trị**
+
+        pointer_name = &pointer_level_1;
+
+* **VD:**
+
+
+        int x = 10;
+        int *ptr = &x;
+        int **ptr_to_ptr = &ptr;
+
+#### **4.3.Truy cập giá trị**
 
 * `ptr_to_ptr:` Địa chỉ của con trỏ cấp 1
+
 * `*ptr_to_ptr:` Giá trị của con trỏ cấp 1,tức là địa chỉ của dữ liệu cuối cùng
+
 * `**ptr_to_ptr:` Giá trị dữ liệu cuối cùng mà con trỏ cấp 1 trỏ tới
 
-```
-#include <stdio.h>
-int main() {
-    int x = 10;
-    int *ptr = &x;              // Con trỏ cấp 1 trỏ đến x
-    int **ptr_to_ptr = &ptr;    // Con trỏ cấp 2 trỏ đến ptr
-    
-    printf("Địa chỉ của ptr: %p\n", ptr_to_ptr);        // Địa chỉ của ptr
-    printf("Địa chỉ của x: %p\n", *ptr_to_ptr);         // Địa chỉ của x
-    printf("Giá trị của x: %d\n", **ptr_to_ptr);        // Giá trị x = 10
-    
-    **ptr_to_ptr = 20; // Thay đổi giá trị x thông qua ptr_to_ptr
-    printf("Giá trị mới của x: %d\n", x);               // x = 20
-    return 0;
-}
 
-```
-#### **3.4.4.Ứng dụng**
+        #include <stdio.h>
+        int main() {
+            int x = 10;
+            int *ptr = &x;              // Con trỏ cấp 1 trỏ đến x
+            int **ptr_to_ptr = &ptr;    // Con trỏ cấp 2 trỏ đến ptr
+            
+            printf("Địa chỉ của ptr: %p\n", ptr_to_ptr);        // Địa chỉ của ptr
+            printf("Địa chỉ của x: %p\n", *ptr_to_ptr);         // Địa chỉ của x
+            printf("Giá trị của x: %d\n", **ptr_to_ptr);        // Giá trị x = 10
+            
+            **ptr_to_ptr = 20; // Thay đổi giá trị x thông qua ptr_to_ptr
+            printf("Giá trị mới của x: %d\n", x);               // x = 20
+            return 0;
+        }
+
+
+#### **4.4.Ứng dụng**
 
 * **Pass-by-reference cho con trỏ**
 
-  ◦ Cho phép hàm thay đổi con trỏ cấp 1 được truyền vào
+    ◦ Cho phép hàm thay đổi con trỏ cấp 1 được truyền vào
 
-  ```
-  #include<stdio.h>
+  
+        #include <stdio.h>
 
-  void change_pointer(int **p, int *new_ptr){
-    *pp = new_ptr;
-  }
+        void change_pointer(int **pp, int *new_ptr) {
+            *pp = new_ptr;  // Thay đổi con trỏ cấp 1
+        }
 
-  int main(){
-    int x = 10, y = 20;
-    int *ptr = &x;
-    int **ptr_to_ptr = &x;
-    int **ptr_to_ptr = &ptr;
-
-    printf("Before: %d\n", *ptr);
-    change_pointer(ptr_to_ptr, &y);
-    printf("After: %d\n",*ptr);
-    return 0;
-  }
+        int main() {
+            int x = 10, y = 20;
+            int *ptr = &x;
+            int **ptr_to_ptr = &ptr;
+            printf("Before: %d\n", *ptr);  // 10
+            change_pointer(ptr_to_ptr, &y);
+            printf("After: %d\n", *ptr);   // 20
+            return 0;
+        }
 
 * **Quản lý mảng các chuỗi:**
 
-  ◦ Sử dụng `char **` để lưu trữ danh sách các chuỗi(mảng con trỏ kiểu `char *`)
+    ◦ Sử dụng `char **` để lưu trữ danh sách các chuỗi(mảng con trỏ kiểu `char *`)
 
-  ```
-  #include<stdio.h>
-  int main(int argc, char ** argv){
-    for(int i=0;i<argc;i++){
-      printf("Argument %d: %s\n", i, argv[i]);
-    }
-    return 0;
-  }
+  
+        #include <stdio.h>
 
-  ```
+        int main(int argc, char **argv) {
+            for (int i = 0; i < argc; i++) {
+                printf("Arg %d: %s\n", i, argv[i]);
+            }
+            return 0;
+        }
+
+  
 
 * **Cấp phát và quản lý mảng 2 chiều động**
 
-  ◦ Mảng 2 chiều động được biểu diễn như mảng các con trỏ,mỗi con trỏ trỏ đến một hàng
+    ◦ Mảng 2 chiều động được biểu diễn như mảng các con trỏ,mỗi con trỏ trỏ đến một hàng
 
   VD: Cấp phát mảng 2 chiều 3x4
-  ```
-  #include<stdio.h>
-  #include<stdlib.h>
+  
+        #include<stdio.h>
+        #include<stdlib.h>
 
-  int main(){
-    int rows = 3, cols = 4;
-    int **matrix;
+        int main(){
+            int rows = 3, cols = 4;
+            int **matrix;
 
-    matrix = (int **)malloc(rows * sizeof(int *));
-    for (int i = 0; i < rows; i++){
-      matrix[i] = (int *)malloc(cols * sizeof(int));
-    }
+            matrix = (int **)malloc(rows * sizeof(int *));
+            for (int i = 0; i < rows; i++){
+            matrix[i] = (int *)malloc(cols * sizeof(int));
+            }
 
-    //gán giá trị
-    for (int i = 0; i < rows; i++){
-      for(int j = 0; j < cols; j++){
-        matrix[i][j] = i * cols + j; 
-      }
-    }
+            //gán giá trị
+            for (int i = 0; i < rows; i++){
+            for(int j = 0; j < cols; j++){
+                matrix[i][j] = i * cols + j; 
+            }
+            }
 
-    //In mảng
-    for(int i = 0;i < rows; i++){
-      for(int j = 0; j < cols; j++){
-        printf("%d", matrix[i][j]);
-      }
-      printf("\n");
-    }
+            //In mảng
+            for(int i = 0;i < rows; i++){
+            for(int j = 0; j < cols; j++){
+                printf("%d", matrix[i][j]);
+            }
+            printf("\n");
+            }
 
-    //Giải phóng bộ nhớ
-    for(int i = 0;i < rows; i++){
-      free(matrix[i]);
-    }
-    free(matrix);
-    return 0;
-    
-  }
-  ```
+            //Giải phóng bộ nhớ
+            for(int i = 0;i < rows; i++){
+            free(matrix[i]);
+            }
+            free(matrix);
+            return 0;
+            
+        }
+  
 
-### **3.5.Const Pointer - Con trỏ hằng số và hằng con trỏ**   
+### **V.Const Pointer - Con trỏ hằng số và hằng con trỏ**   
 
-#### **3.5.1.Định nghĩa**
+#### **5.1.Định nghĩa**
 
 * **Con trỏ hằng số và hằng con trỏ** là các con trỏ trong C/C++ sử dụng từ khóa `const` để hạn chế việc thay đổi giá trị mà con trỏ trỏ tới hoặc địa chỉ mà con trỏ lưu trữ
 
-#### **3.5.2.Phân loại**
+#### **5.2.Phân loại**
 
- *  **1.** `const int *ptr` hoặc `int const *ptr`: Con trỏ trỏ tới một giá trị hằng(`int` không thể thay đổi, nhưng địa chỉ mà `ptr` trỏ tới có thể thay đổi)
+*  **1.** `const int *ptr` hoặc `int const *ptr`: 
 
- *  **2.** `int * const ptr`: Hằng con trỏ trỏ tới một giá trị `int`(**địa chỉ** mà `ptr` trỏ tới **không thể thay đổi**, **giá trị** tại địa chỉ đó **có thể thay đổi**)
+    ◦  Con trỏ trỏ tới một giá trị hằng(`int` không thể thay đổi, nhưng địa chỉ mà `ptr` trỏ tới có thể thay đổi)
 
- *  **3.** `const int * const ptr` hoặc `int const * const ptr`:Hằng con trỏ trỏ tới một giá trị hằng(**cả giá trị và địa chỉ đều không thể thay đổi**)
+ *  **2.** `int * const ptr`: 
 
-#### **3.5.3.Đặc điểm**
+    ◦  Hằng con trỏ trỏ tới một giá trị `int`(**địa chỉ** mà `ptr` trỏ tới **không thể thay đổi**, **giá trị** tại địa chỉ đó **có thể thay đổi**)
 
-   * **Đọc từ phải sang trái:** Cú pháp `const` được hiểu theo cách đọc từ phải sang trái để xác định `const` áp dụng cho giá trị hay con trỏ
+ *  **3.** `const int * const ptr` hoặc `int const * const ptr`:
 
-   * **Tính bất biến:** 
+    ◦  Hằng con trỏ trỏ tới một giá trị hằng(**cả giá trị và địa chỉ đều không thể thay đổi**
+
+#### **5.3.Đặc điểm**
+
+* **Đọc từ phải sang trái:** Cú pháp `const` được hiểu theo cách đọc từ phải sang trái để xác định `const` áp dụng cho giá trị hay con trỏ
+
+        const int *ptr     → "ptr là con trỏ đến int hằng"
+        int * const ptr    → "ptr là con trỏ hằng đến int"  
+        const int * const ptr → "ptr là con trỏ hằng đến int hằng"
+
+* **Tính bất biến:** 
     
-    const int *ptr: Giá trị tại `*ptr` là bất biến
+    ◦ `const int *ptr`: Giá trị tại `*ptr` là bất biến
+
+            int a = 10, b = 20;
+            
+            // 1. const int *ptr - GIÁ TRỊ là bất biến
+            const int *ptr1 = &a;
+            // *ptr1 = 30;  //  LỖI: Không thể thay đổi giá trị
+            ptr1 = &b;      //  ĐƯỢC: Có thể thay đổi địa chỉ
+            printf("ptr1: %d\n", *ptr1);  // 20
+
+    ◦ `int * const ptr`: Địa chỉ mà `ptr` lưu trữ là bất biến
+
+            int a = 10, b = 20;
+            int * const ptr2 = &a;
+            *ptr2 = 30;     //  ĐƯỢC: Có thể thay đổi giá trị
+            // ptr2 = &b;   //  LỖI: Không thể thay đổi địa chỉ
+            printf("ptr2: %d\n", *ptr2);  // 30
+
+    ◦ `const int * const ptr`: Cả giá trị và địa chỉ đều bất biến
+
+            int a = 10, b = 20;
+            const int * const ptr3 = &a;
+            // *ptr3 = 40;  //  LỖI: Không thể thay đổi giá trị
+            // ptr3 = &b;   //  LỚI: Không thể thay đổi địa chỉ
+            printf("ptr3: %d\n", *ptr3);  // 30
+
+
+* **Khởi tạo:** Hằng con trỏ phải được khởi tạo khi khai báo
+
+            int x = 5;
+
+            //  ĐÚNG - Khởi tạo ngay khi khai báo
+
+            int * const ptr1 = &x;          
+            const int * const ptr2 = &x;
+
+            //  SAI - Thiếu khởi tạo
+
+            // int * const ptr3;  // LỖI: hằng con trỏ phải được khởi tạo
+
+#### **5.4.Cú pháp**
+
+
+* **Con trỏ trỏ tới giá trị hằng**
     
-    int * const ptr: Địa chỉ mà `ptr` lưu trữ là bất biến
- 
-    const int * const ptr: Cả giá trị và địa chỉ đều bất biến
+        const [kiểu_dữ_liệu] *ptr;
+    
+* **Hằng con trỏ trỏ tới giá trị**
+    
+        [kiểu_dữ_liệu] * const ptr = &biến;
+    
+* **Hằng con trỏ tới giá trị hằng**
+    
+        const [kiểu_dữ_liệu] * const ptr = &biến;
+    
+#### **5.5.Gán giá trị và sử dụng**
+
+* VD1: `const int *ptr`
+
   
-   * **Khởi tạo:** Hằng con trỏ phải được khởi tạo khi khai báo
+        #include<stdio.h>
+        int main(){
+            int x = 10, y = 20;
+            const int *ptr = &x; //ptr trỏ tới x
+            ptr = &y; //thay đổi địa chỉ
+            printf("%d\n", *ptr);
+            return 0;
+        }
+  
+* VD2: int * const ptr
 
-#### **3.5.4.Cú pháp**
+  
+        #include<stdio.h>
+        int main(){
+            int x = 10, y = 20;
+            int * const ptr = &x;
+            *ptr = 15;
 
+            printf("%d\n", *ptr);
+            return 0;
+        }
+  
+* VD3: const int * const ptr
+  
 
-   * **Con trỏ trỏ tới giá trị hằng**
-    
-    const int * ptr;
-    
-   * **Hằng con trỏ trỏ tới giá trị**
-    
-    int * const ptr = &variable;
-    
-   * **Hằng con trỏ tới giá trị hằng**
-    
-    const int * const ptr = &variable;
-    
-#### **3.5.5.Gán giá trị và sử dụng**
+        #include<stdlib.h>
+        int main(){
+            int x = 10;
+            const int * const ptr = &x;
 
-  * VD1: const int *ptr
-  ```
-  #include<stdio.h>
-  int main(){
-    int x = 10, y = 20;
-    const int *ptr = &x; //ptr trỏ tới x
-    ptr = &y; //thay đổi địa chỉ
-    printf("%d\n", *ptr);
-    return 0;
-  }
-  ```
-  * VD2: int * const ptr
-  ```
-  #include<stdio.h>
-  int main(){
-    int x = 10, y = 20;
-    int * const ptr = &x;
-    *ptr = 15;
+            printf("%d\n", *ptr);
+            return 0;
+        }
+  
 
-    printf("%d\n", *ptr);
-    return 0;
-  }
-  ```
-  * VD3: const int * const ptr
-  ```
-  #include<stdlib.h>
-  int main(){
-    int x = 10;
-    const int * const ptr = &x;
+### **VI.Size of Pointer - Kích thước của con trỏ**
 
-    printf("%d\n", *ptr);
-    return 0;
-  }
-  ```
-
-### **3.6.Size of Pointer - Kích thước của con trỏ**
-
-#### **3.6.1.Định nghĩa**
+#### **6.1.Định nghĩa**
 
 * **Toán tử sizeof():**
 
-  ◦ Toán tử `sizeof()` trả về kích thước (tính bằng byte) của 1 biến hoặc 1 kiểu dữ liệu
+    ◦ Toán tử `sizeof()` trả về kích thước (tính bằng byte) của 1 biến hoặc 1 kiểu dữ liệu
 
-  ◦ Khi áp dụng với con trỏ, `sizeof(pointer_variable)` hoặc `sizeof(pointer_type)` trả về kích thước của chính biến con trỏ
+    ◦ Khi áp dụng với con trỏ, `sizeof(pointer_variable)` hoặc `sizeof(pointer_type)` trả về kích thước của chính biến con trỏ
 
-  ◦ Khi áp dụng với toán tử giải tham chiếu `*`,`sizeof(*pointer_variable)` trả về kích thước của kiểu dữ liệu mà con trỏ trỏ tới
+    ◦ Khi áp dụng với toán tử giải tham chiếu `*`,`sizeof(*pointer_variable)` trả về kích thước của kiểu dữ liệu mà con trỏ trỏ tới
 
-#### **3.6.2.Kích thước của con trỏ**
+#### **6.2.Kích thước của con trỏ**
 
 * Kích thước của con trỏ không phụ thuộc vào kiểu dữ liệu mà nó trỏ tới
 
-  VD: `int*`, `char*`, `double*` hoặc `void*` đều có kích thước giống nhau trên cùng 1 hệ thống
+    VD: `int*`, `char*`, `double*` hoặc `void*` đều có kích thước giống nhau trên cùng 1 hệ thống (4 bytes 32-bit; 8 bytes 64-bit).
 
 * Kích thước của con trỏ phụ thuộc vào kiến trúc hệ thống
 
-  ◦ **32-bit:** Con trỏ thường có kích thước **4 byte**
+    ◦ **32-bit:** Con trỏ thường có kích thước **4 byte**
 
-  ◦ **64-bit:** Con trỏ thường có kích thước 8 byte
+    ◦ **64-bit:** Con trỏ thường có kích thước 8 byte
 
 * Con trỏ chỉ lưu trữ địa chỉ bộ nhớ,và kích thước của địa chỉ này phụ thuộc vào không gian địa chỉ mà hệ thống hỗ trợ
 
-#### **3.6.3.Kích thước của kiểu dữ liệu mà con trỏ trỏ tới**
+#### **6.3.Kích thước của kiểu dữ liệu mà con trỏ trỏ tới**
 
 * Khi sử dụng `sizeof(*pointer_variable)`,kết quả trả về là kích thước của kiểu dữ liệu mà con trỏ trỏ tới
 
-```
-VD:
-sizeof(int): thường là 4 byte
-sizeof(char): thường là 1 byte
-sizeof(double): thường là 8 byte
-```
 
-#### **3.6.4.Lưu ý**
+* VD:
+        sizeof(int): thường là 4 byte
+        sizeof(char): thường là 1 byte
+        sizeof(double): thường là 8 byte
+
+
+#### **6.4.Lưu ý**
 
 * Kích thước của con trỏ có thể khác nhau giữa các hệ thống hoặc trình biên dịch
 
 * Toán tử `sizeof()` là 1 toán tử thời gian biên dịch(compile-time) không phụ thuộc vào giá trị của biến tại thời điểm chạy
 
-```
-#include<stdio.h>
 
-int main(){
-  int *int_ptr;
-  char *char_ptr;
-  double *double_ptr;
-  void *void_ptr;
+        #include<stdio.h>
 
-  int a ='10';
-  char b = 'A';
-  double c = '3.14';
- 
-  //In kích thước của các con trỏ
-  printf("Size cua int*: %zu bytes\n", sizeof(int_ptr));
-  printf("Size cua char*: %zu bytes\n", sizeof(char_ptr));
-  printf("Size cua double*: %zu bytes\n",sizeof(double_ptr));
-  printf("Size cua void*: %zu bytes\n",sizeof(void_ptr));
+        int main(){
+        int *int_ptr;
+        char *char_ptr;
+        double *double_ptr;
+        void *void_ptr;
 
-  //In kích thước của các kiểu dữ liệu mà con trỏ trỏ tới
-  printf("Size cua kieu int: %zu bytes\n",sizeof(*int_ptr));
-  printf("Size cua kieu char: %zu bytes\n",sizeof(*char_ptr));
-  printf("Size cua kieu double: %zu bytes\n",sizeof(*double_ptr));
-  printf("Size cua kieu void: %zu bytes\n",sizeof(*void_ptr));
+        int a ='10';
+        char b = 'A';
+        double c = '3.14';
+        
+        //In kích thước của các con trỏ
+        printf("Size cua int*: %zu bytes\n", sizeof(int_ptr));
+        printf("Size cua char*: %zu bytes\n", sizeof(char_ptr));
+        printf("Size cua double*: %zu bytes\n",sizeof(double_ptr));
+        printf("Size cua void*: %zu bytes\n",sizeof(void_ptr));
 
-  //In kích thước của các biến
-  printf("Size cua bien int: %zu bytes\n",sizeof(a));
-  printf("Size cua bien char: %zu bytes\n",sizeof(b));
-  printf("Size cua bien doublr: %zu bytes\n",sizeof(c));
+        //In kích thước của các kiểu dữ liệu mà con trỏ trỏ tới
+        printf("Size cua kieu int: %zu bytes\n",sizeof(*int_ptr));
+        printf("Size cua kieu char: %zu bytes\n",sizeof(*char_ptr));
+        printf("Size cua kieu double: %zu bytes\n",sizeof(*double_ptr));
+        printf("Size cua kieu void: %zu bytes\n",sizeof(*void_ptr));
 
-  return 0;
-}
-```
+        //In kích thước của các biến
+        printf("Size cua bien int: %zu bytes\n",sizeof(a));
+        printf("Size cua bien char: %zu bytes\n",sizeof(b));
+        printf("Size cua bien doublr: %zu bytes\n",sizeof(c));
 
-```
-Size cua int*: 8 bytes
-Size cua char*: 8 bytes
-Size cua double*: 8 bytes
-Size cua void*: 8 bytes
-Size cua kieu int: 4 bytes
-Size cua kieu char: 1 bytes
-Size cua kieu double: 8 bytes
-Size cua bien int: 4 bytes
-Size cua bien char: 1 bytes
-Size cua bien double: 8 bytes
-```
+        return 0;
+        }
+
+
+        // Output:
+
+        Size cua int*: 8 bytes
+        Size cua char*: 8 bytes
+        Size cua double*: 8 bytes
+        Size cua void*: 8 bytes
+        Size cua kieu int: 4 bytes
+        Size cua kieu char: 1 bytes
+        Size cua kieu double: 8 bytes
+        Size cua bien int: 4 bytes
+        Size cua bien char: 1 bytes
+        Size cua bien double: 8 bytes
+
 
 * Kiểm tra kích thước con trỏ trong Mảng
-```
-#include<stdio.h>
-int main(){
-  int arr[5]={1, 2, 3, 4, 5};
-  int *ptr = arr;
 
-  printf("Size cua con tro ptr: %zu bytes \n",sizeof(ptr));
-  printf("Size cua kieu du lieu ma ptr tro toi: %zu bytes\n", sizeof(*ptr));
-  printf("Size cua mang arr: %zu bytes\n",sizeof(arr));
 
-  return 0;
-}
-```
+        #include<stdio.h>
+        int main(){
+        int arr[5]={1, 2, 3, 4, 5};
+        int *ptr = arr;
 
-```
-Size cua con tro ptr: 8 bytes
-Size cua kieu du lieu ma ptr tro toi: 4 bytes
-Size cua mang arr: 20 bytes
-```
+        printf("Size cua con tro ptr: %zu bytes \n",sizeof(ptr));
+        printf("Size cua kieu du lieu ma ptr tro toi: %zu bytes\n", sizeof(*ptr));
+        printf("Size cua mang arr: %zu bytes\n",sizeof(arr));
+
+        return 0;
+        }
+
+
+        // Output:
+        Size cua con tro ptr: 8 bytes
+        Size cua kieu du lieu ma ptr tro toi: 4 bytes
+        Size cua mang arr: 20 bytes
+
 
 * Con trỏ hàm
 
-```
-#include<stdio.h>
 
-void myFunction(){
-  printf("This is a function.\");
-}
+        #include<stdio.h>
 
-int main(){
-  void (*func_ptr)() = myFunction;
+        void myFunction(){
+        printf("This is a function.\");
+        }
 
-    printf("Kich thuoc cua con tro ham: %zu bytes\n", sizeof(func_ptr));
+        int main(){
+        void (*func_ptr)() = myFunction;
 
-    return 0;
-}
-```
-```
-Kich thuoc cua con tro ham: 8 bytes
-```
+            printf("Kich thuoc cua con tro ham: %zu bytes\n", sizeof(func_ptr));
+
+            return 0;
+        }
+
+        //Output:
+        Kich thuoc cua con tro ham: 8 bytes
+
    </details> 
 
 
 <details>
-	<summary><strong>BÀI 4: Special Variables</strong></summary>
+	<summary><strong>BÀI 4: SPECIAL VARIABLES</strong></summary>
 
-## **Bài 4: Special Variables**
+## **BÀI 4: SPECIAL VARIABLES**
 
-### **4.1.Tổng quan**
+### **I.Tổng quan**
 
 * Trong lập trình C, các biến và hàm được đặc trưng bởi bốn thuộc tính chính: **phạm vi (scope), thời gian sống (lifetime), vị trí bộ nhớ (memory location), và liên kết (linkage).** Những thuộc tính này quyết định cách truy cập, lưu trữ và liên kết các biến và hàm trong chương trình.
 
-*  **Phạm vi(Scope):** Xác định nơi mà tên biến hoặc hàm có thể được truy cập.
+    ◦ **Phạm vi(Scope):** Xác định nơi mà tên biến hoặc hàm có thể được truy cập.
 
-*  **Thời gian tồn tại(Lifetime):** Khoảng thời gian biến tồn tại trong bộ nhớ
+    ◦  **Thời gian tồn tại(Lifetime):** Khoảng thời gian biến tồn tại trong bộ nhớ
 
-*  **Vị trí bộ nhớ(Memory Location):**
+    ◦  **Vị trí bộ nhớ(Memory Location):** Khu vực bộ nhớ nơi biến được lưu trữ.
 
-*  **Liên kết(Linkage):** Quy định khả năng tham chiếu đến tên biến hoặc hàm từ các đơn vị dịch (translation unit) khác.
+    ◦  **Liên kết(Linkage):** Quy định khả năng tham chiếu tên từ các tệp nguồn khác
 
-### **4.2.Phạm vi (Scope)** 
+#### **1.1. Phạm vi (Scope)** 
 
-*  Phạm vi xác định nơi mà tên của biến hoặc hàm có thể được truy cập trong chương trình.
+##### **1.1.1.Phạm vi khối (Block Scope):**
 
-#### **4.2.1.Phạm vi khối (Block Scope):**
-
-* Biến được khai báo bên trong một khối lệnh (giới hạn bởi cặp dấu {}).
+* Biến được khai báo bên trong một khối lệnh (giới hạn bởi cặp dấu `{}`).
 
 * Chỉ có thể truy cập trong khối lệnh chứa nó.
 
 * Ví dụ: Biến cục bộ trong hàm hoặc trong một khối for, while.
 
-#### **4.2.2.Phạm vi tệp (File Scope):**
+        #include <stdio.h>
+
+        int main() {
+            int x = 10;  // Block scope của main
+            {
+                int x = 20;  // Block scope con, che khuất x bên ngoài
+                printf("Inner x: %d\n", x);  // 20
+            }
+            printf("Outer x: %d\n", x);  // 10
+            return 0;
+        }
+
+##### **1.1.2.Phạm vi tệp (File Scope):**
 
 * Biến hoặc hàm được khai báo bên ngoài tất cả các hàm trong một tệp.
 
+        #include <stdio.h>
+
+        // Khai báo bên ngoài tất cả hàm - file scope
+        int globalCounter = 0;
+
+        void increment() {
+            globalCounter++;
+        }
+
+        void display() {
+            printf("Counter: %d\n", globalCounter);
+        }
+
+        int main() {
+            increment();
+            display();  // Counter: 1
+            increment();
+            display();  // Counter: 2
+            return 0;
+        }
+
 * Thường được gọi là biến hoặc hàm toàn cục (global) trong tệp đó.
 
-* Có thể truy cập ở bất kỳ đâu trong tệp, trừ khi bị hạn chế bởi từ khóa như static.
+        #include <stdio.h>
 
-#### **4.2.3.Phạm vi prototype hàm (Function Prototype Scope):**
+        int globalVar = 100;
+
+        void functionA() {
+            printf("functionA: %d\n", globalVar);  // Truy cập được
+            globalVar = 200;
+        }
+
+        void functionB() {
+            printf("functionB: %d\n", globalVar);  // Truy cập được
+            globalVar = 300;
+        }
+
+        int main() {
+            printf("main: %d\n", globalVar);  // Truy cập được
+            functionA();
+            functionB();
+            printf("main: %d\n", globalVar);  // Truy cập được
+            return 0;
+        }
+
+* Có thể truy cập ở bất kỳ đâu trong tệp, trừ khi bị hạn chế bởi từ khóa như `static`.
+
+        #include <stdio.h>
+
+        // Biến static - chỉ dùng trong tệp này
+        static int privateCounter = 0;
+
+        void increaseCounter() {
+            privateCounter++;
+            printf("Internal counter: %d\n", privateCounter);
+        }
+
+        int main() {
+            increaseCounter();  // Internal counter: 1
+            increaseCounter();  // Internal counter: 2
+            // privateCounter không thể truy cập từ tệp khác
+            return 0;
+        }
+
+##### **1.1.3.Phạm vi prototype hàm (Function Prototype Scope):**
 
 * Áp dụng cho các tham số trong khai báo hàm (prototype).
 
 * Chỉ tồn tại trong phần khai báo hàm và không ảnh hưởng đến định nghĩa hàm.
-```
-int globalVar = 10; // File scope
-void myFunction(int param) { // param có Function Prototype Scope
-    int localVar = 5; // Block scope
-    printf("%d\n", localVar);
-}
-```
-### **4.3.Thời gian sống (Lifetime)** 
 
-* Thời gian sống xác định khoảng thời gian một biến tồn tại trong bộ nhớ.
 
-#### **4.3.1.Tự động (Automatic):**
+        int globalVar = 10; // File scope
+        void myFunction(int param) { // param có Function Prototype Scope
+            int localVar = 5; // Block scope
+            printf("%d\n", localVar);
+        }
+
+#### **1.2.Thời gian sống (Lifetime)** 
+
+##### **1.2.1.Tự động (Automatic):**
 
 * Biến cục bộ (local variable) được khai báo trong một khối lệnh.
+
 * Tồn tại chỉ khi khối lệnh chứa nó đang thực thi.
+
 * Bị hủy khi thoát khỏi khối lệnh.
 
-#### **4.3.2.Tĩnh (Static):**
+##### **1.2.2.Tĩnh (Static):**
 
 * Bao gồm biến toàn cục, biến static cục bộ, và biến extern
+
 * Tồn tại suốt vòng đời của chương trình, từ khi bắt đầu đến khi kết thúc.
+
 * Chỉ được khởi tạo một lần khi chương trình khởi động.
-```
-void counter() {
-    static int count = 0; // Biến static, tồn tại suốt chương trình
-    count++;
-    printf("Count: %d\n", count);
-}
 
-int main() {
-    counter(); // In: Count: 1
-    counter(); // In: Count: 2
-    counter(); // In: Count: 3
-    return 0;
-}
-```
-### **4.4. Vị trí bộ nhớ (Memory Location)** 
 
-* Vị trí bộ nhớ xác định nơi mà biến hoặc mã lệnh được lưu trữ trong hệ thống
+        void counter() {
+            static int count = 0; // Biến static, tồn tại suốt chương trình
+            count++;
+            printf("Count: %d\n", count);
+        }
 
-#### **4.4.1.Stack**
+        int main() {
+            counter(); // In: Count: 1
+            counter(); // In: Count: 2
+            counter(); // In: Count: 3
+            return 0;
+        }
+
+##### **1.2.3.Động (Dynamic):**
+
+* Bộ nhớ cấp phát qua `malloc/calloc/realloc`; tồn tại đến khi `free`.
+
+* Không tự động giải phóng; quản lý thủ công để tránh leak.
+
+
+        #include <stdio.h>
+
+        void counter() {
+            static int count = 0;  // Khởi tạo một lần, giữ giá trị
+            count++;
+            printf("Count: %d\n", count);
+        }
+
+        int main() {
+            counter();  // 1
+            counter();  // 2
+            counter();  // 3
+            return 0;
+        }
+
+#### **1.3. Vị trí bộ nhớ (Memory Location)** 
+
+<img width="786" height="454" alt="Image" src="https://github.com/user-attachments/assets/66ad665c-7f57-4178-97d0-b01433a8e552" />
+
+##### **1.3.1.Stack**
 
 * Lưu trữ các biến cục bộ (automatic variables).
+
 * Bộ nhớ được cấp phát và giải phóng tự động khi khối lệnh thực thi hoặc kết thúc.
 
-#### **4.4.2.Data Segment**
+        #include <stdio.h>
+
+        void demoStack() {
+            int localVar = 5;  //  Tự động hủy khi hàm kết thúc
+            printf("Stack var: %d\n", localVar);
+        }
+
+        int main() {
+            demoStack();
+            // localVar ĐÃ BỊ HỦY - không tồn tại ở đây
+            return 0;
+        }
+
+##### **1.3.2.Data Segment**
 
 * Lưu trữ các biến toàn cục hoặc biến static đã được khởi tạo với giá trị khác 0.
-```
-Ví dụ: int globalVar = 10;
-```
-#### **4.4.3.BSS Segment**
+
+    ◦  Biến global
+
+        #include <stdio.h>
+
+        int globalVar = 10;  //  Tồn tại suốt chương trình
+
+        void useGlobal() {
+            globalVar++;
+            printf("Global: %d\n", globalVar);
+        }
+
+        int main() {
+            useGlobal();  // Global: 11
+            useGlobal();  // Global: 12 - giá trị được giữ lại
+            return 0;
+        }
+
+    ◦  Biến static
+
+
+        #include <stdio.h>
+
+        void demoStatic() {
+            static int staticVar = 5;  //  Tồn tại suốt chương trình
+            staticVar++;
+            printf("Static: %d\n", staticVar);
+        }
+
+        int main() {
+            demoStatic();  // Static: 6
+            demoStatic();  // Static: 7 - giá trị được giữ lại
+            demoStatic();  // Static: 8 - giá trị được giữ lại
+            return 0;
+        }
+
+##### **1.3.3.BSS Segment**
 
 * Lưu trữ các biến toàn cục hoặc biến static chưa được khởi tạo hoặc được khởi tạo bằng 0.
-```
-Ví dụ: int globalVar;
-```
 
-#### **4.4.4.Heap**
+
+        #include <stdio.h>
+
+        // BSS Segment - chưa khởi tạo
+        int uninitializedGlobal;
+
+        // BSS Segment - khởi tạo = 0
+        int zeroGlobal = 0;
+
+        void demoBSS() {
+            // BSS Segment - static chưa khởi tạo
+            static int uninitializedStatic;
+            
+            // BSS Segment - static = 0
+            static int zeroStatic = 0;
+            
+            printf("Uninit Global: %d\n", uninitializedGlobal);
+            printf("Zero Global: %d\n", zeroGlobal);
+            printf("Uninit Static: %d\n", uninitializedStatic);
+            printf("Zero Static: %d\n", zeroStatic);
+        }
+
+        int main() {
+            demoBSS();
+            return 0;
+        }
+
+        //Output:
+
+        Uninit Global: 0
+        Zero Global: 0
+        Uninit Static: 0
+        Zero Static: 0
+
+##### **1.3.4.Heap**
 
 * Lưu trữ bộ nhớ được cấp phát động thông qua các hàm như malloc, calloc, hoặc realloc.
 
-#### **4.4.5.Text Segment (Code Segment)**
+    ◦  Bộ nhớ động
+
+        #include <stdio.h>
+        #include <stdlib.h>
+
+        int main() {
+            //  Cấp phát heap
+            int* heapVar = (int*)malloc(sizeof(int));
+            *heapVar = 100;
+            
+            printf("Heap value: %d\n", *heapVar);  // 100
+            
+            //  Thay đổi giá trị
+            *heapVar = 200;
+            printf("After change: %d\n", *heapVar);  // 200
+            
+            //  Giải phóng heap
+            free(heapVar);
+            
+            return 0;
+        }
+
+    ◦  Mảng động
+
+        #include <stdio.h>
+        #include <stdlib.h>
+
+        int main() {
+            //  Cấp phát mảng trên heap
+            int size = 5;
+            int* arr = (int*)malloc(size * sizeof(int));
+            
+            // Sử dụng mảng
+            for(int i = 0; i < size; i++) {
+                arr[i] = i * 10;
+            }
+            
+            // In giá trị
+            for(int i = 0; i < size; i++) {
+                printf("arr[%d] = %d\n", i, arr[i]);
+            }
+            
+            //  Giải phóng
+            free(arr);
+            
+            return 0;
+        }
+
+##### **1.3.5.Text Segment (Code Segment)**
 
 * Lưu trữ mã lệnh của chương trình (các hàm).
 
-```
-int globalVar = 10; // Data Segment
-int uninitializedGlobalVar; // BSS Segment
-void myFunction() {
-    int localVar = 5; // Stack
-    int* dynamicVar = malloc(sizeof(int)); // Heap
-    // Text Segment chứa mã của myFunction
-}
-```
-### **4.5. Liên kết (Linkage)** 
+        #include <stdio.h>
 
-* Liên kết quyết định xem một tên (biến hoặc hàm) có thể được tham chiếu từ các tệp khác hay không.
+        //  Text Segment - hàm được lưu ở đây
+        void myFunction() {
+            printf("This function is in Text Segment\n");
+        }
 
-#### **4.5.1.Liên kết ngoài (External Linkage)**
+        int add(int a, int b) {
+            return a + b;  //  Mã thực thi trong Text Segment
+        }
+
+        int main() {
+            //  Gọi hàm - thực thi code từ Text Segment
+            myFunction();
+            
+            int result = add(5, 3);
+            printf("Result: %d\n", result);
+            
+            return 0;
+        }
+
+#### **1.4. Liên kết (Linkage)** 
+
+##### **1.4.1.Liên kết ngoài (External Linkage)**
 
 * Tên có thể được truy cập từ các tệp khác.
 
 * Áp dụng cho biến toàn cục (không có static) và hàm (không có static).
 
-* Ví dụ: Biến toàn cục hoặc prototype hàm không khai báo static.
+* Ví dụ: 
 
-#### **4.5.2.Liên kết nội (Internal Linkage)**
+    ◦  file1.c
+
+        #include <stdio.h>
+
+        //  External linkage - có thể dùng từ file khác
+
+        int globalCounter = 0;           // Biến toàn cục
+        void displayMessage();           // Prototype hàm
+
+        void incrementCounter() {
+            globalCounter++;
+            printf("Counter: %d\n", globalCounter);
+        }
+
+        int main() {
+            displayMessage();            // Gọi hàm từ file2.c
+            incrementCounter();
+            displayMessage();            // Gọi hàm từ file2.c
+            return 0;
+        }
+
+    ◦  file2.c
+
+        #include <stdio.h>
+
+        //  External linkage - khai báo lại biến từ file1.c
+        extern int globalCounter;
+
+        void displayMessage() {
+            //  Truy cập biến từ file1.c
+            printf("Message: Global counter = %d\n", globalCounter);
+        }
+
+    ◦  Cách biên dịch
+
+        gcc file1.c file2.c -o program
+        ./program
+
+    ◦  Output
+
+        Message: Global counter = 0
+        Counter: 1
+        Message: Global counter = 1
+
+##### **1.4.2.Liên kết nội (Internal Linkage)**
 
 * Tên chỉ có thể được truy cập trong tệp hiện tại.
 
 * Áp dụng cho biến toàn cục hoặc hàm được khai báo với từ khóa static.
 
-#### **4.5.3.Không liên kết (No Linkage)**
+* VD:
+
+    ◦  file1.c
+
+        #include <stdio.h>
+
+        //  Internal linkage - chỉ dùng trong file1.c
+        static int privateCounter = 0;
+        static void privateFunction();
+
+        void publicFunction() {
+            privateCounter++;
+            printf("File1: privateCounter = %d\n", privateCounter);
+            privateFunction();  //  Có thể gọi trong cùng file
+        }
+
+        static void privateFunction() {
+            printf("This is private to file1.c\n");
+            privateCounter += 10;  //  Có thể truy cập trong cùng file
+        }
+
+        int main() {
+            publicFunction();
+            publicFunction();
+            return 0;
+        }
+
+    ◦  file2.c
+
+        #include <stdio.h>
+
+        //  KHÔNG THỂ truy cập từ file khác
+
+        // extern int privateCounter;  // Lỗi biên dịch
+        // void privateFunction();     // Lỗi biên dịch
+
+        void tryToAccess() {
+
+            //  Tất cả đều không thể truy cập
+
+            // printf("Trying to access: %d\n", privateCounter);
+            // privateFunction();
+            printf("Cannot access private variables/functions from file1.c\n");
+        }
+
+    ◦   Biên dịch và chạy
+
+        gcc file1.c file2.c -o program
+        ./program
+
+    ◦  Output
+
+        File1: privateCounter = 1
+        This is private to file1.c
+        File1: privateCounter = 11
+        This is private to file1.c
+
+##### **1.4.3.Không liên kết (No Linkage)**
 
 * Tên chỉ có thể truy cập trong phạm vi khai báo (thường là biến cục bộ).
 
-```
-int globalVar = 10; // External Linkage
-static int staticGlobalVar = 20; // Internal Linkage
-void myFunction() {
-    int localVar = 5; // No Linkage
-}
-```
 
-### **4.6.Extern**
+        int globalVar = 10; // External Linkage
+        static int staticGlobalVar = 20; // Internal Linkage
+        void myFunction() {
+            int localVar = 5; // No Linkage
+        }
 
-#### **4.6.1.Mục đích**
 
-  * Extern là một **chỉ thị khai báo**
+### **II.Special Variables**
 
-  * **Khi dùng với biến:**
+#### **2.1. Extern**
 
-     ◦ Nó thông báo cho trình biên dịch **Biến này được định nghĩa ở đâu đó, có thể ở trong file này hoặc file khác.Đừng cấp phát bộ nhớ cho nó tại đây, chỉ cần biết kiểu và tên của nó thôi.Linker sẽ tìm định nghĩa sau**
+##### **2.1.1.Khái niệm**
 
-  * **Khi dùng với hàm:**
+* extern khai báo tên có định nghĩa ở nơi khác (external linkage).
 
-     ◦ **Nó khai báo một hàm mà định nghĩa của nó có thể ở file khác (hoặc ở phần sau của file hiện tại)**.Đối với hàm ,`extern` thường là ngầm định khi bạn khai báo prototype ở phạm vi toàn cục
+##### **2.1.2.Mục đích**
 
-#### **4.6.2.Ứng dụng**  
+* **Khi dùng với biến:**
 
- * **Chia sẻ biến toàn cục**
+    ◦ Nó thông báo cho trình biên dịch biến này được định nghĩa ở đâu đó, có thể ở trong file này hoặc file khác.
+    
+    ◦ Đừng cấp phát bộ nhớ cho nó tại đây, chỉ cần biết kiểu và tên của nó thôi.
+    
+    ◦ Linker sẽ tìm định nghĩa sau
+
+* **Khi dùng với hàm:**
+
+    ◦ Nó khai báo một hàm mà định nghĩa của nó có thể ở file khác (hoặc ở phần sau của file hiện tại).
+
+    ◦ Đối với hàm ,`extern` thường là ngầm định khi bạn khai báo prototype ở phạm vi toàn cục
+
+##### **2.1.3.Ứng dụng**  
+
+* **Chia sẻ biến toàn cục**
  
     ◦ File 1 (vd: config.c):
 
-    ```
-    //Định nghĩa biến toàn cục
-    int max_users = 100;
-    const char * server_name = "KMA";
-    ```
+    
+        //Định nghĩa biến toàn cục
+        int max_users = 100;
+        const char * server_name = "KMA";
+    
 
     ◦ File 2 (vd: main.c):
-    ```
-    #include <stdio.h>
-
     
-    extern int max_users;
-    extern const char* server_name; // Quan trọng: phải khớp kiểu, kể cả const
+        #include <stdio.h>
 
-    void display_config() {
-    printf("Server Name: %s\n", server_name);
-    printf("Max Users: %d\n", max_users);
-    }
+        
+        extern int max_users;
+        extern const char* server_name; // Quan trọng: phải khớp kiểu, kể cả const
 
-    int main() {
-    display_config();
-    max_users = 150; 
-    printf("Updated Max Users: %d\n", max_users);
-    return 0;
-    }
+        void display_config() {
+        printf("Server Name: %s\n", server_name);
+        printf("Max Users: %d\n", max_users);
+        }
 
+        int main() {
+        display_config();
+        max_users = 150; 
+        printf("Updated Max Users: %d\n", max_users);
+        return 0;
+        }
 
-    ```
- * **Khai báo hàm từ file khác**
+    ◦ Cách biên dịch
+
+        # Cách 1: Biên dịch cùng lúc
+        gcc config.c main.c -o program
+        ./program
+
+        # Cách 2: Biên dịch riêng rẽ
+        gcc -c config.c                # Tạo config.o
+        gcc -c main.c                  # Tạo main.o  
+        gcc config.o main.o -o program # Liên kết
+        ./program
+    
+* **Khai báo hàm từ file khác**
 
     ◦ File 1 (vd:math_utils.c):
-    ```
-    //Định nghĩa hàm
-    int add(int a, int b){
-      return a + b;
-    }
-    ```
+    
+        //Định nghĩa hàm
+        int add(int a, int b){
+        return a + b;
+        }
+    
     ◦ File 2 (vd:math_utils.h):
 
-    ```
-    #ifndef MATH_UTILS_H
-    #define MATH_UTILS_H
+    
+        #ifndef MATH_UTILS_H
+        #define MATH_UTILS_H
 
-    // Khai báo hàm (extern là ngầm định cho khai báo hàm ở phạm vi file)
-    // Viết tường minh extern cũng không sai: extern int add(int, int);
-    int add(int a, int b);
+        // Khai báo hàm (extern là ngầm định cho khai báo hàm ở phạm vi file)
+        // Viết tường minh extern cũng không sai: extern int add(int, int);
+        int add(int a, int b);
 
-    #endif
-    ```
+        #endif
+
 
     ◦ File 3 (vd:main.c):
 
-    ```
-    #include <stdio.h>
-    #include "math_utils.h" // Bao gồm khai báo hàm
-
-    int main() {
-    int result = add(5, 3);
-    printf("Sum: %d\n", result);
-    return 0;
-    }
-    ```
-
-
-### **4.7.Static**
-
-#### **4.7.1.Biến static cục bộ**
-
-* **Lifetime:** Tồn tại suốt vòng đời chương trình, được cấp phát trong **data segment (khởi tạo khác 0)** hoặc **bss segment (khởi tạo bằng 0 hoặc không khởi tạo)**
-
-* **Scope:** Chỉ truy cập được bên trong Hàm
-
-* **Khởi tạo:** 
-
-  ◦  Chỉ khởi tạo **1 lần** khi hàm được gọi lần đầu, 
-
-  ◦  Giữ giá trị giữa các lần gọi,Giá trị của nó không bị mất đi và được duy trì giữa các lần gọi hàm. 
     
-  ◦  Mỗi lần hàm được gọi, giá trị của biến chính bằng giá trị tại lần gần nhất hàm được gọi.
+        #include <stdio.h>
+        #include "math_utils.h" // Bao gồm khai báo hàm
+
+        int main() {
+        int result = add(5, 3);
+        printf("Sum: %d\n", result);
+        return 0;
+        }
+    
+    ◦ Cách biến dịch:
+
+        # Cách 1: Biên dịch trực tiếp
+        gcc math_utils.c main.c -o math_program
+        ./math_program
+
+        # Cách 2: Biên dịch từng bước
+        gcc -c math_utils.c           # Tạo math_utils.o
+        gcc -c main.c                 # Tạo main.o
+        gcc math_utils.o main.o -o math_program
+        ./math_program
 
 
+#### **2.2.Static**
 
-```
-void counter() {
-    static int count = 0; // Chỉ khởi tạo một lần
-    count++;
-    printf("Count: %d\n", count);
-}
+##### **2.2.1.Biến static cục bộ**
 
-int main() {
-    counter(); // In: Count: 1
-    counter(); // In: Count: 2
-    counter(); // In: Count: 3
-    return 0;
-}
-```
+* **Lifetime:** 
 
+    ◦ Tồn tại suốt vòng đời chương trình, được cấp phát trong **data segment (khởi tạo khác 0)** hoặc **bss segment (khởi tạo bằng 0 hoặc không khởi tạo)**
 
-#### **4.7.2.Biến static toàn cục**
+* **Scope:** 
 
-* **Lifetime:** Tồn tại **suốt vòng đời chương trình**,từ khi chương trình khởi động(trước khi hàm `main` chạy) đến khi chương trình kết thúc
-
-* **Scope:** Chỉ được truy cập **bên trong file`.c` được định nghĩa,không thể truy cập từ file khác,kể cả khi sử dụng extern
+    ◦ Chỉ truy cập được bên trong Hàm
 
 * **Khởi tạo:** 
 
-    Chỉ khởi tạo một lần duy nhất tại thời điểm chương trình khởi động (trước khi main được gọi).
+    ◦  Chỉ khởi tạo **1 lần** khi hàm được gọi lần đầu, 
 
-    Giá trị của biến toàn cục static không bị mất và được duy trì trong suốt thời gian chương trình chạy.
+    ◦  Giữ giá trị giữa các lần gọi,Giá trị của nó không bị mất đi và được duy trì giữa các lần gọi hàm. 
+    
+    ◦  Mỗi lần hàm được gọi, giá trị của biến chính bằng giá trị tại lần gần nhất hàm được gọi.
 
-    Mỗi lần giá trị biến được thay đổi (bởi bất kỳ hàm nào trong cùng file), giá trị mới sẽ được giữ và sử dụng cho các lần truy cập tiếp theo trong file.
 
-```
-// file1.c
-static int globalCount = 0; // Khởi tạo một lần khi chương trình chạy
+        void counter() {
+            static int count = 0; // Chỉ khởi tạo một lần
+            count++;
+            printf("Count: %d\n", count);
+        }
 
-void increment() {
-    globalCount++;
-    printf("Global Count: %d\n", globalCount);
-}
+        int main() {
+            counter(); // In: Count: 1
+            counter(); // In: Count: 2
+            counter(); // In: Count: 3
+            return 0;
+        }
 
-void print() {
-    printf("Current Count: %d\n", globalCount); // Giá trị được duy trì
-}
 
-int main() {
-    increment(); // In: Global Count: 1
-    increment(); // In: Global Count: 2
-    print();     // In: Current Count: 2
-    return 0;
-}
 
-// file2.c
-extern int globalCount; // Lỗi: không tìm thấy globalCount
-```
-### **4.8.Weak Symbols**  
+##### **2.2.2.Biến static toàn cục**
 
-#### **4.8.1.Định nghĩa**
+* **Lifetime:** 
+
+    ◦ Tồn tại **suốt vòng đời chương trình**,từ khi chương trình khởi động(trước khi hàm `main` chạy) đến khi chương trình kết thúc
+
+* **Scope:** 
+
+    ◦ Chỉ được truy cập **bên trong file`.c` được định nghĩa,không thể truy cập từ file khác,kể cả khi sử dụng extern
+
+* **Khởi tạo:** 
+
+    ◦ Chỉ khởi tạo một lần duy nhất tại thời điểm chương trình khởi động (trước khi main được gọi).
+
+    ◦ Giá trị của biến toàn cục static không bị mất và được duy trì trong suốt thời gian chương trình chạy.
+
+    ◦ Mỗi lần giá trị biến được thay đổi (bởi bất kỳ hàm nào trong cùng file), giá trị mới sẽ được giữ và sử dụng cho các lần truy cập tiếp theo trong file.
+
+
+        // file1.c
+        static int globalCount = 0; // Khởi tạo một lần khi chương trình chạy
+
+        void increment() {
+            globalCount++;
+            printf("Global Count: %d\n", globalCount);
+        }
+
+        void print() {
+            printf("Current Count: %d\n", globalCount); // Giá trị được duy trì
+        }
+
+        int main() {
+            increment(); // In: Global Count: 1
+            increment(); // In: Global Count: 2
+            print();     // In: Current Count: 2
+            return 0;
+        }
+
+        // file2.c
+        extern int globalCount; // Lỗi: không tìm thấy globalCount
+
+
+#### **2.3.Weak Symbols**  
+
+##### **2.3.1.Định nghĩa**
 
 * Từ khóa `__attribute__((weak))` (trong GCC) đánh dấu một hàm hoặc biến là`weak` symbol, cho phép định nghĩa khác thay thế nó trong quá trình liên kết (linking).
 
 * Mục đích: Cung cấp một định nghĩa mặc định có thể được ghi đè bởi định nghĩa mạnh hơn (strong symbol) trong file khác.
-#### **4.8.2.Đặc điểm**
+
+##### **2.3.2.Đặc điểm**
 
 * **Liên kết (Linkage):** Weak symbols có liên kết ngoài (external linkage), nhưng ưu tiên thấp hơn strong symbols.
 
 * **Ứng dụng:**Thường dùng trong hệ thống nhúng để: 
   
-  ◦ Cung cấp hàm mặc định cho xử lý ngắt (ISR) hoặc hàm khởi tạo phần cứng.
+    ◦ Cung cấp hàm mặc định cho xử lý ngắt (ISR) hoặc hàm khởi tạo phần cứng.
 
-  ◦ Cho phép người dùng ghi đè hàm mặc định mà không sửa mã nguồn gốc.
+    ◦ Cho phép người dùng ghi đè hàm mặc định mà không sửa mã nguồn gốc.
 
 * **Không bắt buộc:** Nếu không có định nghĩa mạnh hơn, weak symbol sẽ được sử dụng.
 
-#### **4.8.3.Cú pháp**
-```
-__attribute__((weak)) return_type function_name(parameters) {
-    // Thân hàm mặc định
-}
-```
+##### **2.3.3.Cú pháp**
 
-#### **4.8.4.VD**
-```
-// File: default_isr.c
-__attribute__((weak)) void TIM1_IRQHandler(void) {
-    printf("Default TIM1 Interrupt Handler\n");
-}
 
-// File: user_isr.c
-void TIM1_IRQHandler(void) {
-    printf("User-defined TIM1 Interrupt Handler\n");
-}
+    __attribute__((weak)) return_type function_name(parameters) {
+        // Thân hàm mặc định
+    }
 
-int main() {
-    TIM1_IRQHandler(); // Gọi định nghĩa mạnh từ user_isr.c
-    return 0;
-}
-```
+
+##### **2.3.4.VD1**
+
+
+    // default_isr.c
+    #include <stdio.h>
+
+    __attribute__((weak)) void TIM1_IRQHandler(void) {
+        printf("Default TIM1 ISR\n");
+    }
+
+    // user_isr.c
+    void TIM1_IRQHandler(void) {  // Strong, ghi đè
+        printf("User TIM1 ISR\n");
+    }
+
+    // main.c
+    int main() {
+        TIM1_IRQHandler();  // User TIM1 ISR
+        return 0;
+    }
+
+
 * **Kết quả:** In ra `User-defined TIM1 Interrupt Handler` vì định nghĩa mạnh trong `user_isr.c` ghi đè định nghĩa yếu
 
-#### **4.8.5.Lưu ý**
+##### **2.3.5.VD2**
 
-* **Hỗ trợ trình biên dịch:** __attribute__((weak)) là tính năng của GCC; các trình biên dịch khác có thể sử dụng cú pháp khác (như #pragma weak).
+
+        // default_config.c
+        #include <stdio.h>
+
+        __attribute__((weak)) int default_value = 42;
+
+        // user_config.c
+        int default_value = 100;  // Strong, ghi đè
+
+        // main.c
+        int main() {
+            printf("Value: %d\n", default_value);  // 100
+            return 0;
+        }
+
+
+#### **2.3.6.Lưu ý**
+
+* **Hỗ trợ trình biên dịch:** __attribute__((weak)) là tính năng của GCC; các trình biên dịch khác có thể sử dụng cú pháp khác (như `#pragma weak`).
 
 * **Ứng dụng nhúng:** Thường dùng trong các thư viện hoặc mã khởi động (bootloader) để cho phép tùy chỉnh xử lý ngắt hoặc hàm khởi tạo.
 
 * **Kiểm tra NULL:** Nếu không có định nghĩa mạnh, cần đảm bảo weak symbol xử lý an toàn.
 
-### **4.9.Volatile**  
+#### **2.4.Volatile**  
 
-#### **4.9.1.Định nghĩa**
+##### **2.4.1.Định nghĩa**
 
 * Từ khóa `volatile` ngăn trình biên dịch tối ưu hóa (như lưu trữ giá trị trong thanh ghi hoặc sắp xếp lại lệnh) các thao tác đọc/ghi biến, vì giá trị của biến có thể thay đổi bất ngờ từ các nguồn bên ngoài (phần cứng, ngắt, hoặc luồng khác).
 
-#### **4.9.2.Hành vi**
+##### **2.4.2.Hành vi**
 
 * Buộc trình biên dịch đọc/ghi trực tiếp từ/tới bộ nhớ mỗi khi truy cập biến.
 
 * Đảm bảo thứ tự thao tác không bị thay đổi do tối ưu hóa.
 
-#### **4.9.3.Các trường hợp sử dụng**
+#### **2.4.3.Các trường hợp sử dụng**
 
 * **Memory-mapped peripheral registers:** Truy cập các thanh ghi phần cứng(như GPIO,UART) để đảm bảo đọc/ghi chính xác giá trị hiện tại
-```
-#define GPIO_PORTA_DATA (*(volatile uint32_t *)0x40058000) // Địa chỉ thanh ghi GPIO
 
-void toggle_pin(void) {
-    GPIO_PORTA_DATA |= (1 << 5);  // Ghi giá trị để bật bit 5 (pin 5)
-    GPIO_PORTA_DATA &= ~(1 << 5); // Ghi giá trị để tắt bit 5
-}
-```
+        #define GPIO_PORTA_DATA (*(volatile uint32_t *)0x40058000) // Địa chỉ thanh ghi GPIO
+
+        void toggle_pin(void) {
+            GPIO_PORTA_DATA |= (1 << 5);  // Ghi giá trị để bật bit 5 (pin 5)
+            GPIO_PORTA_DATA &= ~(1 << 5); // Ghi giá trị để tắt bit 5
+        }
+
 * **Biến toàn cục trong ISR:** Đảm bảo biến toàn cục được truy cập bởi các routine xử lý ngắt luôn phản ánh giá trị mới nhất
 
-```
-volatile uint8_t flag = 0;
-void ISR_Tim1(void){
-  flag = 1;
-}
-int main(){
-  while(1){
-    if(flag){
-      flag = 0;
-    }
-  }
-  return 0;
-}
-```
+
+        #include <stdio.h>
+
+        volatile uint8_t flag = 0;
+
+        void ISR_Tim1(void) {
+            flag = 1;
+        }
+
+        int main() {
+            while (1) {
+                if (flag) {
+                    flag = 0;
+                    printf("ISR triggered\n");
+                }
+            }
+            return 0;
+        }
+
 * **Biến toàn cục trong xử lý đa nguồn:** Đảm bảo giá trị biến được cập nhật đúng khi được truy cập bởi nhiều tác vụ
 
-```
-#include <pthread.h>
-#include <stdio.h>
 
-volatile int shared_counter = 0; // Biến toàn cục chia sẻ
+        #include <stdio.h>
+        #include <threads.h>  // C11
 
-void* thread1_func(void* arg) {
-    while (shared_counter < 10) {
-        shared_counter++; // Tăng giá trị biến
-        printf("Thread 1: counter = %d\n", shared_counter);
-    }
-    return NULL;
-}
+        volatile int shared_counter = 0;
 
-void* thread2_func(void* arg) {
-    while (shared_counter < 10) {
-        shared_counter++; // Tăng giá trị biến
-        printf("Thread 2: counter = %d\n", shared_counter);
-    }
-    return NULL;
-}
+        int thread1_func(void* arg) {
+            for (int i = 0; i < 5; i++) {
+                shared_counter++;
+                printf("Thread 1: %d\n", shared_counter);
+                thrd_yield();  // Yield để tránh race
+            }
+            return 0;
+        }
 
-int main(void) {
-    pthread_t thread1, thread2;
-    pthread_create(&thread1, NULL, thread1_func, NULL);
-    pthread_create(&thread2, NULL, thread2_func, NULL);
-    pthread_join(thread1, NULL);
-    pthread_join(thread2, NULL);
-    return 0;
-}
-```
+        int thread2_func(void* arg) {
+            for (int i = 0; i < 5; i++) {
+                shared_counter++;
+                printf("Thread 2: %d\n", shared_counter);
+                thrd_yield();
+            }
+            return 0;
+        }
 
-### **4.10.Register**
+        int main() {
+            thrd_t t1, t2;
+            thrd_create(&t1, thread1_func, NULL);
+            thrd_create(&t2, thread2_func, NULL);
+            thrd_join(t1, NULL);
+            thrd_join(t2, NULL);
+            printf("Final: %d\n", shared_counter);  // ~10
+            return 0;
+        }
 
-#### **4.10.1.Định nghĩa**
+#### **2.5.Register**
+
+##### **2.5.1.Định nghĩa**
 
 * Biến register được sử dụng để gợi ý cho trình biên dịch rằng 1 biến nên được lưu trữ trong **thanh ghi CPU thay vì RAM**
 
 * Thường được sử dụng cho các biến được truy cập thường xuyên trong vòng lặp hoặc tính toán.
-#### **4.10.2.Đặc điểm**
+
+##### **2.5.2.Đặc điểm**
 
 * **Tăng hiệu năng:** Giảm thời gian truy cập bằng cách lưu biến trong thanh ghi CPU.
 
@@ -1851,128 +3060,179 @@ int main(void) {
 
 * **Không áp dụng** cho các biến lớn hoặc cấu trúc phức tạp.
 
-```
-void compute() {
-    register int i; // Gợi ý lưu i trong thanh ghi
-    for (i = 0; i < 1000000; i++) {
-        // Tính toán
-    }
-}
-```
-### **4.11. Tổng kết**
+        #include <stdio.h>
 
-* **Phạm vi (Scope):** Quy định nơi biến/hàm có thể được truy cập (block, file, prototype)
+        void compute() {
+            register int i;  // Gợi ý register
+            long sum = 0;
+            for (i = 0; i < 1000000; i++) {
+                sum += i;
+            }
+            printf("Sum: %ld\n", sum);
+        }
 
-* **Thời gian sống (Lifetime):** Quy định thời gian tồn tại của biến (automatic, static).
+        int main() {
+            compute();
+            return 0;
+        }
 
-* **Vị trí bộ nhớ (Memory Location):** Quy định nơi lưu trữ biến (stack, heap, data, BSS, text).
+#### **2.6.Auto**
 
-* **Liên kết (Linkage):** Quy định khả năng tham chiếu biến/hàm giữa các tệp (external, internal, no linkage).
+##### **2.6.1.Định nghĩa**
 
-* Từ khóa đặc biệt:
-```
-    extern: Khai báo biến/ham có định nghĩa ở nơi khác, ngụ ý liên kết ngoài.
-    static: Hạn chế phạm vi (liên kết nội) và kéo dài thời gian sống.
-    volatile: Ngăn tối ưu hóa để đảm bảo đọc/ghi chính xác giá trị biến.
-    register: Gợi ý lưu biến trong thanh ghi để tăng hiệu năng.
-    __attribute__((weak)): Đánh dấu biểu tượng yếu, cho phép ghi đè bởi định nghĩa mạnh hơn.
-```
+* `auto` là lớp mặc định cho local vars (block scope, automatic lifetime, stack).
+
+* **Phạm vi:** Block scope
+
+* **Thời gian sống:** Automatic lifetime
+
+* **Vùng nhớ:** Stack
+
+##### **2.6.2.Cú pháp**
+
+* `auto kieudulieu tenbien [= giatri];`
+
+##### **2.6.3.Đặc điểm**
+
+* Phạm vi khối (Block Scope)
+
+        #include <stdio.h>
+
+        void demoBlockScope() {
+            int outer = 10;  //  Auto - phạm vi hàm
+            
+            if (outer > 5) {
+                auto int inner = 20;  //  Auto - phạm vi khối if
+                printf("Inside if: outer=%d, inner=%d\n", outer, inner);
+            }
+            
+            printf("Outside if: outer=%d\n", outer);
+            // printf("inner=%d\n", inner);  //  LỖI: inner không tồn tại
+        }
+
+        int main() {
+            demoBlockScope();
+            // printf("outer=%d\n", outer);  //  LỖI: outer không tồn tại
+            return 0;
+        }
+
+* Automatic Lifetime
+
+        #include <stdio.h>
+
+        void demoLifetime() {
+            auto int counter = 0;  //  Tạo mới mỗi lần gọi hàm
+            
+            counter++;
+            printf("Counter: %d (Địa chỉ: %p)\n", counter, &counter);
+        }
+
+        int main() {
+            printf("Gọi hàm 3 lần:\n");
+            demoLifetime();  // Counter: 1 (Địa chỉ: 0x7fff...1)
+            demoLifetime();  // Counter: 1 (Địa chỉ: 0x7fff...2) ← ĐỊA CHỈ KHÁC
+            demoLifetime();  // Counter: 1 (Địa chỉ: 0x7fff...3) ← ĐỊA CHỈ KHÁC
+            return 0;
+        }
+        
  </details>
 
 
 <details>
-	<summary><strong>BÀI 5: Control Flow</strong></summary>
+	<summary><strong>BÀI 5: CONTROL FLOW</strong></summary>
 
-## **Bài 5: Control Flow**
+## **BÀI 5: CONTROL FLOW**
 
-### **5.1.Goto**
+### **I.Goto**
 
-#### **5.1.1.Định nghĩa**
+#### **1.1.Định nghĩa**
 
 * Câu lệnh `goto` cho phép chương trình **nhảy trực tiếp và vô điều kiện** đến một nhãn được định nghĩa trong cùng một hàm
 
-* Nhãn là một điểm được đánh dấu trong mã nguồn,thường được **đặt tên bằng một định danh (identifier) và kết thúc bằng dấu :**
+* Nhãn là một điểm được đánh dấu trong mã nguồn,thường được **đặt tên bằng một định danh (identifier)** và kết thúc bằng dấu `:`
 
 
-#### **5.1.2.Mục đích**
+#### **1.2.Mục đích**
 
 *  Dùng để thay đổi luồng điều khiển chương trình một cách thủ công, bỏ qua các cấu trúc điều khiển thông thường như vòng lặp,câu lệnh điều kiện hoặc hàm
 
 *  Được sử dụng để thoát khỏi nested loops
-    ```
-    for(int i = 0;i < n; i++){
-        for(int j = 0; j < m; j++){
-            if(some_condition){
-                goto exit_loops; //Thoát khỏi cả 2 vòng lặp
+    
+        for(int i = 0;i < n; i++){
+            for(int j = 0; j < m; j++){
+                if(some_condition){
+                    goto exit_loops; //Thoát khỏi cả 2 vòng lặp
+                }
             }
         }
-    }
-    exit_loops:
-    ```
-
-#### **5.1.3.Cú pháp**
-
-    
-    goto label_name; //Nhảy đến nhãn có tên label_name
-
-    //... (các dòng mã khác)
-
-    label_name: //Định nghĩa nhãn
-    // khối mã được thực thi sau khi nhảy đến đây
-    
+        exit_loops:
     
 
-```
-    #include<stdio.h>
-    #include<stdlib.h>
+#### **1.3.Cú pháp**
 
-    int main(){
+    
+        goto label_name; //Nhảy đến nhãn có tên label_name
 
-        int * arr = malloc(sizeof(int) * 100);
-        if(arr = NULL){
-            goto error;
+        //... (các dòng mã khác)
+
+        label_name: //Định nghĩa nhãn
+        // khối mã được thực thi sau khi nhảy đến đây
+    
+    
+
+#### **1.4.VD**
+
+        #include <stdio.h>
+        #include <stdlib.h>
+
+        int main() {
+            int *arr = malloc(sizeof(int) * 100);
+            if (arr == NULL) {  // Sửa: == thay =
+                goto error;
+            }
+
+            for (int i = 0; i < 5; i++) {
+                arr[i] = i;
+                printf("%d ", arr[i]);  // Thêm khoảng trắng
+            }
+            printf("\n");  // Thêm dòng mới sau mảng
+
+            free(arr);
+            goto done;
+
+        error:
+            printf("Loi: Khong the cap phat bo nho!\n");
+
+        done:
+            printf("End.\n");
+            return 0;
         }
 
-        for(int i =0; i < 5; i++){
-            arr[i] = i;
-            printf("%d", arr[i]);
-        }
-
-        free(arr);
-        goto done;
-    
-    error:
-        printf("Loi: Khong the cap phat bo nho!\n");
-    
-    done:
-        printf("End.\n");
-
-        return 0;
-    }
-
-```
 
 
+### **II.setjmp và longjmp**
 
-### **5.2.setjmp và longjmp**
+#### **2.1.Định nghĩa**
 
-#### **5.2.1.Định nghĩa**
+* `setjmp:` Lưu trạng thái môi trường (stack pointer, registers) vào `jmp_buf`.
 
-* `setjmp` và `longjmp` là 1 cặp hàm trong C cung cấp cơ chế **nhảy không cục bộ**, cho phép chuyển luồng điều khiển từ một hàm sâu trong ngăn xếp gọi trở về một điểm đã đánh dấu ở một hàm gọi bên ngoài, **bỏ qua các lệnh return thông thường**
+* `longjmp:` Khôi phục trạng thái, tiếp tục từ sau setjmp như thể nó vừa return.
 
-* `goto` chỉ nhảy trong phạm vi cùng một hàm
+* Khác `goto`: Có thể nhảy qua hàm (unwind stack), nhưng không gọi destructors (C không có).
 
-* `setjmp/longjmp` có thể nhảy qua nhiều cấp hàm trong ngăn xếp gọi,kể cả từ hàm con về hàm cha
-
-#### **5.2.2.Mục đích**
+#### **2.2.Mục đích**
 
 * Triển khai cơ chế xử lý ngoại lệ đơn giản trong C
 
 * Thoát khỏi các ngữ cảnh xử lý phức tạp khi xảy ra lỗi hoặc điều kiện đặc biệt
 
-#### **5.2.3.Thư viện**
+#### **2.3.Thư viện**
 
 * Sử dụng thư viện `<setjmp.h>`
+
+* `jmp_buf`: Kiểu mảng/cấu trúc lưu trạng thái (opaque type).
+
+#### **2.4.Các hàm chính**
 
 * **Hàm int setjmp(jmp_buf env)**
 
@@ -1984,9 +3244,6 @@ void compute() {
 
         Trả về giá trị val(hoặc 1 nếu val == 0)khi được khôi phục bởi longjmp
 
-    ◦ **Lưu ý:**
-
-        jmp_buf là một kiểu dữ liệu đặc biệt (thường là mảng hoặc cấu trúc được định nghĩa trong <setjmp.h>,dùng để lưu trạng thái)
 
 * **Hàm void longjmp(jmp_buf env,int val)**
 
@@ -2006,56 +3263,70 @@ void compute() {
         longjmp khôi phục trạng thái ngăn xếp và thanh ghi, nhưng không đảm bảo trạng thái của các biến cục bộ hoặc tài nguyên
 
 * **VD:**
-```
-#include<setjmp.h>
-#include<stdio.h>
 
-jmp_buf env;
+        #include <setjmp.h>
+        #include <stdio.h>
 
-void check_even(int number){
-    if(number % 2 != 0){
-        printf("Loi: %d la so le!\n", number);
-        longjmp(env, 1); //Nhay ve setjmp voi ma loi 1
-    }
-    printf("%d la so chan\n", number);
-}
+        jmp_buf env;
 
-int main(){
-    if(setjmp(env) == 0){
-        printf("Kiem tra so...\n");
-        check_even(7);
-    }else{
-        printf("Da phat hien loi,chuong trinh tiep tuc.\n");
-    }
-    return 0;
-}
-```
+        void check_even(int number) {
+            if (number % 2 != 0) {
+                printf("Loi: %d la so le!\n", number);
+                longjmp(env, 1);  // Nhay ve setjmp voi ma loi 1
+            }
+            printf("%d la so chan\n", number);
+        }
 
-```
-Kiem tra so...
-Loi: 7 la so le!
-Da phat hien loi,chuong trinh tiep tuc
-```
+        int main() {
+            if (setjmp(env) == 0) {
+                printf("Kiem tra so...\n");
+                check_even(7);
+            } else {
+                printf("Da phat hien loi, chuong trinh tiep tuc.\n");
+            }
+            return 0;
+        }
+
+
+
+        Kiem tra so...
+        Loi: 7 la so le!
+        Da phat hien loi,chuong trinh tiep tuc
+
  </details>
 <details> 
- <summary><strong>BÀI 6: Bit Manipulation</strong></summary>
+ <summary><strong>BÀI 6: BIT MANIPULATION</strong></summary>
 
-## **Bài 6: Bit Manipulation**
+## **BÀI 6: BIT MANIPULATION**
 
-### **6.1.Số nhị phân và bit**
+### **I.Số nhị phân và bit**
 
-#### **6.1.1.Định nghĩa**
+#### **1.1.Định nghĩa**
 
 * Máy tính lưu trữ và xử lý dữ liệu dưới dạng nhị phân (binary), sử dụng các bit (0 và 1)
 
 * Một byte gồm 8 bit.Các giá trị lớn hơn(như 16,32,64 bit) được dùng cho các kiểu dữ liệu như `short`,`int`,`long`,...
 
 * VD:
-  ```
-  Số thập phân 5: 00000101
-  Số thập phân 13: 00001101
-  ```
-#### **6.1.2.Số có dấu và không dấu**
+  
+        Số thập phân 5: 00000101
+        Số thập phân 13: 00001101
+
+* VD: Kiểm tra binary
+
+        #include <stdio.h>
+
+        int main() {
+            unsigned int num = 5;  // 00000101
+            printf("5 in binary: ");
+            for (int i = 7; i >= 0; i--) {
+                printf("%u", (num >> i) & 1);
+            }
+            printf("\n");
+            return 0;
+        }
+
+#### **1.2.Số có dấu và không dấu**
 
 * Với **số không dấu (unsigned)**, các bit chỉ biểu diễn **giá trị dương**
 
@@ -2063,18 +3334,21 @@ Da phat hien loi,chuong trinh tiep tuc
 
   ◦ bit cao nhất (MSB) biểu thị dấu **0 cho dương , 1 cho âm**
   
-  ◦ Giá trị thường được biểu diễn dưới dạng bù 2
+  ◦ Giá trị thường được biểu diễn dưới dạng bù 2 (`~positive + 1`)
 
   VD: 
-  ```
-  -5 = 11111011
-  ```
+  
+        5 = 00000101
+        -5 = 11111011
+  
 
-### **6.2.Bitwise Operators (Toán tử thao tác bit)**
+### **II.Bitwise Operators (Toán tử thao tác bit)**
+
+#### **2.1.Định nghĩa**
 
 *  Các toán tử này hoạt động trực tiếp trên biểu diễn bit của toán hạng, thường là kiểu số nguyên (`int`,`unsigned int`,...)
 
-#### **6.2.1. & (Bitwise AND)**
+#### **2.2. & (Bitwise AND)**
 
 * Kết quả bit là 1 nếu cả 2 bit tương ứng là 1
 
@@ -2082,7 +3356,16 @@ Da phat hien loi,chuong trinh tiep tuc
 
 * VD: 101 & 110 = 100
 
-#### **6.2.2. | (Bitwise OR)**
+        #include <stdio.h>
+
+        int main() {
+            unsigned int a = 5;  // 101
+            unsigned int b = 6;  // 110
+            printf("%u & %u = %u\n", a, b, a & b);  // 4 (100)
+            return 0;
+        }
+
+#### **2.3. | (Bitwise OR)**
 
 * Kết quả bit là 1 nếu ít nhất 1 trong 2 bit tương ứng là 1
 
@@ -2090,7 +3373,7 @@ Da phat hien loi,chuong trinh tiep tuc
 
 * VD: 101 | 110 = 111
 
-#### **6.2.3. ^ (Bitwise XOR)**
+#### **2.4. ^ (Bitwise XOR)**
 
 * Kết quả bit là 1 nếu 2 bit tương ứng khác nhau
 
@@ -2098,7 +3381,17 @@ Da phat hien loi,chuong trinh tiep tuc
 
 * VD: 101 ^ 110 = 011
 
-#### **6.2.4. ~ (Bitwise NOT)**
+        #include <stdio.h>
+
+        int main() {
+            unsigned int x = 5, y = 3;
+            printf("Before: x=%u, y=%u\n", x, y);
+            x ^= y; y ^= x; x ^= y;
+            printf("After: x=%u, y=%u\n", x, y);  // x=3, y=5
+            return 0;
+        }
+
+#### **2.5. ~ (Bitwise NOT)**
 
 * Đảo tất cả các bit: 0 thành 1, 1 thành 0
 
@@ -2106,7 +3399,7 @@ Da phat hien loi,chuong trinh tiep tuc
 
 * `~101` = `~00000101 = 11111010`
 
-#### **6.2.5. << (Left Shift)**
+#### **2.6. << (Left Shift)**
 
 * Dịch chuyển các bit sang trái n vị trí, các bit mới bên phải được điền bằng 0
 
@@ -2116,7 +3409,15 @@ Da phat hien loi,chuong trinh tiep tuc
 
 * Lưu ý: Nếu dịch quá nhiều, bit có thể bị mất, gây tràn
 
-#### **6.2.6. >> (Right Shift)**
+        #include <stdio.h>
+
+        int main() {
+            unsigned int num = 5;
+            printf("%u << 1 = %u\n", num, num << 1);  // 10
+            return 0;
+        }
+
+#### **2.7. >> (Right Shift)**
 
 * Dịch chuyển các bit sang phải n vị trí, các bit mới bên trái được điền bằng 0 (thường cho số không dấu)
 
@@ -2124,130 +3425,274 @@ Da phat hien loi,chuong trinh tiep tuc
 
  VD: `1011 >> 1 = 0101 (Thập phân: 11 >> 1 = 5)`
 
+        #include <stdio.h>
+
+        int main() {
+            unsigned int num = 11;  // 1011
+            printf("%u >> 1 = %u\n", num, num >> 1);  // 5 (0101)
+            return 0;
+        }
+
 * **Arithmetic Shift:** Bit mới bên trái điền bằng bit dấu (MSB) ban đầu (thường cho số có dấu)
 
  VD: `-5 (11111011) >> 1 = 11111101`
 
-### **6.3.Bitmasks (Mặt nạ bit)**
+        #include <stdio.h>
 
-#### **6.3.1.Định nghĩa**
+        int main() {
+            int num = -5;  // Giả sử 32-bit: ...11111011
+            printf("%d >> 1 = %d\n", num, num >> 1);  // -3 (...11111101)
+            return 0;
+        }
+
+### **III.Bitmasks (Mặt nạ bit)**
+
+#### **3.1.Định nghĩa**
 
 * Bitmask là một giá trị (thường là hằng số) được thiết kế để thao tác (set,clear,toggle,test) các bit cụ thể trong một biến bằng các toán tử Bitwise
 
 * Mỗi bit trong mask địa diện cho một cờ (flag) hoặc tùy chọn
 
-#### **6.3.2.Kỹ thuật phổ biến**
+#### **3.2.Kỹ thuật phổ biến**
 
 * **Tạo mask cho bit thứ n** 
 
-◦  Công thức: `1 << n`
+    ◦  Công thức: `1 << n`
 
-◦  VD: Mask cho bit 3: `1 << 3 = 00001000`
+    ◦  VD: Mask cho bit 3: `1 << 3 = 00001000`
+
+        // Tạo mask cho bit thứ n
+        unsigned int mask = 1 << n;
+        printf("Mask bit %d: %d (binary: ", n, mask);
+        for(int i = 7; i >= 0; i--) {
+            printf("%d", (mask >> i) & 1);
+        }
+        printf(")\n");
 
 * **Set bit thứ n(đặt bit thành 1)**
 
-◦  Công thức: `value |= (1 << n);`
+    ◦  Công thức: `value |= (1 << n);`
 
-◦ VD: Set bit 3 của `value = 5 (nhị phân: 00000101)`
+    ◦ VD: Set bit 3 của `value = 5 (nhị phân: 00000101)`
 
-  ```
-  value |= ( 1 << 3); -> 00000101 | 00001000 = 00001101 (thập phân: 13)
-  ```
+  
+        value |= ( 1 << 3); -> 00000101 | 00001000 = 00001101 (thập phân: 13)
+  
+
+        // Set bit thứ n
+        unsigned char value = 5; // 00000101
+        printf("Trước khi set bit %d: %d\n", n, value);
+        value |= (1 << n);
+        printf("Sau khi set bit %d: %d\n", n, value);
+
 
 * **Clear bit thứ n(xóa bit, đặt thành 0)**
 
-◦ Công thức: `value &= ~(1 << n);`
+    ◦ Công thức: `value &= ~(1 << n);`
 
-◦ VD: Clear bit thứ 3 của `value = 13 (nhị phân: 00001101)`
-  ```
-  value &= ~(1 << 3); -> 00001101 & 11110111 = 00000101
-  ```
+    ◦ VD: Clear bit thứ 3 của `value = 13 (nhị phân: 00001101)`
+  
+        value &= ~(1 << 3); -> 00001101 & 11110111 = 00000101
+  
+        // Clear bit thứ n
+        unsigned char value = 13; // 00001101
+        printf("Trước khi clear bit %d: %d\n", n, value);
+        value &= ~(1 << n);
+        printf("Sau khi clear bit %d: %d\n", n, value);
 
 * **Toggle bit thứ n(đảo bit: 0 thành 1, 1 thành 0)**
 
-◦ Công thức: `value ^= (1 << n);`
+    ◦ Công thức: `value ^= (1 << n);`
 
-◦ VD: Toggle bit thứ 3 của `value = 5 (nhị phân: 00000101)`
-  ```
-  value ^= (1 << 3); -> 00000101 ^ 00001000 = 00001101
-  ```
+    ◦ VD: Toggle bit thứ 3 của `value = 5 (nhị phân: 00000101)`
+  
+        value ^= (1 << 3); -> 00000101 ^ 00001000 = 00001101
+  
+        // Toggle bit thứ n
+        unsigned char value = 5; // 00000101
+        printf("Trước khi toggle bit %d: %d\n", n, value);
+        value ^= (1 << n);
+        printf("Sau khi toggle bit %d: %d\n", n, value);
 
 * **Test bit thứ n (kiểm tra bit có được set không)**
 
-◦ Công thức: `if (value & (1 << n)) {...}`
+    ◦ Công thức: `if (value & (1 << n)) {...}`
 
-◦ Kết quả khác 0 nếu bit được set (là 1)
+    ◦ Kết quả khác 0 nếu bit được set (là 1)
 
-◦ VD: Kiểm tra bit 2 của `value = 5 (nhị phân: 00000101)`
-  ```
-  5 & (1 << 2) -> 00000101 & 00000100 = 00000100 (khác 0, bit 2 được set)
-  ```
+    ◦ VD: Kiểm tra bit 2 của `value = 5 (nhị phân: 00000101)`
+  
+        5 & (1 << 2) -> 00000101 & 00000100 = 00000100 (khác 0, bit 2 được set)
+  
+        // Test bit thứ n
+        unsigned char value = 5; // 00000101
+        if (value & (1 << n)) {
+            printf("Bit %d được SET (là 1)\n", n);
+        } else {
+            printf("Bit %d được CLEAR (là 0)\n", n);
+        }
 
 * **Set nhiều bit**
 
-◦ Công thức: `value |= (MASK1 | MASK2);`
+    ◦ Công thức: `value |= (MASK1 | MASK2);`
 
-◦ VD: Set bit 2 và bit 3: `value |= (1 << 2 | 1 << 3);`
-```
-00000000 | (00000100 | 00001000) = 00001100 (thập phân: 12)
-```
+    ◦ VD: Set bit 2 và bit 3: `value |= (1 << 2 | 1 << 3);`
+
+        00000000 | (00000100 | 00001000) = 00001100 (thập phân: 12)
+
+        // Set nhiều bit
+        unsigned char value = 0;
+        printf("Trước khi set nhiều bit: %d\n", value);
+        value |= (1 << 2 | 1 << 3);
+        printf("Sau khi set bit 2 và 3: %d\n", value);
+
 
 * **Clear nhiều bit**
 
-◦ Công thức: `value &= ~(MASK1 | MASK2);`
+    ◦ Công thức: `value &= ~(MASK1 | MASK2);`
 
-◦ VD: Clear bit 2 và 3 của `value = 15 (nhị phân: 00001111)`
-```
-value &= ~(1 << 2 | 1 << 3); -> 00001111 & 11110011 = 00000011 (thập phân: 3)
-```
+    ◦ VD: Clear bit 2 và 3 của `value = 15 (nhị phân: 00001111)`
+
+        value &= ~(1 << 2 | 1 << 3); -> 00001111 & 11110011 = 00000011 (thập phân: 3)
+
+        // Clear nhiều bit
+        unsigned char value = 15; // 00001111
+        printf("Trước khi clear nhiều bit: %d\n", value);
+        value &= ~(1 << 2 | 1 << 3);
+        printf("Sau khi clear bit 2 và 3: %d\n", value);
+
 * **Kiểm tra nhiều bit cùng được set**
 
-◦ Công thức: `if ((value & (MASK1 | MASK2)) == (MASK1 | MASK2)) {...}`
+    ◦ Công thức: `if ((value & (MASK1 | MASK2)) == (MASK1 | MASK2)) {...}`
 
-◦ VD: Kiểm tra bit 2 và 3 của `value = 12 (nhị phân: 00001100)`
-```
-(12 & (1 << 2 | 1 << 3)) == (1 << 2 | 1 << 3) -> (00001100 & 00001100) == 00001100 -> true
-```
+    ◦ VD: Kiểm tra bit 2 và 3 của `value = 12 (nhị phân: 00001100)`
 
-### **6.4.Bit Fields (Trường bit trong cấu trúc)**
+        (12 & (1 << 2 | 1 << 3)) == (1 << 2 | 1 << 3) -> (00001100 & 00001100) == 00001100 -> true
 
-#### **6.4.1.Lý thuyết**
+        // Kiểm tra nhiều bit cùng được set
+        unsigned char value = 12; // 00001100
+        unsigned int mask = (1 << 2 | 1 << 3);
 
-* Bit Fields cho phép định nghĩa các thành viên của một `struct` với số lượng bit cụ thể, giúp tiết kiệm bộ nhớ hoặc ánh xạ chính xác tới cấu trúc dữ liệu của phần cứng (như thanh ghi điều khiển)
+        if ((value & mask) == mask) {
+            printf("Cả bit 2 và 3 đều được SET\n");
+        } else {
+            printf("Bit 2 và 3 KHÔNG cùng được SET\n");
+        }
 
-```
-struct Register {
-  unsigned int flag1 : 1;  //flag1 dùng 1 bit
-  unsigned int config : 4; //config dùng 4 bit
-  unsigned int status : 3; //status dùng 3 bit
-};
-```
-Cách sử dụng:
+### **IV.Bit Fields (Trường bit trong cấu trúc)**
 
-```
-Khởi tạo :  struct Register reg = {1, 5, 2}; (gán flag1 = 1, config = 5, status = 2).
-Truy cập :  reg.flag1 = 0; hoặc if (reg.status == 2) { ... }.
-```
+#### **4.1.Lý thuyết**
 
-Lưu ý:
+*   Bit Fields cho phép định nghĩa các thành viên của một `struct` với số lượng bit cụ thể, giúp tiết kiệm bộ nhớ hoặc ánh xạ chính xác tới cấu trúc dữ liệu của phần cứng (như thanh ghi điều khiển)
+
+*   Cú pháp:  `type member : width; (width = số bits, 1- sizeof(type)*8).`
+
+*   VD:
+        #include <stdio.h>
+
+        struct Register {
+            unsigned int flag1 : 1;   // 1 bit
+            unsigned int config : 4;  // 4 bits (0-15)
+            unsigned int status : 3;  // 3 bits (0-7)
+            // Tổng: 8 bits (1 byte)
+        };
+
+        int main() {
+            struct Register reg = {1, 5, 2};  // flag1=1, config=5, status=2
+            printf("Flag1: %u, Config: %u, Status: %u\n", reg.flag1, reg.config, reg.status);
+            reg.flag1 = 0;
+            if (reg.status == 2) printf("Status OK\n");
+            return 0;
+        }
+
+* Cách sử dụng:
+
+
+   ◦ Khởi tạo :  struct Register reg = {1, 5, 2}; (gán flag1 = 1, config = 5, status = 2).
+
+   ◦ Truy cập :  reg.flag1 = 0; hoặc if (reg.status == 2) { ... }.
+
+
+#### **4.2.Lưu ý**
 
 * Thứ tự bit và padding: 
    
    ◦ Thứ tự các bit field trong bộ nhớ (endianness) và cách đóng gói (padding) phụ thuộc vào trình biên dịch và kiến trúc máy, gây vấn đề về tính tương thích (portability).
 
+        #include <stdio.h>
+
+        int main() {
+            int x = 0x12345678;
+            char *p = (char*)&x;
+            
+            printf("Byte order: ");
+            for(int i = 0; i < 4; i++) {
+                printf("%02X ", p[i]);
+            }
+            // Kết quả khác nhau tùy Little/Big Endian
+        }
+
    ◦ Một số trình biên dịch có thể chèn padding để căn chỉnh byte.
+
+        #include <stdio.h>
+
+        struct BadPadding {
+            char a;      // 1 byte
+            int b;       // 4 bytes - có thể bị padding 3 bytes
+            char c;      // 1 byte
+        };
+
+        int main() {
+            printf("Sizeof struct: %zu\n", sizeof(struct BadPadding));
+            // Có thể là 12 thay vì 6 bytes do padding
+        }
 
 * Hạn chế:
 
    ◦ Không thể lấy địa chỉ của bit field (ví dụ: &reg.flag1 là lỗi).
 
+        struct Register {
+            unsigned int flag1 : 1;
+            unsigned int flag2 : 1;
+        };
+
+        int main() {
+            struct Register reg;
+            
+            // LỖI: không thể lấy địa chỉ bit-field
+            // unsigned int *ptr = &reg.flag1; // COMPILE ERROR
+            
+            reg.flag1 = 1; // Chỉ gán giá trị trực tiếp
+        }
+
    ◦ Kiểu dữ liệu cơ sở thường là `unsigned int` hoặc `int` để tránh vấn đề với số có dấu.
+
+        struct InvalidBitfield {
+            // char base : 1;    // Hành vi không xác định
+            unsigned int valid : 1; // ĐÚNG: dùng unsigned int
+            int signed_bit : 1;     // ĐÚNG: dùng int
+        };
+
+   ◦ UB - Width vượt quá giới hạn
+
+        struct Overflow {
+            unsigned int a : 40; // UB: vượt quá 32 bits
+            unsigned int b : 0;  // UB: width = 0
+            unsigned int c : -1; // UB: width âm
+        };
+
+        // ĐÚNG:
+        struct Valid {
+            unsigned int a : 4;  // OK: ≤ 32
+            unsigned int b : 1;  // OK
+        };
 
 * Ứng dụng:
 
    ◦ Lập trình nhúng: Điều khiển thanh ghi phần cứng.
 
    ◦ Nén dữ liệu: Lưu trữ nhiều giá trị nhỏ trong không gian bộ nhớ hạn chế.
+   
 </details>
 <details> 
  <summary><strong>BÀI 7: Kiểu dữ liệu tùy chỉnh</strong></summary>
