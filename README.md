@@ -3695,54 +3695,116 @@ VD:
    
 </details>
 <details> 
- <summary><strong>BÀI 7: Kiểu dữ liệu tùy chỉnh</strong></summary>
+ <summary><strong>BÀI 7: CUSTOM DATA TYPES</strong></summary>
 
-## **Bài 7: Kiểu dữ liệu tùy chỉnh**
+## **BÀI 7: CUSTOM DATA TYPES**
 
-### **7.1.Structs**
+### **I.Cấu trúc (Structs)**
 
-#### **7.1.1.Định nghĩa**
+#### **1.1.Định nghĩa**
 
 * Struct là kiểu dữ liệu tùy chỉnh, nhóm các biến có kiểu dữ liệu khác nhau thành một đơn vị logic
 
-* Các thành viên được lưu trữ liên tiếp trong bộ nhớ, nhưng có thể có **padding** để đảm bảo căn chỉnh bộ nhớ theo kiến trúc CPU
+* Các thành viên (members) được lưu trữ liên tiếp trong bộ nhớ, nhưng có thể có **padding** để đảm bảo căn chỉnh bộ nhớ theo kiến trúc CPU
 
-#### **7.1.2.Đặc điểm**
+#### **1.2.Đặc điểm**
 
-* Mỗi thành viên có thể truy cập riêng lẻ qua tên
+* Mỗi thành viên có thể truy cập qua `.` (biến) hoặc `->` (con trỏ)
 
-* Kích thước của struct (`sizeof(struct)`) là tổng kích thước của tất cả thành viên, cộng thêm **padding** 
+* Kích thước của struct (`sizeof(struct)`) là tổng kích thước của `members + padding`
 
 * Padding đảm bảo các thành viên nằm ở địa chỉ chia cho hết kích thước căn chỉnh
 
 * Có thể dùng `__attribute__(packed))` để loại bỏ padding
 
-#### **7.1.3.Cú pháp**
+#### **1.3.Cú pháp**
 
-```
-struct TenStruct {
-    int bien1;      //4 bytes
-    double bien2;   //8 bytes
-    char ten[10];   //10 bytes 
-}
 
-```
-#### **7.1.4.Khai báo và truy cập**
+        struct TenStruct {
+            // Khai báo các thành viên (members)
+            kiểu_dữ_liệu tên_biến1;
+            kiểu_dữ_liệu tên_biến2;
+            // ...
+        };
+
+
+#### **1.4.Khai báo và truy cập**
 
 * Khai báo biến
-```
-struct TenStruct bienStruct;
-struct TenStruct *conTro = &bienStruct;
 
-```
+        struct TenStruct bienStruct;
+        struct TenStruct *conTro = &bienStruct;
+
+
 
 * Truy cập thành viên
 
-   ◦ Dùng `.` cho biến struct : `bienStruct.bien1 = 10`
+    ◦ Dùng `.` cho biến struct : `bienStruct.bien1 = 10`
 
-   ◦ Dung `->` cho con trỏ struct: `conTro->bien1 = 20` 
+    ◦ Dung `->` cho con trỏ struct: `conTro->bien1 = 20` 
 
-#### **7.1.5.Struct lồng nhau**
+
+* Khởi tạo với giá trị
+
+        struct TenStruct ten_bien = {
+            gia_tri1,
+            gia_tri2,
+            gia_tri3
+        };
+
+    ◦ VD:
+
+            struct Employee emp1 = {
+            101,                    // id
+            "John Doe",             // name
+            {15, 8, 1990},         // birth_date (struct lồng)
+            5000.0                 // salary
+        };
+
+* Khởi tạo từng phần
+
+        struct TenStruct ten_bien;
+        ten_bien.thanh_vien1 = gia_tri1;
+        ten_bien.thanh_vien2 = gia_tri2;
+        ten_bien.struct_long.thanh_vien_inner = gia_tri3;
+
+    ◦ VD:
+
+                struct Employee emp2;
+                emp2.id = 102;
+                strcpy(emp2.name, "Jane Smith");
+                emp2.birth_date.day = 20;
+                emp2.birth_date.month = 5;
+                emp2.birth_date.year = 1985;
+                emp2.salary = 5500.0;
+
+* Khởi tạo với designated initializers (C99)
+
+            struct TenStruct ten_bien = {
+                .thanh_vien1 = gia_tri1,
+                .thanh_vien2 = gia_tri2,
+                .struct_long = {
+                    .thanh_vien_inner1 = gia_tri_a,
+                    .thanh_vien_inner2 = gia_tri_b
+                }
+            };
+
+    ◦ VD:
+
+            struct Employee emp3 = {
+                .id = 103,
+                .salary = 6000.0,
+                .birth_date = {
+                    .year = 1992,
+                    .month = 3,
+                    .day = 10
+                },
+                .name = "Bob Johnson"
+            };
+
+#### **1.5.Struct lồng nhau**
+
+##### **1.5.1.Đặc điểm**
 
 * Cho phép tổ chức dữ liệu theo cấu trúc phân cấp
 
@@ -3750,152 +3812,409 @@ struct TenStruct *conTro = &bienStruct;
 
 * Padding vẫn áp dụng cho cả struct bên trong và bên ngoài
 
-```
-struct SinhVien {
-    int maSV;
-    char ten[50];
-    float diemTB;
-};
+##### **1.5.2.Cấu trúc**
 
-struct LopHoc {
-    char tenLop[20];
-    int siSo;
-    struct SinhVien sv[100];
-};
+        struct OuterStruct {
+            kiểu_dữ_liệu member1;
+            struct InnerStruct {
+                kiểu_dữ_liệu inner_member1;
+                kiểu_dữ_liệu inner_member2;
+            } inner_variable;
+            kiểu_dữ_liệu member2;
+        };
 
-```
+##### **1.5.3.Các dạng struct lồng nhau**
 
-* Truy cập
-```
-struct LopHoc lop;
-lop.sv[0].maSV = 1001;
-strcpy(lop.sv[0].ten. "Mai Thanh Tung");
-lop.sv[0].diemTB = 8.5;
-```
+* **Dạng 1: Struct lồng trực tiếp**
+
+        struct Date {
+            int day;
+            int month;
+            int year;
+        };
+
+        struct Employee {
+            int id;
+            char name[50];
+            struct Date birth_date;
+            struct Date hire_date;
+        };
+
+
+* **Dạng 2: Struct lồng với typedef**
+
+        typedef struct {
+            float x;
+            float y;
+        } Point;
+
+        typedef struct {
+            Point top_left;             // Struct lồng
+            Point bottom_right;         // Struct lồng
+            char color[20];
+        } Rectangle;
+
+* **Dạng 3: Struct chứa mảng của struct**
+
+        struct Student {
+            char name[50];
+            float gpa;
+        };
+
+        struct Classroom {
+            int room_number;
+            struct Student students[30];        // Mảng struct lồng
+            int student_count;
+        }
+
+* **Dạng 4: Struct lồng nhiều cấp**
+
+        struct Address {
+            char street[100];
+            char city[50];
+            char zip_code[10];
+        };
+
+        struct Contact {
+            char phone[15];
+            char mail[50];
+            struct Address address;     // Struct lồng cấp 1
+        };
+
+        struct Person {
+            char name[50];
+            struct Contact contact;     // Struct lồng cấp 2
+        };
 
 
 
 
-### **7.2.Unions**
+### **II.Unions**
 
-#### **7.2.1.Định nghĩa**
+#### **2.1.Định nghĩa**
 
-* Cho phép lưu trữ nhiều kiểu dữ liệu khác nhau tại **cùng một vị trí bộ nhớ**. 
+* Cho phép lưu trữ nhiều kiểu dữ liệu khác nhau tại **cùng một vị trí bộ nhớ (cùng địa chỉ)**. 
 
 * Chỉ một thành viên chứa giá trị hợp lệ tại một thời điểm
 
-#### **7.2.2.Đặc điểm**
+#### **2.2.Đặc điểm**
 
-* Kích thước của union bằng kích thước của thành viên lớn nhất
+* `Kích thước` của union bằng kích thước của `thành viên lớn nhất + padding`
 
 * Phải tự quản lý thành viên hợp lệ, thường dùng biến/enum bổ sung
 
 * Type punning: Ghi dữ liệu bằng một kiểu và đọc bằng kiểu khác(ví dụ: xem bit của float qua int)
 
-#### **7.2.3.Cú pháp**
-```
-union DuLieu{
-    int soNguyen;       //4 bytes
-    float soThuc;       //4 bytes
-    char chuoi[20];     //20 bytes
-};
-```
+#### **2.3.Cú pháp**
 
-#### **7.2.4.Khai báo biến và truy cập**
+        union TenUnion {
+            kieu_du_lieu    ten_thanh_vien1;
+            kieu_du_lieu    ten_thanh_vien2;
+            kieu_du_lieu    ten_thanh_vien3;
+        };
 
-* **Khai báo biến:** `union DuLieu bienUnion;`
+    ◦ VD:
 
-* **Truy cập:** `bienUnion.soNguyen = 100;`
+        union DuLieu{
+            int soNguyen;       //4 bytes
+            float soThuc;       //4 bytes
+            char chuoi[20];     //20 bytes
+        };
 
-#### **7.2.5.Union trong Struct**
+
+#### **2.4.Khai báo biến, truy cập, khởi tạo**
+
+##### **2.4.1.Khai báo**
+
+* **Dạng 1: Khai báo biến union**
+
+        union  TenUnion ten_bien;
+
+
+* **Dạng 2: Khai báo cơ bản** 
+
+        union TenUnion {
+            // các thành viên
+        };
+
+    ◦ VD:
+
+        union DuLieu {
+            int soNguyen;
+            float soThuc;
+            char chuoi[20];
+        };
+
+* **Dạng 3: Khai báo với typedef** 
+
+        typedef union {
+            // các thành viên
+        } TenUnion;
+
+    ◦ VD:
+
+        // Khai báo union với typedef
+        typedef union {
+            int soNguyen;
+            float soThuc;
+            char kyTu;
+        } GiaTri;
+
+* **Dạng 4: Khai báo và khai báo biến cùng lúc** 
+
+        union TenUnion {
+            // các thành viên
+        } bien1, bien2;
+
+    ◦ VD:
+
+        union DuLieu {
+            int soNguyen;
+            float soThuc;
+            char chuoi[10];
+        } data1, data2, data3;
+
+##### **2.4.2.Truy cập**
+
+* **Truy cập với biến union thông thường:**
+
+        union TenUnion bien;
+        bien.thanh_vien = gia_tri;
+
+* **Truy cập với con trỏ union:**
+
+        union TenUnion *ptr;
+        ptr->thanh_vien = gia_tri;
+
+##### **2.4.3.Khởi tạo**
+
+* **Khởi tạo thành viên đầu tiên:**
+
+        union TenUnion bien = {gia_tri};
+
+* **Khởi tạo với designated initializer (C99):**
+
+        union TenUnion bien = {.thanh_vien = gia_tri};
+
+#### **2.5.Union trong Struct**
+
+##### **2.5.1.Đặc điểm**
 
 * Union được sử dụng như một thành viên của struct để lưu trữ nhiều kiểu dữ liệu khác nhau tại cùng một vị trí bộ nhớ trong struct
 
 * Padding của struct vẫn áp dụng, nhưng union chỉ chiếm kích thước của thành viên lớn nhất
 
-* Cú pháp
-```
-struct SinhVien {
-    int maSV;
-    char ten[50];
-    enum{ DIEM_SO, DIEM_CHU } kieuDiem;
-    union {
-        float diemSo;
-        char diemChu[3];
-    } diem;
-};
+##### **2.5.2.Cú pháp**
 
-```
 
-* Truy cập
+        struct TenStruct {
+            kieu_du_lieu thanh_vien1;
+            kieu_du_lieu thanh_vien2;
+            union {
+                kieu_du_lieu union_thanh_vien1;
+                kieu_du_lieu union_thanh_vien2;
+                //...
+            } ten_union;
+            kieu_du_lieu thanh_vien3;
+        };
 
-  ◦ Ghi và đọc dựa trên giá trị của biến `kieuDiem:`
-  ```
-  struct SinhVien SV;
-  sv.kieuDiem = DIEM_SO;
-  sv.diem.diemSo = 8.5;
-  ```
-### **7.3.Enum (Kiểu liệt kê)**
+##### **2.5.3.Các dạng khai báo**
 
-#### **7.3.1.Định nghĩa**
+* **Dạng 1: Union ẩn danh trong struct**
 
-*  enum là một kiểu dữ liệu tùy chỉnh cho phép định nghĩa một tập hợp các hằng số nguyên được đặt tên (enumerators), giúp mã dễ đọc và bảo trì hơn.
+        struct TenStruct {
+            // các thành viên Thường
+            union {
+                // các thành viên union
+            }
+        }
+
+    ◦ VD:
+
+            struct SinhVien {
+            char ten[50];
+            int maSo;
+            union {
+                float diemThi;
+                char xepLoai;
+                int hocBong;
+            }; // Union ẩn danh - truy cập trực tiếp
+        };
+
+* **Dạng 2: Union có tên trong struct**
+
+        struct TenStruct {
+            // các thành viên Thường
+            union TenUnion {
+                // các thành viên union;
+            } ten_bien_union;
+        };
+
+    ◦ VD:
+
+        struct HinhHoc {
+            char loaiHinh[20];
+            union DuLieu {
+                float banKinh;           // Cho hình tròn
+                struct {                 // Cho hình chữ nhật
+                    float chieuDai;
+                    float chieuRong;
+                } hcn;
+                float canh;              // Cho hình vuông
+            } duLieu;
+        };
+
+* **Dạng 3: Union với typedef**
+
+        typedef union {
+            // các thành viên union 
+        } KieuUnion;
+
+        struct TenStruct {
+            // các thành viên Thường
+            KieuUnion ten_bien_union;
+        };
+
+
+    ◦ VD:
+
+        // Định nghĩa union với typedef
+        typedef union {
+            int nguyen;
+            float thuc;
+            char kyTu;
+            char chuoi[20];
+        } GiaTri;
+
+        struct Bien {
+            char kieu[10];
+            GiaTri giaTri;  // Sử dụng union đã định nghĩa
+        };
+
+### **III.Enum (Kiểu liệt kê)**
+
+#### **3.1.Định nghĩa**
+
+*  `enum` là một kiểu dữ liệu tùy chỉnh cho phép định nghĩa một tập hợp các hằng số nguyên được đặt tên (enumerators), giúp mã dễ đọc và bảo trì hơn.
 
 *  Mục đích: Biểu diễn các giá trị rời rạc, ví dụ: trạng thái, chế độ, hoặc cờ (flag) trong hệ thống nhúng.
 
-#### **7.3.2.Đặc điểm**
+#### **3.2.Đặc điểm**
 
 * **Kiểu dữ liệu:**
 
-   ◦ Mặc định, enum được ánh xạ thành kiểu int, nhưng trình biên dịch có thể chọn kiểu nhỏ hơn (như char) để tối ưu bộ nhớ.
+    ◦ Mặc định, enum được ánh xạ thành kiểu int, nhưng trình biên dịch có thể chọn kiểu nhỏ hơn (như char) để tối ưu bộ nhớ.
 
 * **Giá trị:**
 
-   ◦ Mỗi enumerator được gán một giá trị nguyên, bắt đầu từ 0 (mặc định) hoặc giá trị do người dùng chỉ định.
+    ◦ Mỗi enumerator được gán một giá trị nguyên, bắt đầu từ 0 (mặc định) hoặc giá trị do người dùng chỉ định.
 
 * **Ứng dụng:**
 
-   ◦ Thường dùng trong hệ thống nhúng để định nghĩa trạng thái thiết bị, mã lỗi, hoặc chế độ hoạt động.
+    ◦ Thường dùng trong hệ thống nhúng để định nghĩa trạng thái thiết bị, mã lỗi, hoặc chế độ hoạt động.
 
-#### **7.3.3. Cú pháp**
-```
-enum TenEnum {
-    VALUE1,    // 0
-    VALUE2,    // 1
-    VALUE3 = 5 // 5, các giá trị tiếp theo tăng dần
-};
-```
-#### **7.3.4.VD**
-```
-enum DeviceState {
-    OFF = 0,
-    ON,
-    STANDBY,
-    ERROR = 10
-};
+#### **3.3. Cú pháp**
 
-struct Device {
-    enum DeviceState state;
-};
+        enum TenEnum {
+            VALUE1,    // 0
+            VALUE2,    // 1
+            VALUE3 = 5 // 5, các giá trị tiếp theo tăng dần
+        };
 
-int main() {
-    struct Device dev;
-    dev.state = ON;
-    if (dev.state == ON) {
-        printf("Device is ON\n");
-    }
-    printf("State value: %d\n", dev.state); // In: State value: 1
-    return 0;
-}
-```
-#### **7.3.5.Lưu ý**
+    ◦ vd:
+
+        enum DeviceState {
+            OFF = 0,
+            ON,
+            STANDBY,
+            ERROR = 10
+        };
+
+        struct Device {
+            enum DeviceState state;
+        };
+
+        int main() {
+            struct Device dev;
+            dev.state = ON;
+            if (dev.state == ON) {
+                printf("Device is ON\n");
+            }
+            printf("State value: %d\n", dev.state); // In: State value: 1
+            return 0;
+        }
+
+#### **3.4. Các dạng khai báo**
+
+* **Dạng 1: Khai báo cơ bản**
+
+        enum TenEnum {
+            // các giá trị
+        };
+
+    ◦ vd:
+
+        enum NgayTrongTuan {
+            THU_HAI,    // 0
+            THU_BA,     // 1
+            THU_TU,     // 2
+            THU_NAM,    // 3
+            THU_SAU,    // 4
+            THU_BAY,    // 5
+            CHU_NHAT    // 6
+        };
+
+* **Dạng 2: Khai báo với typedef**
+
+        typedef enum {
+            // các giá trị
+        } TenEnum;
+
+    ◦ vd:
+
+        typedef enum {
+            DO,
+            VANG,
+            XANH
+        } MauSac;
+
+* **Dạng 3: Khai báo và khai báo biến cùng lúc**
+
+        enum TenEnum {
+            // các giá trị
+        } bien1, bien2;
+
+    ◦ VD:
+
+        // Khai báo enum và biến cùng lúc
+        enum GioiTinh {
+            NAM,
+            NU,
+            KHAC
+        } gt1, gt2;
+
+* **Dạng 4: Enum không tên**
+
+        enum {
+            // các giá trị
+        } bien1, bien2;
+
+    ◦ vd:
+
+        enum {
+            THAP,
+            TRUNG_BINH,
+            CAO
+        } muc_do;
+
+#### **3.5.Lưu ý**
 
 * **Tối ưu bộ nhớ:**
 
    ◦ Trong hệ thống nhúng, có thể sử dụng enum với kiểu dữ liệu rõ ràng (như uint8_t) bằng cách kết hợp với typedef
-```
-typedef enum { LOW = 0, HIGH } PinState_t __attribute__((packed));
-```
+
+        typedef enum { LOW = 0, HIGH } PinState_t __attribute__((packed));
+
 
 * **Kết hợp với bit fields:**
    
@@ -3906,13 +4225,14 @@ typedef enum { LOW = 0, HIGH } PinState_t __attribute__((packed));
    ◦ Sử dụng enum thay vì hằng số #define để tăng tính bảo trì và kiểm tra lỗi.
 
 
-### **7.4.Typedef (Tạo kiểu dữ liệu mới)**
+### **IV.Typedef (Tạo kiểu dữ liệu mới)**
 
-#### **7.4.1.Định nghĩa**
+#### **4.1.Định nghĩa**
 
-*  Typedef tạo bí danh(alias) cho kiểu dữ liệu hiện có, giúp mã dễ đọc và tăng tính tương thích
+*  `Typedef` tạo bí danh(alias) cho kiểu dữ liệu hiện có, giúp mã dễ đọc và tăng tính tương thích
 
-#### **7.4.2. Đặc điểm**
+#### **4.2. Đặc điểm**
+
 *  Không tạo kiểu mới, chỉ đặt tên khác
 
 *  Ứng dụng: 
@@ -3922,185 +4242,469 @@ typedef enum { LOW = 0, HIGH } PinState_t __attribute__((packed));
    ◦ Tăng tính rõ ràng và khả năng bảo trì.
 
    ◦ Cải thiện tính tương thích (portability) giữa các nền tảng.
-#### **7.4.3. Cú pháp**
 
-```
-typedef existing_type new_type_name;
+#### **4.3. Cú pháp**
 
-```
 
-#### **7.4.4. Ứng dụng**
+        typedef existing_type new_type_name;
 
-   ◦ Rút gọn struct: 
-   `typedef struct { int x; int y; } Diem;`
 
-   ◦ Rút gọn con trỏ hàm: 
-   `typedef int (*HamTinhToan) (int,int);`
 
-   ◦ portability: 
-   `typedef unsigned char BYTE;`
+#### **4.4. Ứng dụng**
 
-### **7.5.Kích thước của Struct và Union**
+* **Rút gọn struct:**
 
-#### **7.5.1.Kích thước của Struct**
+        #include <stdio.h>
+
+        typedef struct {
+            int x, y;
+        } Diem;  // Alias cho struct
+
+        int main() {
+            Diem p = {1, 2};
+            printf("Point: (%d, %d)\n", p.x, p.y);
+            return 0;
+        }
+
+* **Rút gọn con trỏ hàm:**
+
+        typedef int (*HamTinhToan)(int, int);  // Alias
+
+        int add(int a, int b) { return a + b; }
+
+        int main() {
+            HamTinhToan op = add;
+            printf("Sum: %d\n", op(5, 3));  // 8
+            return 0;
+        }
+
+* portability: 
+
+        typedef unsigned char BYTE;
+
+### **V.SIZE của Struct và Union**
+
+#### **5.1.SIZE của Struct**
+
+##### **5.1.1.Khái niệm**
 
 * Kích thước của struct là tổng kích thước của tất cả thành viên, cộng thêm **byte đệm (padding)** để đảm bảo **căn chỉnh bộ nhớ (alignment)** 
 
-* **Alignment:**
+* Alignment là yêu cầu về địa chỉ bộ nhớ mà một biến phải bắt đầu. Địa chỉ này phải chia hết cho giá trị alignment.
 
-   ◦ Mỗi kiểu dữ liệu có yêu cầu căn chỉnh riêng, thường là bội số của kích thước kiểu (ví dụ: `int` 4 bytes căn chỉnh tại địa chỉ chia hết cho 4, `double` 8 bytes căn chỉnh tại địa chỉ chia hết cho 8)
+* Offset là khoảng cách tính từ điểm bắt đầu của một cấu trúc (struct/union) đến vị trí của một thành viên cụ thể.
 
-   ◦ Struct được căn chỉnh theo **yêu cầu căn chỉnh lớn nhất** của bất kỳ thành viên ngoài
+##### **5.1.2.Nguyên tắc căn chỉnh**
 
-* **Padding:**
+* **Quy tắc căn chỉnh:**
 
-   ◦ Trình biên dịch thêm byte đệm giữa các thành viên hoặc cuối struct để đảm bảo mỗi thành viên nằm ở địa chỉ phù hợp
+   ◦ Mỗi kiểu dữ liệu có alignment requirement riêng
 
-   ◦ Kích thước struct phải là bội số của yêu cầu căn chỉnh lớn nhất để hỗ trợ mảng struct
+   ◦ Biến phải được đặt tại địa chỉ chia hết cho alignment của nó
 
-* **Công thức tính:**
+   ◦ Struct có alignment bằng alignment của thành viên lớn nhất
 
-   ◦ 1. Xác định kích thước và yêu cầu căn chỉnh của từng thành viên
+    | Kiểu dữ liệu | Kích thước | Alignment |
+    |--------------|------------|-----------|
+    | char         | 1 byte     | 1 byte    |
+    | short        | 2 bytes    | 2 bytes   |
+    | int          | 4 bytes    | 4 bytes   |
+    | float        | 4 bytes    | 4 bytes   |
+    | double       | 8 bytes    | 8 bytes   |
+    | pointer      | 4/8 bytes  | 4/8 bytes |
 
-   ◦ 2. Thêm padding giữa các thành viên để căn chỉnh địa Chỉ
+##### **5.1.3.Các bước tính kích thước struct**
 
-   ◦ 3. Thêm padding cuối struct để kích thước tổng là bội số của yêu cầu căn chỉnh lớn nhất
+* **Bước 1: Xác định alignment của struct**
 
-* **Yếu tố ảnh hưởng**
+   ◦ Mỗi kiểu dữ liệu có alignment requirement riêng
 
-   ◦ Kiến trúc CPU (32 bit vs 64 bit)
+        Alignment_struct = max(alignment_các_thành_viên)
 
-   ◦ Trình biên dịch
+* **Bước 2: Sắp xếp và thêm padding**
 
-   ◦ Thứ tự khai báo thành viên
+   ◦ Mỗi thành viên phải ở offset chia hết cho alignment của nó
 
-* **VD1:**
+   ◦ Thêm padding giữa các thành viên nếu cần 
 
-```
-struct Example {
-    char c;    // 1 byte
-    int i;     // 4 bytes
-    double d;  // 8 bytes
-};
+   ◦ Thêm padding cuối struct để chia hết cho alignment_struct  
 
-```
-Tính toán kích thước (hệ 64 bit)
-```
- char c: 1 byte, căn chỉnh 1 byte -> offset 0
- int i: 4 bytes, căn chỉnh 4 bytes -> cần offset chia hết cho 4,nên thêm 3 bytes padding sau c -> offset: 4 (1 + 3)
- double d: 8 bytes, căn chỉnh 8 bytes -> cần offset chia hết cho 8,nên thêm 4 bytes padding sau i -> offset: 12 (4 + 4 + 4)
+##### **5.1.4.VD**
 
- => Tổng: 12 + 8 = 20 bytes
+* **Struct đơn giản:**
 
- => Struct cần căn chỉnh 8 bytes (lớn nhất trong các thành viên), nên thêm 4 byte padding cuối -> KÍCH THƯỚC: 24 BYTES
-```
+        struct Example1 {
+            char a;     // 1 byte
+            int b;      // 4 bytes
+            char c;     // 1 byte
+        };
 
-Loại bỏ padding
-```
-struct Example {
-    char c;
-    int i;
-    double d;
-} __attribute__((packed));
+   ◦ Tính toán
 
-=> KÍCH THƯỚC: 1 + 4 + 8 = 13 bytes
-```
+        Offset 0: char a (1 byte)
+        Offset 1: padding (3 bytes) - vì int cần alignment 4 bytes
+        Offset 4: int b (4 bytes)
+        Offset 8: char c (1 byte)
+        Offset 9: padding (3 bytes) - để size chia hết cho 4 (alignment của int)
+        Tổng: 12 bytes
 
-* **VD2:**
+   ◦ Kiểm tra
 
-```
-struct Example2 {
-    double d;  // 8 bytes
-    int i;     // 4 bytes
-    char c;    // 1 byte
-};
+        #include <stdio.h>
 
-```
-Tính toán kích thước (hệ 64 bit)
-```
-double d: 8 bytes, căn chỉnh 8 bytes → offset 0.
-int i: 4 bytes, căn chỉnh 4 bytes → offset 8 (không cần padding).
-char c: 1 byte, căn chỉnh 1 byte → offset 12 (8 + 4).
+        struct Example1 {
+            char a;
+            int b;
+            char c;
+        };
 
-=> Tổng: 12 + 1 = 13 bytes.
+        int main() {
+            printf("Sizeof Example1: %lu bytes\n", sizeof(struct Example1));
+            printf("Offset a: %lu\n", (size_t)&((struct Example1*)0)->a);
+            printf("Offset b: %lu\n", (size_t)&((struct Example1*)0)->b);
+            printf("Offset c: %lu\n", (size_t)&((struct Example1*)0)->c);
+            return 0;
+        }
 
-=> Căn chỉnh struct: 8 bytes → thêm 3 byte padding cuối → Kích thước: 16 bytes.
+* **Tối ưu hóa bằng sắp xếp lại:**
 
-=> Thứ tự khai báo ảnh hưởng padding, nên đặt thành viên lớn trước có thể giảm kích thước.
+        // Struct chưa tối ưu
+        struct BadLayout {
+            char a;     // 1 byte
+            int b;      // 4 bytes
+            char c;     // 1 byte
+            double d;   // 8 bytes
+        };
 
-```
+   ◦ Tính toán
 
-#### **7.5.2.Kích thước của Union**
+        Offset 0: char a (1 byte)
+        Offset 1: padding (3 bytes)
+        Offset 4: int b (4 bytes)
+        Offset 8: char c (1 byte)
+        Offset 9: padding (7 bytes) - vì double cần alignment 8 bytes
+        Offset 16: double d (8 bytes)
+        Offset 24: padding (0 bytes) - đã chia hết cho 8
+        Tổng: 24 bytes
 
-* Kích thước của union (sizeof(union)) bằng kích thước của **thành viên lớn nhất**, cộng thêm padding (nếu cần) để đảm bảo căn chỉnh bộ nhớ.
+   ◦ Struct tối ưu:
 
-* **Alignment:**
+        struct GoodLayout {
+            double d;   // 8 bytes
+            int b;      // 4 bytes
+            char a;     // 1 byte
+            char c;     // 1 byte
+        };
 
-   ◦ Union được căn chỉnh theo yêu cầu căn chỉnh lớn nhất của bất kỳ thành viên nào.
+   ◦ Tính toán:
 
-   ◦ Tất cả thành viên chia sẻ cùng vị trí bộ nhớ, nên không có padding giữa các thành viên.
+        Offset 0: double d (8 bytes)
+        Offset 8: int b (4 bytes)
+        Offset 12: char a (1 byte)
+        Offset 13: char c (1 byte)
+        Offset 14: padding (2 bytes) - để chia hết cho 8
+        Tổng: 16 bytes
+
+* **Struct với các kiểu phức tạp:**
+
+        struct Complex {
+            short s;        // 2 bytes
+            char c;         // 1 byte
+            int i;          // 4 bytes
+            double d;       // 8 bytes
+            char arr[3];    // 3 bytes
+        };
+
+   ◦ Tính toán
+
+        Offset 0: short s (2 bytes)
+        Offset 2: char c (1 byte)
+        Offset 3: padding (1 byte) - vì int cần alignment 4
+        Offset 4: int i (4 bytes)
+        Offset 8: double d (8 bytes)
+        Offset 16: char arr[3] (3 bytes)
+        Offset 19: padding (5 bytes) - để chia hết cho 8 (alignment của double)
+        Tổng: 24 bytes
+
+   ◦ Công cụ kiểm tra offset:
+
+        #include <stdio.h>
+        #include <stddef.h> // for offsetof
+
+        struct TestStruct {
+            char a;
+            int b;
+            double c;
+            char d;
+        };
+
+        void print_offsets() {
+            printf("Offset of a: %lu\n", offsetof(struct TestStruct, a));
+            printf("Offset of b: %lu\n", offsetof(struct TestStruct, b));
+            printf("Offset of c: %lu\n", offsetof(struct TestStruct, c));
+            printf("Offset of d: %lu\n", offsetof(struct TestStruct, d));
+            printf("Total size: %lu\n", sizeof(struct TestStruct));
+        }
+
+* **Struct chứa struct:**
+
+        struct Inner {
+            int a;      // 4 bytes
+            char b;     // 1 byte
+        };              // size = 8 bytes (với padding)
+
+        struct Outer {
+            char x;             // 1 byte
+            struct Inner inner; // 8 bytes
+            double y;           // 8 bytes
+        };
+
+   ◦ Tính toán
+
+        Offset 0: char x (1 byte)
+        Offset 1: padding (3 bytes) - vì struct Inner có alignment 4
+        Offset 4: struct Inner (8 bytes)
+            - Offset 4: int a (4 bytes)
+            - Offset 8: char b (1 byte)
+            - Offset 9: padding (3 bytes)
+        Offset 12: padding (4 bytes) - vì double cần alignment 8
+        Offset 16: double y (8 bytes)
+        Tổng: 24 bytes
+
+* **Struct với mảng:**
+
+        struct WithArray {
+            int a;          // 4 bytes
+            char arr[5];    // 5 bytes
+            double b;       // 8 bytes
+        };
 
 
-* **Công thức tính:**
+   ◦ Tính toán
 
-   ◦ 1. Xác định kích thước lớn nhất của các thành viên.
+        Offset 0: int a (4 bytes)
+        Offset 4: char arr[5] (5 bytes)
+        Offset 9: padding (7 bytes) - vì double cần alignment 8
+        Offset 16: double b (8 bytes)
+        Tổng: 24 bytes
 
-   ◦ 2. Đảm bảo kích thước union là bội số của yêu cầu căn chỉnh lớn nhất.
 
-* **Yếu tố ảnh hưởng**
+##### **5.1.5.Quy tắc tổng hợp**
 
-   ◦ Kiến trúc CPU (32 bit vs 64 bit)
+* **Quy tắc 1: Member Alignment**
 
-   ◦ Trình biên dịch
+   ◦ Mỗi thành viên phải ở offset chia hết cho alignment của nó.
 
-   ◦ Kích thước và yêu cầu căn chỉnh của thành viên lớn nhất.
+* **Quy tắc 2: Struct Alignment**
 
-* **VD1:**
+   ◦ Kích thước struct phải chia hết cho alignment của thành viên lớn nhất.
 
-```
-union Data {
-    char c;     // 1 byte
-    int i;      // 4 bytes
-    double d;   // 8 bytes
-};
+* **Quy tắc 3: Padding Strategy**
 
-```
-Tính toán kích thước (hệ 64 bit)
-```
-Thành viên lớn nhất: double d (8 bytes).
-Yêu cầu căn chỉnh lớn nhất: 8 bytes.
-Kích thước union: 8 bytes (không cần padding thêm vì 8 đã là bội số của 8).
+        // Chiến lược thêm padding:
+        current_offset = 0;
+        for each member in struct:
+            alignment = alignment_of(member);
+            padding = (alignment - (current_offset % alignment)) % alignment;
+            current_offset += padding + sizeof(member);
+        end for
+        // Thêm padding cuối để chia hết cho alignment lớn nhất
 
-```
+##### **5.1.6.Công thức tính nhanh**
 
-Loại bỏ padding
-```
-union Data {
-    char c;
-    int i;
-    double d;
-} __attribute__((packed));
+        // Giả sử struct có các thành viên với kích thước: s1, s2, s3...
+        // và alignments: a1, a2, a3...
 
-=> KÍCH THƯỚC: 8 bytes vì thành viên lớn nhất (double) yêu cầu tối thiểu 8 bytes.
-```
+        size = 0;
+        max_align = 1;
 
-* **VD2:**
+        for each member:
+            align = alignment_of(member);
+            max_align = max(max_align, align);
+            padding = (align - (size % align)) % align;
+            size += padding + sizeof(member);
+        end for
 
-```
-union Data2 {
-    char arr[7]; // 7 bytes
-    int i;       // 4 bytes
-};
+        // Padding cuối
+        final_padding = (max_align - (size % max_align)) % max_align;
+        total_size = size + final_padding;
 
-```
-Tính toán kích thước (hệ 64 bit)
-```
-hành viên lớn nhất: char arr[7] (7 bytes).
-Yêu cầu căn chỉnh lớn nhất: 4 bytes (int i).
-Kích thước union: 7 bytes, nhưng phải là bội số của 4 → thêm 1 byte padding → Kích thước: 8 bytes.
+#### **5.2.Size của Union**
 
-```
+##### **5.2.1.Khái niệm**
+
+* Tất cả thành viên dùng chung một vùng nhớ
+
+* Bằng kích thước của thành viên lớn nhất
+
+* Bằng alignment requirement của thành viên lớn nhất
+
+##### **5.2.2.Công thức tính size union**
+
+        size_union = max(sizeof(member1), sizeof(member2), ...)
+        alignment_union = max(alignment(member1), alignment(member2), ...)
+
+##### **5.2.3.Các bước tính kích thước union**
+
+* **Bước 1: Tìm thành viên lớn nhất**
+
+        largest_member = member có kích thước lớn nhất
+
+* **Bước 2: Xác định alignment của union**
+
+        alignment_union = alignment của thành viên lớn nhất
+
+
+* **Bước 3: Thêm padding nếu cần**
+
+        size_union = sizeof(largest_member) + padding
+        // Padding được thêm để size_union chia hết cho alignment_union
+
+##### **5.2.4.VD**
+
+* **Union cơ bản**
+
+        union BasicUnion {
+            char a;     // 1 byte, alignment 1
+            int b;      // 4 bytes, alignment 4
+            double c;   // 8 bytes, alignment 8
+        };
+
+   ◦ Tính toán:
+
+        - Thành viên lớn nhất: double c (8 bytes)
+        - Alignment union: max(1, 4, 8) = 8
+        - Kích thước union: 8 bytes (không cần padding vì 8 ÷ 8 = 1)
+        Tổng: 8 bytes
+
+   ◦ Kiểm tra:
+
+        #include <stdio.h>
+
+        union BasicUnion {
+            char a;
+            int b;
+            double c;
+        };
+
+        int main() {
+            printf("Sizeof BasicUnion: %lu bytes\n", sizeof(union BasicUnion));
+            printf("Alignment requirement:\n");
+            printf("char: %lu, int: %lu, double: %lu\n", 
+                _Alignof(char), _Alignof(int), _Alignof(double));
+            return 0;
+        }
+
+* **Union với mảng:**
+
+        union WithArray {
+            int x;          // 4 bytes, alignment 4
+            char arr[10];   // 10 bytes, alignment 1
+            double y;       // 8 bytes, alignment 8
+        };
+
+   ◦ Tính toán:
+
+        - Thành viên lớn nhất: char arr[10] (10 bytes)
+        - Alignment union: max(4, 1, 8) = 8
+        - Kích thước cần: 10 bytes
+        - Padding cần thêm: (8 - (10 % 8)) % 8 = 6 bytes
+        - Tổng: 10 + 6 = 16 bytes
+
+* **Union với struct:**
+
+        struct Point {
+            int x;      // 4 bytes
+            int y;      // 4 bytes
+        };              // size = 8 bytes, alignment = 4
+
+        union UnionWithStruct {
+            char a;             // 1 byte, alignment 1
+            struct Point p;     // 8 bytes, alignment 4
+            double d;           // 8 bytes, alignment 8
+        };
+
+   ◦ Tính toán:
+
+        - Thành viên lớn nhất: struct Point p và double d (8 bytes)
+        - Alignment union: max(1, 4, 8) = 8
+        - Kích thước union: 8 bytes (không cần padding)
+        Tổng: 8 bytes
+
+* **Union có thành viên cần alignment lớn:**
+
+        union ComplexUnion {
+            char a;         // 1 byte, alignment 1
+            int b;          // 4 bytes, alignment 4
+            long double c;  // 16 bytes, alignment 16 (tùy hệ thống)
+        };
+
+   ◦ Tính toán:
+
+        - Thành viên lớn nhất: long double c (16 bytes)
+        - Alignment union: 16
+        - Kích thước union: 16 bytes
+        Tổng: 16 bytes
+
+* **Union với mảng kích thước lẻ:**
+
+        union OddArrayUnion {
+            short s;        // 2 bytes, alignment 2
+            char arr[7];    // 7 bytes, alignment 1
+            int i;          // 4 bytes, alignment 4
+        };
+
+   ◦ Tính toán:
+
+        - Thành viên lớn nhất: char arr[7] (7 bytes)
+        - Alignment union: max(2, 1, 4) = 4
+        - Kích thước cần: 7 bytes
+        - Padding: (4 - (7 % 4)) % 4 = 1 byte
+        - Tổng: 7 + 1 = 8 bytes
+
+
+* **Union trong union:**
+
+        union Inner {
+            int a;      // 4 bytes
+            double b;   // 8 bytes
+        };              // size = 8, alignment = 8
+
+        union Outer {
+            char x;             // 1 byte
+            union Inner inner;  // 8 bytes
+            long y;             // 8 bytes
+        };
+
+   ◦ Tính toán:
+
+        - Thành viên lớn nhất: union Inner inner và long y (8 bytes)
+        - Alignment union: max(1, 8, 8) = 8
+        - Kích thước union: 8 bytes
+        Tổng: 8 bytes
+
+* **Union chứa struct có padding:**
+
+        struct PaddedStruct {
+            char a;     // 1 byte
+            int b;      // 4 bytes
+        };              // size = 8 bytes (với padding), alignment = 4
+
+        union UnionWithPadded {
+            char x;                 // 1 byte
+            struct PaddedStruct s;  // 8 bytes
+            double y;               // 8 bytes
+        };
+
+   ◦ Tính toán:
+
+        - Thành viên lớn nhất: struct PaddedStruct s và double y (8 bytes)
+        - Alignment union: max(1, 4, 8) = 8
+        - Kích thước union: 8 bytes
+        Tổng: 8 bytes
+
 </details> 
+
 <details> 
  <summary><strong>BÀI 8:Memory Layout</strong></summary>
 
