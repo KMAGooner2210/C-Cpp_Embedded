@@ -4706,19 +4706,21 @@ VD:
 </details> 
 
 <details> 
- <summary><strong>BÀI 8:Memory Layout</strong></summary>
+ <summary><strong>BÀI 8:MEMORY LAYOUT</strong></summary>
 
-## **Bài 8: Memory Layout**
+## **BÀI 8:MEMORY LAYOUT**
 
 ![Image](https://github.com/user-attachments/assets/0533640f-e379-42a7-a204-6e873241a0c6)
 
-### **8.1.Text Segment(.text)**
+### **I.Text Segment(.text)**
 
-#### **8.1.1.Mục đích**
+#### **1.1.Mục đích**
+
+* Vùng lưu mã thực thi (executable code).
 
 * Lưu trữ mã máy đã được biên dịch từ mã nguồn C, bao gồm các lệnh thực thi của chương trình
 
-#### **8.1.2.Đặc điểm**
+#### **1.2.Đặc điểm**
 
 * Chỉ đọc (read-only) để bảo vệ mã lệnh khỏi bị sửa đổi trong lúc chạy
 
@@ -4726,56 +4728,79 @@ VD:
 
 * Thường nằm ở vùng địa chỉ thấp của bộ nhớ
 
-VD: Các hàm như main(), các vòng lặp,câu lệnh điều kiện và các hàm khác đều được lưu ở đây
+        #include <stdio.h>
 
+        int main() {
+            printf("In text segment.\n");  // Mã này lưu ở .text
+            return 0;
+        }
 
+   ◦ Biên dịch: `gcc -o prog prog.c`;
 
-### **8.2.Initialized Data Segment(.data)**
+   ◦ Xem: `objdump -d prog | grep main`;   
 
-#### **8.2.1.Mục đích**
+### **II.Initialized Data Segment(.data)**
+
+#### **2.1.Mục đích**
 
 * Lưu trữ các biến toàn cục và biến tĩnh được khởi tạo với giá trị khác 0 trong mã nguồn. 
 
 
-#### **8.2.2.Đặc điểm**
+#### **2.2.Đặc điểm**
 
 * Có thể đọc và ghi (read-write)
 
 * Kích thước được xác định tại thời điểm biên dịch
 
 * Các giá trị khởi tạo được lưu trực tiếp trong file thực thi, do đó làm tăng kích thước file
-```
-int global_value = 100; // Lưu trong .data
-static int static_value = 50; // Lưu trong .data
-```
 
+        #include <stdio.h>
 
-### **8.3.Unitialized Data Segment(.bss)**
+        int global_value = 100;    // .data
+        static int static_value = 50;  // .data
 
-#### **8.3.1.Mục đích**
+        int main() {
+            printf("Global: %d, Static: %d\n", global_value, static_value);
+            return 0;
+        }
+
+   ◦ Xem: `objdump -t prog | grep global_value`;   
+
+### **III.Unitialized Data Segment(.bss)**
+
+#### **3.1.Mục đích**
 
 * Lưu trữ các biến toàn cục và biến tĩnh không được khởi tạo tường minh hoặc được khởi tạo bằng 0
 
-#### **8.3.2.Đặc điểm**
+#### **3.2.Đặc điểm**
 
 * Có thể đọc và ghi (read-write)
 
 * Hệ điều hành tự động khởi tạo tất cả các giá trị trong vùng này thành 0 khi chương trình bắt đầu
 
 * Không lưu giá trị cụ thể trong file thực thi, giúp tiết kiệm không gian
-```
-int global_zero; //Lưu trong .bss
-static float static_uninit; //Lưu trong .bss
-```
 
-### **8.4.Heap**
 
-#### **8.4.1.Mục đích**
+        #include <stdio.h>
+
+        int global_zero;           // .bss (init 0)
+        static float static_uninit;  // .bss (init 0)
+
+        int main() {
+            printf("Global zero: %d, Static uninit: %f\n", global_zero, static_uninit);
+            return 0;
+        }
+
+        Output: Global zero: 0, Static uninit: 0.000000
+
+### **IV.Heap**
+
+#### **4.1.Mục đích**
 
 * Vùng nhớ động được cấp phát và giải phóng trong lúc chạy chương trình thông qua các hàm như `malloc()`,`calloc()`,`realloc()` và `free()`
 
 
-#### **8.4.2.Đặc điểm**
+#### **4.2.Đặc điểm**
 
 * Kích thước có thể thay đổi động (tăng hoặc giảm ) trong quá trình thực thi
 
@@ -4791,21 +4816,30 @@ static float static_uninit; //Lưu trong .bss
 
    ◦ Fragmentation: Bộ nhớ bị chia thành các mảnh nhỏ,gây khó khăn cho việc cấp phát các khối lớn
 
-vd:
-```
-int *ptr = malloc(10 * sizeof(int));
-free(ptr);
+        #include <stdio.h>
+        #include <stdlib.h>
 
-```
+        int main() {
+            int *ptr = malloc(10 * sizeof(int));  // Heap
+            if (ptr) {
+                ptr[0] = 42;
+                printf("Heap value: %d\n", ptr[0]);
+                free(ptr);  // Tránh leak
+                // ptr[0] = 99;  // Use-after-free: UB!
+            }
+            return 0;
+        }
 
-### **8.5.Stack**
+        Debug: Valgrind valgrind --leak-check=full ./prog.
 
-#### **8.5.1.Mục đích**
+### **V.Stack**
+
+#### **5.1.Mục đích**
 
 * Lưu trữ các biến cục bộ, tham số hàm, địa chỉ trả về, và trạng thái thanh ghi khi gọi hàm
 
 
-#### **8.5.2.Đặc điểm**
+#### **5.2.Đặc điểm**
 
 * Hoạt động theo cơ chế LIFO
 
@@ -4815,29 +4849,53 @@ free(ptr);
 
 * Kích thước stack thường cố định, được xác định bởi hệ điều hành hoặc trình biên dịch.Vượt quá kích thước có thể gây ra stack overflow
 
-vd:
-```
-void func(int param){
-    int local_var = 10; //Lưu trên stack
-}
+        #include <stdio.h>
 
-```
+        void func(int param) {
+            int local_var = 10;  // Stack
+            printf("Param: %d, Local: %d\n", param, local_var);
+        }
 
-### **8.6.Các vùng bộ nhớ phụ khác**
+        int main() {
+            func(20);
+            return 0;
+        }
 
-#### **8.6.1.Environment/Arguments Segment**
+### **VI.Các vùng bộ nhớ phụ khác**
 
-* Lưu trữ các biến môi trường và các tham số dòng lệnh(argc, argv) được truyền vào chương trình
+#### **6.1.Environment/Arguments Segment**
+
+* Lưu trữ các biến môi trường và các tham số dòng lệnh(`argc, argv`) được truyền vào chương trình
 
 * Thường nằm ở vùng địa chỉ cao, gần stack
 
+        #include <stdio.h>
 
-#### **8.6.2. Memory Mapping Segment**
+        int main(int argc, char *argv[]) {
+            printf("Args: %d\n", argc);
+            for (int i = 0; i < argc; i++) printf("Arg %d: %s\n", i, argv[i]);
+            // Env: extern char **environ; printf("%s\n", environ[0]);
+            return 0;
+        }
+
+#### **6.2. Memory Mapping Segment**
 
 * Dùng cho các file ánh xạ bộ nhớ (memory-mapped files) hoặc các thư viện động được nạp vào bộ nhớ
 
 * Vị trí và cách sử dụng phụ thuộc vào hệ điều hành
 
+        #include <sys/mman.h>
+        #include <fcntl.h>
+        #include <stdio.h>
+
+        int main() {
+            int fd = open("file.txt", O_RDONLY);
+            char *map = mmap(NULL, 1024, PROT_READ, MAP_PRIVATE, fd, 0);  // Mmap segment
+            printf("Mapped: %s\n", map);  // Nội dung file
+            munmap(map, 1024);
+            close(fd);
+            return 0;
+        }
 
 </details>
 <details> 
