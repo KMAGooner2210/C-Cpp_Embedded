@@ -3204,7 +3204,7 @@ VD:
 
         int main() {
             int *arr = malloc(sizeof(int) * 100);
-            if (arr == NULL) {  // Sửa: == thay =
+            if (arr == NULL) { 
                 goto error;
             }
 
