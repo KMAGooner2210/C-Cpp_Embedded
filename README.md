@@ -2689,10 +2689,12 @@ VD:
 
     ◦  Output
 
-        File1: privateCounter = 1
-        This is private to file1.c
-        File1: privateCounter = 11
-        This is private to file1.c
+		File1: privateCounter = 1
+		This is private to file1.c
+		Private: 11
+		File1: privateCounter = 12
+		This is private to file1.c
+		Private: 22
 
 ##### **1.4.3.Không liên kết (No Linkage)**
 
