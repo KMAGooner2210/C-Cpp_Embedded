@@ -2370,20 +2370,35 @@ VD:
 * Không tự động giải phóng; quản lý thủ công để tránh leak.
 
 
-        #include <stdio.h>
-
-        void counter() {
-            static int count = 0;  // Khởi tạo một lần, giữ giá trị
-            count++;
-            printf("Count: %d\n", count);
-        }
-
-        int main() {
-            counter();  // 1
-            counter();  // 2
-            counter();  // 3
-            return 0;
-        }
+		#include <stdio.h>
+		#include <stdlib.h>  // Cho malloc/free
+		
+		int main() {
+		    int n = 5;
+		    int *arr = (int*)malloc(n * sizeof(int));  // Cấp phát động cho n phần tử int
+		    
+		    if (arr == NULL) {  // Kiểm tra lỗi cấp phát
+		        printf("Lỗi cấp phát bộ nhớ!\n");
+		        return 1;
+		    }
+		    
+		    // Sử dụng: Gán giá trị
+		    for (int i = 0; i < n; i++) {
+		        arr[i] = i * 2;  // Ví dụ: 0, 2, 4, 6, 8
+		    }
+		    
+		    // In ra
+		    printf("Mảng: ");
+		    for (int i = 0; i < n; i++) {
+		        printf("%d ", arr[i]);
+		    }
+		    printf("\n");
+		    
+		    free(arr); 
+		    arr = NULL; 
+		    
+		    return 0;
+		}
 
 #### **1.3. Vị trí bộ nhớ (Memory Location)** 
 
