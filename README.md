@@ -3605,6 +3605,8 @@ VD:
 *   Cú pháp:  `type member : width; (width = số bits, 1- sizeof(type)*8).`
 
 *   VD:
+
+  
         #include <stdio.h>
 
         struct Register {
