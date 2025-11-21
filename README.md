@@ -4725,7 +4725,7 @@ VD:
 </details> 
 
 <details> 
- <summary><strong>BÀI 8:MEMORY LAYOUT</strong></summary>
+ <summary><strong>BÀI 8: MEMORY LAYOUT</strong></summary>
 
 ## **BÀI 8:MEMORY LAYOUT**
 
