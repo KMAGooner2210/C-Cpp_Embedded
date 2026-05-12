@@ -1,3 +1,10 @@
+// ## **Ex3. Đặt Bit Thứ n** 
+// o	Yêu cầu: Viết hàm đặt (set) bit thứ n của một số nguyên không dấu thành 1
+// ```
+// o	Ví dụ: 
+// 	Input: value = 5 (nhị phân: 00000101), n = 3
+// 	Output: 13 (nhị phân: 00001101)
+// ```
 #include<stdio.h>
 #include<conio.h>
 
