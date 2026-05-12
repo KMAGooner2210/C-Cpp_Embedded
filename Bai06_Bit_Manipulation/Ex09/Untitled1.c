@@ -1,3 +1,13 @@
+// ## **Ex9.	Kiểm Tra Nhiều Bit Cùng Được Set**
+// o	Yêu cầu: Viết hàm kiểm tra xem tất cả các bit ở các vị trí cho trước trong một số nguyên không dấu có đều được set (bằng 1) hay không.
+// ```
+// o	Ví dụ: 
+// 	Input: value = 12 (nhị phân: 00001100), positions = [2, 3]
+// 	Output: true (cả bit 2 và 3 đều là 1)
+// 	Input: value = 12 (nhị phân: 00001100), positions = [2, 4]
+// 	Output: false (bit 4 là 0)
+// o	Gợi ý: Tạo mask bằng OR, sau đó dùng AND và so sánh.
+// ```
 #include<stdio.h>
 #include<conio.h>
 #include<stdint.h>
