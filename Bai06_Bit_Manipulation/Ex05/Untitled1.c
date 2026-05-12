@@ -1,3 +1,14 @@
+// ## **Ex5.	Đảo Bit Thứ n**
+
+// o	Yêu cầu: Viết hàm đảo (toggle) bit thứ n của một số nguyên không dấu (từ 0 thành 1 hoặc 1 thành 0).
+// ```
+// o	Ví dụ: 
+// 	Input: value = 5 (nhị phân: 00000101), n = 3
+// 	Output: 13 (nhị phân: 00001101)
+// 	Input: value = 13 (nhị phân: 00001101), n = 3
+// 	Output: 5 (nhị phân: 00000101)
+// o	Gợi ý: Sử dụng toán tử XOR (^).
+// ```
 #include<stdio.h>
 #include<conio.h>
 
