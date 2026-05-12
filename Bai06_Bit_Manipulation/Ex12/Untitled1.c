@@ -1,18 +1,42 @@
+// ## **Ex12. Thanh Ghi Phần Cứng Với Bit Fields**
+// •  Định nghĩa thanh ghi 16 bit
+
+// •	Sử dụng struct với bit fields để biểu diễn một thanh ghi 16 bit, gồm các trường: 
+// ```
+// o	interrupt: 1 bit (bit 0), giá trị 0-1 (0 = Tắt ngắt, 1 = Bật ngắt).
+// o	direction: 2 bit (bit 1-2), giá trị 0-3 (0 = Dừng, 1 = Tiến, 2 = Lùi, 3 = Xoay).
+// o	speed: 5 bit (bit 3-7), giá trị 0-31 (Tốc độ lấy mẫu hoặc điều khiển, ánh xạ: 0 = Tắt, 1-10 = Thấp, 11-20 = Trung bình, 21-31 = Cao).
+// o	reserved: 3 bit (bit 8-10), luôn giữ giá trị 0 (dự phòng).
+// o	data: 5 bit (bit 11-15), giá trị 0-31, đại diện cho nhiệt độ (ánh xạ tuyến tính 0-62°C, ví dụ: 20 = 40°C).
+// ```
+
+// •  Nhập liệu từ người dùng
+
+// •	Kiểm tra tính hợp lệ của giá trị nhập
+// ```
+// o	interrupt: 0-1.
+// o	direction: 0-3.
+// o	speed: 0-31.
+// o	data: 0-31.
+// ```
+// •	Nếu nhập sai (số âm, vượt phạm vi, hoặc không phải số), chương trình thông báo lỗi và yêu cầu nhập lại.
+
+// •  Cơ chế nhập lại và thoát
 
 #include <stdio.h>
 #include <stdint.h>
-#include <conio.h> // Thu vi?n cho getch() tr�n Windows
+#include <conio.h> // Thu vi?n cho getch() trên Windows
 
-// �?nh nghia struct cho thanh ghi 16 bit v?i bit fields
+// Ð?nh nghia struct cho thanh ghi 16 bit v?i bit fields
 typedef struct {
     uint16_t interrupt : 1;  // Bit 0: B?t/T?t ng?t (0-1)
     uint16_t direction : 2;  // Bit 1-2: Hu?ng truy?n (0-3)
     uint16_t speed : 5;      // Bit 3-7: T?c d? l?y m?u c?m bi?n (0-31)
-    uint16_t reserved : 3;   // Bit 8-10: D? ph�ng, lu�n 0
-    uint16_t data : 5;       // Bit 11-15: Nhi?t d? (0-31, tuong ?ng 0-62�C)
-} __attribute__((packed)) ControlRegister; // �?m b?o kh�ng padding
+    uint16_t reserved : 3;   // Bit 8-10: D? phòng, luôn 0
+    uint16_t data : 5;       // Bit 11-15: Nhi?t d? (0-31, tuong ?ng 0-62°C)
+} __attribute__((packed)) ControlRegister; // Ð?m b?o không padding
 
-// H�m ki?m tra gi� tr? h?p l?
+// Hàm ki?m tra giá tr? h?p l?
 int isValidInput(uint16_t interrupt, uint16_t direction, uint16_t speed, uint16_t data) {
     if (interrupt > 1) {
         printf("Loi: interrupt phai la 0 hoac 1.\n");
@@ -33,16 +57,16 @@ int isValidInput(uint16_t interrupt, uint16_t direction, uint16_t speed, uint16_
     return 1;
 }
 
-// H�m in gi� tr? nh? ph�n c?a thanh ghi 16 bit (t? MSB d?n LSB)
+// Hàm in giá tr? nh? phân c?a thanh ghi 16 bit (t? MSB d?n LSB)
 void printBinary(uint16_t value) {
     for (int i = 15; i >= 0; i--) {
         printf("%d", (value >> i) & 1);
-        if (i == 11 || i == 8 || i == 3 || i == 1) printf(" "); // Ph�n t�ch c�c tru?ng
+        if (i == 11 || i == 8 || i == 3 || i == 1) printf(" "); // Phân tách các tru?ng
     }
     printf("\n");
 }
 
-// H�m hi?n th? th�ng tin chi ti?t v? c�c tru?ng
+// Hàm hi?n th? thông tin chi ti?t v? các tru?ng
 void displayFieldInfo(ControlRegister reg, int isAfterProcessing) {
     printf("\nThong tin cac truong %s:\n", isAfterProcessing ? "sau xu ly" : "ban dau");
     // Interrupt
@@ -60,37 +84,37 @@ void displayFieldInfo(ControlRegister reg, int isAfterProcessing) {
     // Reserved
     printf("Reserved: %u (Luon giu 0)\n", reg.reserved);
     // Data
-    float temperature = (reg.data / 31.0) * 62.0; // T�nh nhi?t d? (�C)
-    printf("Data: %u/31 (Nhiet do: %.1f�C)%s\n", reg.data, temperature,
+    float temperature = (reg.data / 31.0) * 62.0; // Tính nhi?t d? (°C)
+    printf("Data: %u/31 (Nhiet do: %.1f°C)%s\n", reg.data, temperature,
            isAfterProcessing && reg.speed > 10 && reg.data > 0 ? " [Da tang do speed > 10]" : "");
 }
 
-// H�m nh?p gi� tr? v?i co ch? nh?p l?i v� tho�t b?ng ESC
+// Hàm nh?p giá tr? v?i co ch? nh?p l?i và thoát b?ng ESC
 int inputValue(const char *prompt, const char *guide, uint16_t *value, int min, int max) {
     char choice;
     while (1) {
         printf("%s\n%s", prompt, guide);
         printf("Gia tri: ");
-        if (scanf("%hu", value) != 1) { // Ki?m tra l?i nh?p kh�ng ph?i s?
-            while (getchar() != '\n'); // X�a buffer
+        if (scanf("%hu", value) != 1) { // Ki?m tra l?i nh?p không ph?i s?
+            while (getchar() != '\n'); // Xóa buffer
             printf("Loi: Vui long nhap so nguyen.\n");
         } else if (*value < min || *value > max) {
             printf("Loi: Gia tri phai trong khoang %d-%d.\n", min, max);
         } else {
-            while (getchar() != '\n'); // X�a buffer
+            while (getchar() != '\n'); // Xóa buffer
             return 1; // Nh?p h?p l?
         }
         printf("Nhan ESC de thoat, hoac bat ky phim nao de nhap lai...");
         choice = getch(); // S? d?ng getch() t? conio.h
-        if (choice == 27) { // Ph�m ESC
-            return 0; // Tho�t
+        if (choice == 27) { // Phím ESC
+            return 0; // Thoát
         }
         printf("\n");
     }
 }
 
 int main() {
-    // Bi?n d? luu gi� tr? nh?p t? ngu?i d�ng
+    // Bi?n d? luu giá tr? nh?p t? ngu?i dùng
     uint16_t init_interrupt, init_direction, init_speed, init_data;
 
     // Nh?p interrupt
@@ -131,31 +155,31 @@ int main() {
     reg.interrupt = init_interrupt;
     reg.direction = init_direction;
     reg.speed = init_speed;
-    reg.reserved = 0; // �?m b?o reserved = 0
+    reg.reserved = 0; // Ð?m b?o reserved = 0
     reg.data = init_data;
 
-    // �p ki?u v? uint16_t d? thao t�c v?i to�n b? thanh ghi
-    uint16_t *reg_value = (uint16_t*)&reg; // S?a t? (uint16_t*)� th�nh (uint16_t*)�
+    // Ép ki?u v? uint16_t d? thao tác v?i toàn b? thanh ghi
+    uint16_t *reg_value = (uint16_t*)&reg; // S?a t? (uint16_t*)® thành (uint16_t*)®
 
-    // In gi� tr? ban d?u
+    // In giá tr? ban d?u
     printf("\nGia tri thanh ghi ban dau (nhi phan, MSB -> LSB):\n");
     printBinary(*reg_value);
-    displayFieldInfo(reg, 0); // Hi?n th? th�ng tin ban d?u
+    displayFieldInfo(reg, 0); // Hi?n th? thông tin ban d?u
 
-    // X�a bit reserved (d?m b?o lu�n 0)
-    *reg_value &= ~(0x7 << 8); // Bitmask: 11111000 11111111 (x�a bit 8-10)
+    // Xóa bit reserved (d?m b?o luôn 0)
+    *reg_value &= ~(0x7 << 8); // Bitmask: 11111000 11111111 (xóa bit 8-10)
 
-    // Ki?m tra speed v� tang data n?u speed > 10
+    // Ki?m tra speed và tang data n?u speed > 10
     if (reg.speed > 10) {
-        if (reg.data < 31) { // �?m b?o data kh�ng vu?t qu� 31
+        if (reg.data < 31) { // Ð?m b?o data không vu?t quá 31
             reg.data += 1;
         }
     }
 
-    // In gi� tr? sau x? l�
+    // In giá tr? sau x? lý
     printf("\nGia tri thanh ghi sau xu ly (nhi phan, MSB -> LSB):\n");
     printBinary(*reg_value);
-    displayFieldInfo(reg, 1); // Hi?n th? th�ng tin sau x? l�
+    displayFieldInfo(reg, 1); // Hi?n th? thông tin sau x? lý
 
     return 0;
 }
