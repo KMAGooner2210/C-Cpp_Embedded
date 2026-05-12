@@ -1,3 +1,13 @@
+// ## **Ex6.	Đếm Số Bit 1** 
+// o	Yêu cầu: Viết hàm đếm số bit 1 trong biểu diễn nhị phân của một số nguyên không dấu.
+// ```
+// o	Ví dụ: 
+// 	Input: 5 (nhị phân: 00000101)
+// 	Output: 2 (có 2 bit 1)
+// 	Input: 15 (nhị phân: 00001111)
+// 	Output: 4
+// o	Gợi ý: Dùng vòng lặp và toán tử AND hoặc mẹo (value & (value - 1)) để xóa bit 1 thấp nhất.
+// ```
 #include<stdio.h>
 #include<conio.h>
 
