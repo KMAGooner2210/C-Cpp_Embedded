@@ -1,3 +1,14 @@
+// ## **Ex1.	Chuyển Đổi Số Thập Phân Sang Nhị Phân**
+// o	Yêu cầu: Viết hàm chuyển số thập phân (unsigned int) sang biểu diễn nhị phân dưới dạng chuỗi (string).
+// ```
+// o	Ví dụ: 
+
+// 	Input: 5
+// 	Output: "00000101" (giả sử 8 bit)
+// 	Input: 13
+// 	Output: "00001101"
+// o	Gợi ý: Sử dụng phép dịch bit (>>), toán tử AND (&) và lặp để kiểm tra từng bit.
+// ```
 #include<stdio.h>
 #include<string.h>
 #include<conio.h>
