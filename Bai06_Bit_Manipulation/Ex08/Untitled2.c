@@ -1,3 +1,11 @@
+// ## **Ex8.	Set Nhiều Bit Cùng Lúc** 
+// o	Yêu cầu: Viết hàm đặt (set) nhiều bit cụ thể (danh sách các vị trí) của một số nguyên không dấu thành 1.
+// ```
+// o	Ví dụ: 
+// 	Input: value = 0 (nhị phân: 00000000), positions = [2, 3, 5]
+// 	Output: 44 (nhị phân: 00101100)
+// o	Gợi ý: Tạo bitmask bằng cách OR nhiều mask đơn lẻ, sau đó áp dụng toán tử OR.
+// ```
 #include<stdio.h>
 #include<conio.h>
 #include<stdint.h>
