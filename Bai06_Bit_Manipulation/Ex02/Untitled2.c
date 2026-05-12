@@ -1,3 +1,13 @@
+// ## **Ex2.	Kiểm Tra Bit Thứ n** 
+// o	Yêu cầu: Viết hàm kiểm tra bit thứ n (tính từ 0) của một số nguyên không dấu (unsigned int) có được set (bằng 1) hay không.
+// ```
+// o	Ví dụ: 
+// 	Input: value = 5 (nhị phân: 00000101), n = 2
+// 	Output: true (bit 2 là 1)
+// 	Input: value = 5, n = 3
+// 	Output: false (bit 3 là 0)
+// o	Gợi ý: Sử dụng bitmask và toán tử AND.
+// ```
 #include<stdio.h>
 #include<stdbool.h>
 #include <conio.h>
