@@ -1,3 +1,12 @@
+// ## **Ex4.	Xóa Bit Thứ n** 
+// o	Yêu cầu: Viết hàm xóa (clear) bit thứ n của một số nguyên không dấu, tức là đặt bit đó thành 0.
+
+// ```
+// o	Ví dụ: 
+// 	Input: value = 13 (nhị phân: 00001101), n = 3
+// 	Output: 5 (nhị phân: 00000101)
+// o	Gợi ý: Sử dụng toán tử NOT (~) và AND (&) với bitmask.
+// ```
 #include<stdio.h>
 #include<conio.h>
 
