@@ -1,3 +1,47 @@
+// ## **Ex11.Sử Dụng Bit Fields**
+
+// Yêu cầu:
+
+// •  Định nghĩa struct: 
+
+// •	Sử dụng bit fields để lưu trữ thông tin cấu hình cho một thiết bị phần cứng: 
+// ```
+// o	enabled: 1 bit (bật/tắt thiết bị, 0 = tắt, 1 = bật).
+// o	mode: 3 bit (chế độ hoạt động, giá trị từ 0-7, với các chế độ được xác định như sau): 
+// 	0: Tắt (Off).
+// 	1: Tiết kiệm năng lượng (Low Power).
+// 	2: Bình thường (Normal).
+// 	3: Hiệu suất cao (High Performance).
+// 	4: Chẩn đoán (Diagnostic).
+// 	5: Cập nhật firmware (Firmware Update).
+// 	6: Chờ (Idle).
+// 	7: Khẩn cấp (Emergency).
+// o	priority: 4 bit (mức độ ưu tiên, giá trị từ 0-15, được phân loại như sau): 
+// 	0-3: Thấp (Low).
+// 	4-7: Trung bình (Medium).
+// 	8-11: Cao (High).
+// 	12-15: Rất cao (Critical).
+// ```
+// •	Tổng cộng 8 bit, giả định đóng gói trong 1 byte.
+
+// •  Viết chương trình: 
+
+// •	Khởi tạo: Khởi tạo struct với enabled = 1 (thiết bị bật), mode = 3 (chế độ hiệu suất cao), priority = 10 (ưu tiên cao).
+
+// •	Kiểm tra tính hợp lệ: 
+// ```
+// o	Đảm bảo enabled là 0 hoặc 1.
+// o	Đảm bảo mode từ 0 đến 7.
+// o	Đảm bảo priority từ 0 đến 15.
+// o	Nếu bất kỳ giá trị nào không hợp lệ, in thông báo lỗi và dừng chương trình.
+// ```
+// •	In trạng thái: 
+// ```
+// o	In giá trị của enabled với mô tả "Thiết bị: Bật" hoặc "Tắt".
+// o	In giá trị của mode với tên chế độ tương ứng (ví dụ: "Chế độ: Hiệu suất cao").
+// o	In giá trị của priority với mức ưu tiên tương ứng (ví dụ: "Ưu tiên: Cao").
+// o	In biểu diễn nhị phân của toàn bộ struct (8 bit, dự kiến: 11001011).
+// ```
 #include <stdio.h>
 #include <stdint.h>
 
